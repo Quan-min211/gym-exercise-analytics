@@ -1,0 +1,141 @@
+# ============================================================
+# 🚫 AI TOOLS — không commit vào repo
+# ============================================================
+spec-kit/
+taste-skill/
+impeccable/
+
+# ============================================================
+# 💻 IDE & Editor cá nhân
+# ============================================================
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# JetBrains (PyCharm, WebStorm, IntelliJ...)
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim / Neovim
+*.swp
+*.swo
+*~
+.netrwhist
+
+# Cursor
+.cursor/
+
+# ============================================================
+# 🖥️ Hệ điều hành
+# ============================================================
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+.directory
+
+# ============================================================
+# 🐍 Python (DA / DE tools)
+# ============================================================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.tox/
+.nox/
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ============================================================
+# 📦 Node.js (Web / JS tools)
+# ============================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnp/
+.pnp.js
+.yarn/install-state.gz
+dist/
+.next/
+.nuxt/
+.svelte-kit/
+
+# ============================================================
+# 🔑 Secrets & Config cá nhân
+# ============================================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+secrets.json
+config.local.*
+credentials.json
+service-account*.json
+
+# ============================================================
+# 📊 Data files tạm / lớn (nếu cần)
+# ============================================================
+# Bỏ comment dòng dưới nếu không muốn commit raw data
+# data/
+# images/
+# videos/
+
+# ============================================================
+# 🗂️ Misc
+# ============================================================
+*.log
+*.tmp
+*.temp
+*.bak
+*.orig
+.cache/
+tmp/
+temp/

@@ -1,0 +1,112 @@
+/**
+ * FitData Hub — Design System Tokens
+ *
+ * Design read (taste-skill): fitness product app for gym-goers.
+ * Aesthetic: premium consumer, energetic but trustworthy.
+ * Dial settings: DESIGN_VARIANCE 7 / MOTION_INTENSITY 5 / VISUAL_DENSITY 5
+ *
+ * Palette: deep charcoal base + teal-green accent (fitness energy) + warm amber highlights.
+ * No AI-purple gradients, no generic glassmorphism, no flat card grids.
+ */
+
+:root {
+  /* ---- Brand Colors ---- */
+  --color-accent:          hsl(162, 72%, 40%);   /* teal-green — primary CTA */
+  --color-accent-light:    hsl(162, 72%, 52%);   /* hover lift */
+  --color-accent-dim:      hsl(162, 40%, 28%);   /* muted accent for borders */
+  --color-accent-glow:     hsl(162, 72%, 40%, 0.18);
+
+  --color-warm:            hsl(38, 90%, 56%);    /* amber — highlight / tag */
+  --color-warm-dim:        hsl(38, 60%, 38%);
+
+  /* ---- Surface / Background ---- */
+  --color-bg:              hsl(222, 20%, 8%);    /* page ground */
+  --color-bg-deep:         hsl(222, 22%, 5%);    /* deepest inset */
+  --color-surface:         hsl(222, 18%, 12%);   /* card / panel */
+  --color-surface-raised:  hsl(222, 16%, 16%);   /* elevated element */
+  --color-surface-hover:   hsl(222, 16%, 19%);   /* hover state */
+  --color-border:          hsl(222, 14%, 22%);   /* default border */
+  --color-border-strong:   hsl(162, 30%, 30%);   /* accent-tinted border */
+
+  /* ---- Text ---- */
+  --color-text-primary:    hsl(210, 20%, 94%);   /* headlines */
+  --color-text-secondary:  hsl(210, 12%, 72%);   /* body text */
+  --color-text-muted:      hsl(210, 10%, 52%);   /* captions, meta */
+  --color-text-disabled:   hsl(210, 8%, 36%);
+
+  /* ---- Semantic ---- */
+  --color-success:         hsl(142, 60%, 42%);
+  --color-warning:         hsl(38, 90%, 52%);
+  --color-danger:          hsl(0, 68%, 54%);
+  --color-info:            hsl(200, 72%, 52%);
+
+  /* ---- Typography ---- */
+  --font-display:  'Outfit', system-ui, sans-serif;
+  --font-body:     'Inter', system-ui, sans-serif;
+  --font-mono:     'JetBrains Mono', 'Fira Code', monospace;
+
+  --text-xs:   0.75rem;   /* 12px */
+  --text-sm:   0.875rem;  /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-lg:   1.125rem;  /* 18px */
+  --text-xl:   1.25rem;   /* 20px */
+  --text-2xl:  1.5rem;    /* 24px */
+  --text-3xl:  1.875rem;  /* 30px */
+  --text-4xl:  2.25rem;   /* 36px */
+  --text-5xl:  3rem;      /* 48px */
+
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-semibold: 600;
+  --weight-bold:    700;
+  --weight-black:   900;
+
+  --leading-tight:  1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+
+  /* ---- Spacing ---- */
+  --space-1:  0.25rem;  /* 4px */
+  --space-2:  0.5rem;   /* 8px */
+  --space-3:  0.75rem;  /* 12px */
+  --space-4:  1rem;     /* 16px */
+  --space-5:  1.25rem;  /* 20px */
+  --space-6:  1.5rem;   /* 24px */
+  --space-8:  2rem;     /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+
+  /* ---- Border Radius ---- */
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-sm:  0 1px 3px hsl(222, 30%, 4%, 0.4);
+  --shadow-md:  0 4px 12px hsl(222, 30%, 4%, 0.5);
+  --shadow-lg:  0 8px 24px hsl(222, 30%, 4%, 0.6);
+  --shadow-xl:  0 16px 48px hsl(222, 30%, 4%, 0.7);
+  --shadow-glow: 0 0 24px var(--color-accent-glow);
+
+  /* ---- Transitions ---- */
+  --transition-fast:   150ms ease;
+  --transition-base:   250ms ease;
+  --transition-slow:   400ms ease;
+  --transition-spring: 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ---- Layout ---- */
+  --max-width-sm:   640px;
+  --max-width-md:   768px;
+  --max-width-lg:   1024px;
+  --max-width-xl:   1280px;
+  --max-width-2xl:  1440px;
+
+  --sidebar-width: 260px;
+  --header-height: 64px;
+}

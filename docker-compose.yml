@@ -1,0 +1,99 @@
+services:
+
+  # ---------------------------------------------------------------------------
+  # PostgreSQL 16
+  # ---------------------------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-fitdata}
+      POSTGRES_USER: ${POSTGRES_USER:-fitdata}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fitdata_secret_change_me}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-fitdata} -d ${POSTGRES_DB:-fitdata}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ---------------------------------------------------------------------------
+  # ETL pipeline — runs once to seed the database, then exits
+  # ---------------------------------------------------------------------------
+  etl:
+    build:
+      context: .
+      dockerfile: de_pipeline/Dockerfile
+    env_file: .env
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-fitdata}
+      DB_USER: ${POSTGRES_USER:-fitdata}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-fitdata_secret_change_me}
+    volumes:
+      - ./data:/app/data:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"   # exit after one successful run
+
+  # ---------------------------------------------------------------------------
+  # FastAPI backend + frontend SPA
+  # ---------------------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file: .env
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-fitdata}
+      DB_USER: ${POSTGRES_USER:-fitdata}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-fitdata_secret_change_me}
+    volumes:
+      # Serve media files from host without baking them into the image
+      - ./images:/app/images:ro
+      - ./videos:/app/videos:ro
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      etl:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Jupyter Lab — Data Analysis notebooks (development only)
+  # Comment out or remove for production deployments.
+  # ---------------------------------------------------------------------------
+  jupyter:
+    image: quay.io/jupyter/scipy-notebook:latest
+    env_file: .env
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-fitdata}
+      DB_USER: ${POSTGRES_USER:-fitdata}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-fitdata_secret_change_me}
+      JUPYTER_ENABLE_LAB: "yes"
+    volumes:
+      - ./da_notebooks:/home/jovyan/work
+      - ./data:/home/jovyan/data:ro
+    ports:
+      - "8888:8888"
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles:
+      - dev   # only starts with: docker compose --profile dev up
+
+volumes:
+  postgres_data:

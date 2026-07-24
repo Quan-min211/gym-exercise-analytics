@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FitData Hub — Browse 800+ gym exercises with animated demonstrations, muscle targeting info, and step-by-step instructions.">
+  <title>FitData Hub — Exercise Library</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="site-logo" aria-label="FitData Hub home">
+        Fit<strong>Data</strong>Hub
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <ul>
+          <li><a href="/" aria-current="page">Exercises</a></li>
+          <li><a href="/recommend.html">Recommender</a></li>
+          <li><a href="/schedule.html">My Schedule</a></li>
+          <li><a href="/analytics.html">Analytics</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-content" aria-labelledby="page-title">
+
+      <!-- Page heading + search -->
+      <header class="section-header">
+        <div>
+          <h1 id="page-title">Exercise Library</h1>
+          <p class="text-muted mt-4">
+            Browse <strong id="total-count" class="text-accent">—</strong> exercises
+            across all muscle groups and equipment types.
+          </p>
+        </div>
+      </header>
+
+      <!-- Search bar -->
+      <search aria-label="Search exercises">
+        <form id="search-form" role="search">
+          <label for="search-input" class="visually-hidden">Search exercises by name</label>
+          <div class="search-bar">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+            </svg>
+            <input
+              type="search"
+              id="search-input"
+              class="input"
+              placeholder="Search by name, muscle, or movement…"
+              autocomplete="off"
+              aria-label="Search exercises"
+            >
+          </div>
+        </form>
+      </search>
+
+      <div class="layout-with-sidebar mt-8">
+
+        <!-- Filter sidebar -->
+        <aside class="filter-sidebar" aria-label="Exercise filters">
+
+          <section class="filter-group" aria-labelledby="filter-bodypart">
+            <h3 id="filter-bodypart">Body Part</h3>
+            <fieldset id="filter-body-part-list" aria-labelledby="filter-bodypart">
+              <legend class="visually-hidden">Filter by body part</legend>
+              <!-- Populated by JS -->
+            </fieldset>
+          </section>
+
+          <section class="filter-group" aria-labelledby="filter-equipment-label">
+            <h3 id="filter-equipment-label">Equipment</h3>
+            <fieldset id="filter-equipment-list" aria-labelledby="filter-equipment-label">
+              <legend class="visually-hidden">Filter by equipment</legend>
+            </fieldset>
+          </section>
+
+          <section class="filter-group" aria-labelledby="filter-muscle-label">
+            <h3 id="filter-muscle-label">Target Muscle</h3>
+            <fieldset id="filter-muscle-list" aria-labelledby="filter-muscle-label">
+              <legend class="visually-hidden">Filter by target muscle</legend>
+            </fieldset>
+          </section>
+
+          <button class="btn btn-ghost btn-sm w-full" id="clear-filters-btn" type="button">
+            Clear all filters
+          </button>
+        </aside>
+
+        <!-- Exercise grid + pagination -->
+        <section class="main-area" aria-labelledby="page-title">
+          <div id="exercise-grid" class="exercise-grid" aria-live="polite" aria-label="Exercise results">
+            <!-- Skeleton placeholders while loading -->
+            <article class="card exercise-card skeleton" aria-hidden="true" style="height:320px"></article>
+            <article class="card exercise-card skeleton" aria-hidden="true" style="height:320px"></article>
+            <article class="card exercise-card skeleton" aria-hidden="true" style="height:320px"></article>
+            <article class="card exercise-card skeleton" aria-hidden="true" style="height:320px"></article>
+            <article class="card exercise-card skeleton" aria-hidden="true" style="height:320px"></article>
+            <article class="card exercise-card skeleton" aria-hidden="true" style="height:320px"></article>
+          </div>
+
+          <nav class="pagination" id="pagination" aria-label="Exercises pagination"></nav>
+        </section>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <address>
+      Data sourced from <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
+    </address>
+    <p>FitData Hub &mdash; Built as a Data Engineering &amp; Analytics learning project.</p>
+  </footer>
+
+  <script src="/js/app.js" type="module"></script>
+  <script src="/js/exercises.js" type="module"></script>
+</body>
+</html>
