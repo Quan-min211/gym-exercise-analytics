@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FitData Hub — Smart Recommender. Generate a personalised workout plan based on your goals, equipment, and fitness level.">
+  <title>Smart Recommender — FitData Hub</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="site-logo" aria-label="FitData Hub home">
+        Fit<strong>Data</strong>Hub
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <ul>
+          <li><a href="/">Exercises</a></li>
+          <li><a href="/recommend.html" aria-current="page">Recommender</a></li>
+          <li><a href="/schedule.html">My Schedule</a></li>
+          <li><a href="/analytics.html">Analytics</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-content" aria-labelledby="page-title">
+      <header class="text-center mb-8">
+        <h1 id="page-title">Smart Recommender</h1>
+        <p class="text-muted mt-4">Generate a personalised weekly workout plan in seconds.</p>
+      </header>
+
+      <!-- Multi-step Wizard -->
+      <div id="wizard-container" class="card" style="max-width: 800px; margin: 0 auto; padding: var(--space-8);">
+        
+        <div class="step-indicator" aria-label="Progress">
+          <div class="step-item active" data-step="1">
+            <div class="step-bubble">1</div>
+            <div class="step-label">Goals</div>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step-item" data-step="2">
+            <div class="step-bubble">2</div>
+            <div class="step-label">Equipment</div>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step-item" data-step="3">
+            <div class="step-bubble">3</div>
+            <div class="step-label">Details</div>
+          </div>
+        </div>
+
+        <form id="recommend-form">
+          
+          <!-- Step 1: Goals -->
+          <div class="wizard-step" id="step-1">
+            <h2 class="mb-6" style="font-size: var(--text-xl)">What is your primary goal?</h2>
+            <div class="form-field mb-4">
+              <label>
+                <input type="radio" name="goal" value="build_muscle" checked> Build Muscle
+              </label>
+            </div>
+            <div class="form-field mb-4">
+              <label>
+                <input type="radio" name="goal" value="lose_weight"> Lose Weight
+              </label>
+            </div>
+            <div class="form-field mb-4">
+              <label>
+                <input type="radio" name="goal" value="improve_endurance"> Improve Endurance
+              </label>
+            </div>
+            <div class="form-field mb-4">
+              <label>
+                <input type="radio" name="goal" value="flexibility"> Flexibility
+              </label>
+            </div>
+            <div class="form-field mb-8">
+              <label>
+                <input type="radio" name="goal" value="general_fitness"> General Fitness
+              </label>
+            </div>
+            <div class="flex justify-between">
+              <div></div>
+              <button type="button" class="btn btn-primary" onclick="nextStep(2)">Next Step</button>
+            </div>
+          </div>
+
+          <!-- Step 2: Equipment -->
+          <div class="wizard-step visually-hidden" id="step-2">
+            <h2 class="mb-6" style="font-size: var(--text-xl)">What equipment do you have?</h2>
+            <div id="equipment-checkboxes" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);" class="mb-8">
+              <!-- Populated by JS -->
+            </div>
+            <div class="flex justify-between">
+              <button type="button" class="btn btn-secondary" onclick="nextStep(1)">Back</button>
+              <button type="button" class="btn btn-primary" onclick="nextStep(3)">Next Step</button>
+            </div>
+          </div>
+
+          <!-- Step 3: Details -->
+          <div class="wizard-step visually-hidden" id="step-3">
+            <h2 class="mb-6" style="font-size: var(--text-xl)">Fine-tune your plan</h2>
+            
+            <div class="form-field mb-6">
+              <label for="fitness_level">Fitness Level</label>
+              <select name="fitness_level" id="fitness_level" class="select">
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </div>
+
+            <div class="form-field mb-6">
+              <label for="session_duration">Session Duration</label>
+              <select name="session_duration" id="session_duration" class="select">
+                <option value="30">30 minutes (Quick)</option>
+                <option value="45">45 minutes</option>
+                <option value="60" selected>60 minutes (Standard)</option>
+                <option value="90">90 minutes (Extended)</option>
+              </select>
+            </div>
+
+            <div class="form-field mb-8">
+              <label for="days_per_week">Days per week</label>
+              <select name="days_per_week" id="days_per_week" class="select">
+                <option value="2">2 Days</option>
+                <option value="3" selected>3 Days</option>
+                <option value="4">4 Days</option>
+                <option value="5">5 Days</option>
+                <option value="6">6 Days</option>
+              </select>
+            </div>
+
+            <div class="flex justify-between">
+              <button type="button" class="btn btn-secondary" onclick="nextStep(2)">Back</button>
+              <button type="submit" class="btn btn-primary" id="generate-btn">Generate Plan</button>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Results Area -->
+      <div id="results-container" class="visually-hidden mt-8">
+        <div class="section-header">
+          <h2>Your Weekly Plan</h2>
+          <div class="flex gap-4">
+            <button class="btn btn-secondary" id="restart-btn">Start Over</button>
+            <button class="btn btn-primary" id="save-schedule-btn">Save to My Schedule</button>
+          </div>
+        </div>
+
+        <div class="stats-grid mb-8" id="plan-stats">
+          <!-- Populated by JS -->
+        </div>
+
+        <div id="plan-days" class="flex-col gap-6">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <script src="/js/app.js" type="module"></script>
+  <script src="/js/recommend.js" type="module"></script>
+</body>
+</html>

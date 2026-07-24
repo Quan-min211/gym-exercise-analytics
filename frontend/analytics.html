@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FitData Hub — Analytics Dashboard. Explore dataset statistics, muscle co-occurrence, and equipment distribution.">
+  <title>Analytics Dashboard — FitData Hub</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <!-- Chart.js for data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="site-logo" aria-label="FitData Hub home">
+        Fit<strong>Data</strong>Hub
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <ul>
+          <li><a href="/">Exercises</a></li>
+          <li><a href="/recommend.html">Recommender</a></li>
+          <li><a href="/schedule.html">My Schedule</a></li>
+          <li><a href="/analytics.html" aria-current="page">Analytics</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-content" aria-labelledby="page-title">
+      
+      <header class="section-header">
+        <div>
+          <h1 id="page-title">Dataset Analytics</h1>
+          <p class="text-muted mt-2">Explore the distribution of exercises, equipment, and targeted muscles across the FitData Hub library.</p>
+        </div>
+      </header>
+
+      <!-- High-level Stats -->
+      <div class="stats-grid mb-8" id="overview-stats">
+        <div class="stat-card skeleton" style="height: 120px;"></div>
+        <div class="stat-card skeleton" style="height: 120px;"></div>
+        <div class="stat-card skeleton" style="height: 120px;"></div>
+        <div class="stat-card skeleton" style="height: 120px;"></div>
+      </div>
+
+      <div class="layout-with-sidebar mt-8" style="gap: var(--space-6);">
+        
+        <!-- Left Column: Charts -->
+        <div class="main-area flex-col gap-6">
+          
+          <article class="chart-card">
+            <header>
+              <h3>Equipment Popularity</h3>
+              <p>Top 15 most common equipment types used in exercises.</p>
+            </header>
+            <div class="chart-container">
+              <canvas id="equipmentChart" aria-label="Bar chart showing equipment popularity"></canvas>
+            </div>
+          </article>
+
+          <article class="chart-card">
+            <header>
+              <h3>Target Muscle Distribution</h3>
+              <p>Exercises categorized by their primary target muscle.</p>
+            </header>
+            <div class="chart-container">
+              <canvas id="targetMuscleChart" aria-label="Bar chart showing target muscle distribution"></canvas>
+            </div>
+          </article>
+
+        </div>
+
+        <!-- Right Column: Charts -->
+        <aside style="flex: 0 0 340px;" class="flex-col gap-6">
+          
+          <article class="chart-card">
+            <header>
+              <h3>Body Part Focus</h3>
+              <p>High-level body region distribution.</p>
+            </header>
+            <div class="chart-container" style="min-height: 320px;">
+              <canvas id="bodyPartChart" aria-label="Doughnut chart showing body part focus"></canvas>
+            </div>
+          </article>
+
+          <article class="chart-card">
+            <header>
+              <h3>Top Muscle Co-occurrences</h3>
+              <p>Muscles frequently trained together (Primary + Secondary).</p>
+            </header>
+            <div class="chart-container" style="min-height: 400px; overflow-y: auto;">
+              <table style="width: 100%; text-align: left; border-collapse: collapse; font-size: var(--text-sm);">
+                <thead>
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <th style="padding: var(--space-2) 0;">Muscle A</th>
+                    <th style="padding: var(--space-2) 0;">Muscle B</th>
+                    <th style="padding: var(--space-2) 0; text-align: right;">Count</th>
+                  </tr>
+                </thead>
+                <tbody id="cooccurrence-table-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+        </aside>
+
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <address>
+      Data sourced from <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
+    </address>
+    <p>FitData Hub &mdash; Built as a Data Engineering &amp; Analytics learning project.</p>
+  </footer>
+
+  <script src="/js/app.js" type="module"></script>
+  <script src="/js/analytics.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FitData Hub — My Schedule. View and manage your workout routines.">
+  <title>My Schedule — FitData Hub</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="site-logo" aria-label="FitData Hub home">
+        Fit<strong>Data</strong>Hub
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <ul>
+          <li><a href="/">Exercises</a></li>
+          <li><a href="/recommend.html">Recommender</a></li>
+          <li><a href="/schedule.html" aria-current="page">My Schedule</a></li>
+          <li><a href="/analytics.html">Analytics</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-content" aria-labelledby="page-title">
+      
+      <header class="section-header">
+        <div>
+          <h1 id="page-title">My Schedule</h1>
+          <p class="text-muted mt-2" id="schedule-subtitle">Loading your schedule...</p>
+        </div>
+        <div class="flex gap-4">
+          <a href="/recommend.html" class="btn btn-secondary">Generate New Plan</a>
+          <button id="delete-schedule-btn" class="btn btn-ghost text-danger visually-hidden">Delete Schedule</button>
+        </div>
+      </header>
+
+      <div id="no-schedule-msg" class="visually-hidden text-center mt-12" style="padding: var(--space-12) 0; background: var(--color-surface); border-radius: var(--radius-xl); border: 1px dashed var(--color-border);">
+        <h2 style="font-size: var(--text-xl); margin-bottom: var(--space-4);">No Schedule Found</h2>
+        <p class="text-muted mb-6">You don't have an active workout schedule.</p>
+        <a href="/recommend.html" class="btn btn-primary">Generate a Plan Now</a>
+      </div>
+
+      <div id="schedule-container" class="visually-hidden mt-8">
+        <div class="schedule-grid" id="calendar-grid" aria-label="Weekly Calendar View">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <address>
+      Data sourced from <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
+    </address>
+    <p>FitData Hub &mdash; Built as a Data Engineering &amp; Analytics learning project.</p>
+  </footer>
+
+  <script src="/js/app.js" type="module"></script>
+  <script src="/js/schedule.js" type="module"></script>
+</body>
+</html>
