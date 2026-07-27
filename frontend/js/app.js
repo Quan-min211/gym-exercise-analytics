@@ -118,8 +118,8 @@ export function buildExerciseCard(exercise) {
   const title = el('h3', { text: exercise.name });
   const tags = el('div', { class: 'tags' });
 
-  tags.appendChild(el('span', { class: 'tag tag-accent', text: exercise.body_part }));
-  tags.appendChild(el('span', { class: 'tag tag-neutral', text: exercise.equipment }));
+  tags.appendChild(el('span', { class: 'tag tag-red', text: exercise.body_part }));
+  tags.appendChild(el('span', { class: 'tag tag-iron', text: exercise.equipment }));
 
   body.appendChild(title);
   body.appendChild(tags);

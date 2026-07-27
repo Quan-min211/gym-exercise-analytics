@@ -26,18 +26,23 @@
   </header>
 
   <main>
-    <section class="page-content" aria-labelledby="page-title">
 
-      <!-- Page heading + search -->
-      <header class="section-header">
-        <div>
-          <h1 id="page-title">Exercise Library</h1>
-          <p class="text-muted mt-4">
-            Browse <strong id="total-count" class="text-accent">—</strong> exercises
-            across all muscle groups and equipment types.
-          </p>
+    <!-- Hero Block -->
+    <section class="page-hero" aria-labelledby="page-title">
+      <div class="hero-inner">
+        <h1 id="page-title">Exercise<br><strong>Library</strong></h1>
+        <p>
+          Browse <strong id="total-count">—</strong> exercises across all muscle groups,
+          equipment types, and body regions. Find your move.
+        </p>
+        <div class="flex gap-4 mt-8" style="flex-wrap: wrap;">
+          <a href="/recommend.html" class="btn btn-primary">Generate My Plan</a>
+          <a href="/analytics.html" class="btn btn-outline-red">View Dataset Stats</a>
         </div>
-      </header>
+      </div>
+    </section>
+
+    <section class="page-content" aria-labelledby="page-title">
 
       <!-- Search bar -->
       <search aria-label="Search exercises">
@@ -69,7 +74,6 @@
             <h3 id="filter-bodypart">Body Part</h3>
             <fieldset id="filter-body-part-list" aria-labelledby="filter-bodypart">
               <legend class="visually-hidden">Filter by body part</legend>
-              <!-- Populated by JS -->
             </fieldset>
           </section>
 
@@ -88,20 +92,19 @@
           </section>
 
           <button class="btn btn-ghost btn-sm w-full" id="clear-filters-btn" type="button">
-            Clear all filters
+            Clear Filters
           </button>
         </aside>
 
         <!-- Exercise grid + pagination -->
         <section class="main-area" aria-labelledby="page-title">
           <div id="exercise-grid" class="exercise-grid" aria-live="polite" aria-label="Exercise results">
-            <!-- Skeleton placeholders while loading -->
-            <article class="card exercise-card skeleton" aria-hidden="true" style="height:320px"></article>
-            <article class="card exercise-card skeleton" aria-hidden="true" style="height:320px"></article>
-            <article class="card exercise-card skeleton" aria-hidden="true" style="height:320px"></article>
-            <article class="card exercise-card skeleton" aria-hidden="true" style="height:320px"></article>
-            <article class="card exercise-card skeleton" aria-hidden="true" style="height:320px"></article>
-            <article class="card exercise-card skeleton" aria-hidden="true" style="height:320px"></article>
+            <article class="card exercise-card skeleton" aria-hidden="true" style="height:300px"></article>
+            <article class="card exercise-card skeleton" aria-hidden="true" style="height:300px"></article>
+            <article class="card exercise-card skeleton" aria-hidden="true" style="height:300px"></article>
+            <article class="card exercise-card skeleton" aria-hidden="true" style="height:300px"></article>
+            <article class="card exercise-card skeleton" aria-hidden="true" style="height:300px"></article>
+            <article class="card exercise-card skeleton" aria-hidden="true" style="height:300px"></article>
           </div>
 
           <nav class="pagination" id="pagination" aria-label="Exercises pagination"></nav>
@@ -115,7 +118,7 @@
     <address>
       Data sourced from <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
     </address>
-    <p>FitData Hub &mdash; Built as a Data Engineering &amp; Analytics learning project.</p>
+    <p>FitData Hub &mdash; Data Engineering &amp; Analytics learning project.</p>
   </footer>
 
   <script src="/js/app.js" type="module"></script>
