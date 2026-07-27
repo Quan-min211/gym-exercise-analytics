@@ -30,7 +30,6 @@ async function init() {
       showEmptyState();
     } else {
       $('#schedule-subtitle').textContent = 'Error loading schedule. Please try again.';
-      $('#schedule-subtitle').classList.add('text-danger');
     }
   }
 
@@ -50,18 +49,20 @@ async function init() {
 
 function showEmptyState() {
   $('#schedule-subtitle').textContent = '';
-  $('#no-schedule-msg').classList.remove('visually-hidden');
-  $('#schedule-container').classList.add('visually-hidden');
-  $('#delete-schedule-btn').classList.add('visually-hidden');
+  $('#no-schedule-msg').style.display = 'block';
+  $('#schedule-container').style.display = 'none';
+  $('#schedule-actions').style.display = 'none';
 }
 
 async function renderSchedule(schedule) {
-  $('#page-title').textContent = schedule.name;
+  $('#page-title').textContent = schedule.name || 'My Schedule';
   $('#schedule-subtitle').textContent = `Created on ${new Date(schedule.created_at).toLocaleDateString()}`;
   
-  $('#no-schedule-msg').classList.add('visually-hidden');
-  $('#schedule-container').classList.remove('visually-hidden');
-  $('#delete-schedule-btn').classList.remove('visually-hidden');
+  $('#no-schedule-msg').style.display = 'none';
+  $('#schedule-container').style.display = 'block';
+  $('#schedule-actions').style.display = 'flex';
+
+  const todayIndex = new Date().getDay(); // 0=Sun, 1=Mon...
 
   const grid = $('#calendar-grid');
   grid.innerHTML = '';

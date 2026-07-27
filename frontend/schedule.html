@@ -3,9 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="FitData Hub — My Schedule. View and manage your workout routines.">
+  <meta name="description" content="FitData Hub — My Schedule. View and manage your weekly workout routine.">
   <title>My Schedule — FitData Hub</title>
   <link rel="stylesheet" href="/css/main.css">
+  <style>
+    /* ---- Empty State ---- */
+    .empty-state {
+      text-align: center;
+      padding: var(--space-20) var(--space-6);
+      background: var(--color-surface);
+      border: 2px dashed var(--color-border-iron);
+      border-radius: var(--radius-lg);
+    }
+
+    .empty-state h2 {
+      font-size: var(--text-3xl);
+      margin-bottom: var(--space-4);
+      color: var(--color-text-muted);
+    }
+
+    .empty-state p {
+      font-size: var(--text-base);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-8);
+      font-family: var(--font-body);
+      text-transform: none;
+      letter-spacing: 0;
+      font-weight: var(--weight-regular);
+    }
+
+    /* ---- Schedule day labels ---- */
+    .day-label {
+      font-family: var(--font-display);
+      font-weight: var(--weight-black);
+      font-size: var(--text-xs);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-3);
+    }
+
+    .schedule-day.is-today {
+      border-color: var(--color-accent-dim);
+      border-top: 3px solid var(--color-accent);
+    }
+
+    .schedule-day.is-today .day-label {
+      color: var(--color-accent-light);
+    }
+  </style>
 </head>
 <body>
 
@@ -26,27 +72,36 @@
   </header>
 
   <main>
-    <section class="page-content" aria-labelledby="page-title">
-      
-      <header class="section-header">
-        <div>
-          <h1 id="page-title">My Schedule</h1>
-          <p class="text-muted mt-2" id="schedule-subtitle">Loading your schedule...</p>
-        </div>
-        <div class="flex gap-4">
-          <a href="/recommend.html" class="btn btn-secondary">Generate New Plan</a>
-          <button id="delete-schedule-btn" class="btn btn-ghost text-danger visually-hidden">Delete Schedule</button>
-        </div>
-      </header>
 
-      <div id="no-schedule-msg" class="visually-hidden text-center mt-12" style="padding: var(--space-12) 0; background: var(--color-surface); border-radius: var(--radius-xl); border: 1px dashed var(--color-border);">
-        <h2 style="font-size: var(--text-xl); margin-bottom: var(--space-4);">No Schedule Found</h2>
-        <p class="text-muted mb-6">You don't have an active workout schedule.</p>
-        <a href="/recommend.html" class="btn btn-primary">Generate a Plan Now</a>
+    <!-- Page Hero -->
+    <section class="page-hero" aria-labelledby="page-title">
+      <div class="hero-inner">
+        <h1 id="page-title">My <strong>Schedule</strong></h1>
+        <p id="schedule-subtitle">Loading your workout schedule…</p>
+      </div>
+    </section>
+
+    <section class="page-content" aria-labelledby="page-title">
+
+      <!-- Action bar -->
+      <div class="section-header" id="schedule-actions" style="display: none;">
+        <div></div>
+        <div class="flex gap-4">
+          <a href="/recommend.html" class="btn btn-ghost btn-sm">Generate New Plan</a>
+          <button id="delete-schedule-btn" class="btn btn-outline-red btn-sm">Delete Schedule</button>
+        </div>
       </div>
 
-      <div id="schedule-container" class="visually-hidden mt-8">
-        <div class="schedule-grid" id="calendar-grid" aria-label="Weekly Calendar View">
+      <!-- Empty state -->
+      <div class="empty-state" id="no-schedule-msg" style="display: none;">
+        <h2>No Schedule Found</h2>
+        <p>You don't have an active workout schedule yet. Generate one in seconds.</p>
+        <a href="/recommend.html" class="btn btn-primary btn-lg">Generate My Plan</a>
+      </div>
+
+      <!-- Schedule calendar -->
+      <div id="schedule-container" style="display: none;">
+        <div class="schedule-grid" id="calendar-grid" aria-label="Weekly workout calendar">
           <!-- Populated by JS -->
         </div>
       </div>
@@ -58,7 +113,7 @@
     <address>
       Data sourced from <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
     </address>
-    <p>FitData Hub &mdash; Built as a Data Engineering &amp; Analytics learning project.</p>
+    <p>FitData Hub &mdash; Data Engineering &amp; Analytics learning project.</p>
   </footer>
 
   <script src="/js/app.js" type="module"></script>

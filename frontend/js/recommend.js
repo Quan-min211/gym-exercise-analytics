@@ -13,18 +13,21 @@ async function loadEquipment() {
     const filters = await api.get('/exercises/filters');
     const container = $('#equipment-checkboxes');
     
-    // Always check body weight by default
-    filters.equipment_types.forEach(eq => {
-      const wrap = el('label', { class: 'form-field', style: 'flex-direction: row; align-items: center;' });
-      const input = el('input', { 
-        type: 'checkbox', 
-        name: 'equipment', 
+    filters.equipment_types.forEach((eq, i) => {
+      const optionDiv = el('div', { class: 'equipment-option' });
+      const id = `eq-${i}`;
+      const input = el('input', {
+        type: 'checkbox',
+        name: 'equipment',
+        id,
         value: eq,
-        checked: eq === 'body weight'
       });
-      wrap.appendChild(input);
-      wrap.appendChild(document.createTextNode(eq));
-      container.appendChild(wrap);
+      if (eq === 'body weight') input.setAttribute('checked', '');
+      const label = el('label', { for: id });
+      label.appendChild(document.createTextNode(eq));
+      optionDiv.appendChild(input);
+      optionDiv.appendChild(label);
+      container.appendChild(optionDiv);
     });
   } catch (err) {
     console.error('Failed to load equipment:', err);
@@ -33,8 +36,8 @@ async function loadEquipment() {
 
 // Attach to window so onclick="nextStep(x)" works from HTML
 window.nextStep = function(stepNum) {
-  $$('.wizard-step').forEach(s => s.classList.add('visually-hidden'));
-  $(`#step-${stepNum}`).classList.remove('visually-hidden');
+  $$('.wizard-step').forEach(s => s.classList.remove('active'));
+  $(`#step-${stepNum}`).classList.add('active');
   
   $$('.step-item').forEach((item, idx) => {
     const step = idx + 1;
@@ -45,7 +48,8 @@ window.nextStep = function(stepNum) {
 };
 
 function setupWizard() {
-  window.nextStep(1);
+  // Show step 1 on load
+  nextStep(1);
 }
 
 function setupForm() {
@@ -69,6 +73,8 @@ function setupForm() {
     try {
       generatedPlan = await api.post('/recommend/weekly', request);
       renderResults(generatedPlan);
+      // Scroll to results
+      $('#results-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (err) {
       console.error(err);
       alert('Failed to generate plan. Please try again.');
@@ -79,9 +85,9 @@ function setupForm() {
   });
 
   $('#restart-btn').addEventListener('click', () => {
-    $('#wizard-container').classList.remove('visually-hidden');
-    $('#results-container').classList.add('visually-hidden');
-    window.nextStep(1);
+    $('#wizard-container').style.display = '';
+    $('#results-container').style.display = 'none';
+    nextStep(1);
   });
 
   $('#save-schedule-btn').addEventListener('click', async () => {
@@ -115,9 +121,9 @@ function setupForm() {
 }
 
 function renderResults(plan) {
-  $('#wizard-container').classList.add('visually-hidden');
+  $('#wizard-container').style.display = 'none';
   const resultsContainer = $('#results-container');
-  resultsContainer.classList.remove('visually-hidden');
+  resultsContainer.style.display = 'block';
 
   // Stats
   const stats = $('#plan-stats');
@@ -125,7 +131,7 @@ function renderResults(plan) {
   
   const addStat = (val, label) => {
     const card = el('div', { class: 'stat-card text-center' });
-    card.appendChild(el('div', { class: 'stat-value stat-accent', text: val }));
+    card.appendChild(el('div', { class: 'stat-value stat-accent', text: String(val) }));
     card.appendChild(el('div', { class: 'stat-label', text: label }));
     stats.appendChild(card);
   };
@@ -140,21 +146,20 @@ function renderResults(plan) {
   daysContainer.innerHTML = '';
 
   plan.days.forEach(day => {
-    const dayCard = el('article', { class: 'card' });
+    const dayCard = el('article', { class: `plan-day-card${day.is_rest_day ? ' rest-day' : ''}` });
     
-    const header = el('div', { class: 'card-header', style: 'padding: var(--space-4); border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;' });
-    header.appendChild(el('h3', { text: day.day_label }));
+    const header = el('div', { class: 'plan-day-header' });
+    header.appendChild(el('h3', { text: day.day_label, style: 'font-size: var(--text-xl)' }));
     
     if (day.is_rest_day) {
       header.appendChild(el('span', { class: 'tag tag-neutral', text: 'Rest Day' }));
-      dayCard.appendChild(header);
-      dayCard.style.opacity = '0.6';
-      dayCard.style.borderStyle = 'dashed';
     } else {
-      header.appendChild(el('span', { class: 'tag tag-accent', text: day.focus }));
-      dayCard.appendChild(header);
+      header.appendChild(el('span', { class: 'tag tag-red', text: day.focus || 'Training' }));
+    }
+    dayCard.appendChild(header);
 
-      const body = el('div', { class: 'card-body exercise-grid' });
+    if (!day.is_rest_day && day.exercises && day.exercises.length > 0) {
+      const body = el('div', { class: 'plan-day-body exercise-grid' });
       day.exercises.forEach(ex => {
         body.appendChild(buildExerciseCard(ex));
       });

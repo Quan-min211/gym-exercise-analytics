@@ -6,6 +6,173 @@
   <meta name="description" content="FitData Hub — Smart Recommender. Generate a personalised workout plan based on your goals, equipment, and fitness level.">
   <title>Smart Recommender — FitData Hub</title>
   <link rel="stylesheet" href="/css/main.css">
+  <style>
+    /* ---- Wizard goal cards ---- */
+    .goal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: var(--space-3);
+      margin-bottom: var(--space-8);
+    }
+
+    .goal-card {
+      position: relative;
+    }
+
+    .goal-card input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .goal-card label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-3);
+      padding: var(--space-5) var(--space-4);
+      background: var(--color-surface);
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      text-align: center;
+      transition: all var(--transition-base);
+      min-height: 120px;
+    }
+
+    .goal-card label .goal-icon {
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .goal-card label .goal-name {
+      font-family: var(--font-display);
+      font-weight: var(--weight-bold);
+      font-size: var(--text-sm);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+    }
+
+    .goal-card input:checked + label {
+      border-color: var(--color-accent);
+      background: rgba(211,47,47,0.08);
+      box-shadow: var(--shadow-red);
+    }
+
+    .goal-card input:checked + label .goal-name {
+      color: var(--color-accent-light);
+    }
+
+    .goal-card label:hover {
+      border-color: var(--color-accent-dim);
+      background: var(--color-surface-hover);
+    }
+
+    /* ---- Equipment checkboxes ---- */
+    .equipment-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: var(--space-3);
+      margin-bottom: var(--space-8);
+    }
+
+    .equipment-option {
+      position: relative;
+    }
+
+    .equipment-option input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .equipment-option label {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      text-transform: capitalize;
+      transition: all var(--transition-fast);
+    }
+
+    .equipment-option label::before {
+      content: '';
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      border: 2px solid var(--color-border-iron);
+      border-radius: var(--radius-sm);
+      transition: all var(--transition-fast);
+      background: var(--color-bg);
+    }
+
+    .equipment-option input:checked + label {
+      border-color: var(--color-accent-dim);
+      background: rgba(211,47,47,0.07);
+      color: var(--color-text-primary);
+    }
+
+    .equipment-option input:checked + label::before {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+    }
+
+    .equipment-option label:hover {
+      border-color: var(--color-accent-dim);
+      background: var(--color-surface-hover);
+      color: var(--color-text-primary);
+    }
+
+    /* ---- Wizard steps layout ---- */
+    .wizard-step { display: none; }
+    .wizard-step.active { display: block; }
+
+    .wizard-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: var(--space-8);
+      padding-top: var(--space-6);
+      border-top: 1px solid var(--color-border);
+    }
+
+    /* ---- Results: Day card ---- */
+    .plan-day-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: var(--space-4);
+    }
+
+    .plan-day-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-4) var(--space-5);
+      background: var(--color-surface-raised);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .plan-day-body {
+      padding: var(--space-4);
+    }
+
+    .plan-day-card.rest-day {
+      border-style: dashed;
+      opacity: 0.55;
+    }
+  </style>
 </head>
 <body>
 
@@ -26,144 +193,171 @@
   </header>
 
   <main>
-    <section class="page-content" aria-labelledby="page-title">
-      <header class="text-center mb-8">
-        <h1 id="page-title">Smart Recommender</h1>
-        <p class="text-muted mt-4">Generate a personalised weekly workout plan in seconds.</p>
-      </header>
 
-      <!-- Multi-step Wizard -->
-      <div id="wizard-container" class="card" style="max-width: 800px; margin: 0 auto; padding: var(--space-8);">
-        
-        <div class="step-indicator" aria-label="Progress">
-          <div class="step-item active" data-step="1">
-            <div class="step-bubble">1</div>
-            <div class="step-label">Goals</div>
+    <!-- Page Hero -->
+    <section class="page-hero" aria-labelledby="page-title">
+      <div class="hero-inner">
+        <h1 id="page-title">Smart<br><strong>Recommender</strong></h1>
+        <p>Tell us your goal and equipment. We'll build a balanced, science-backed weekly plan in seconds.</p>
+      </div>
+    </section>
+
+    <section class="page-content" aria-labelledby="page-title">
+
+      <!-- Wizard Container -->
+      <div id="wizard-container" style="max-width: 860px; margin: 0 auto;">
+
+        <!-- Step Indicator -->
+        <div class="step-indicator" aria-label="Setup progress">
+          <div class="step-item active" id="step-ind-1">
+            <div class="step-bubble" aria-hidden="true">1</div>
+            <div class="step-label">Goal</div>
           </div>
           <div class="step-connector"></div>
-          <div class="step-item" data-step="2">
-            <div class="step-bubble">2</div>
+          <div class="step-item" id="step-ind-2">
+            <div class="step-bubble" aria-hidden="true">2</div>
             <div class="step-label">Equipment</div>
           </div>
           <div class="step-connector"></div>
-          <div class="step-item" data-step="3">
-            <div class="step-bubble">3</div>
+          <div class="step-item" id="step-ind-3">
+            <div class="step-bubble" aria-hidden="true">3</div>
             <div class="step-label">Details</div>
           </div>
         </div>
 
-        <form id="recommend-form">
-          
-          <!-- Step 1: Goals -->
-          <div class="wizard-step" id="step-1">
-            <h2 class="mb-6" style="font-size: var(--text-xl)">What is your primary goal?</h2>
-            <div class="form-field mb-4">
-              <label>
-                <input type="radio" name="goal" value="build_muscle" checked> Build Muscle
-              </label>
-            </div>
-            <div class="form-field mb-4">
-              <label>
-                <input type="radio" name="goal" value="lose_weight"> Lose Weight
-              </label>
-            </div>
-            <div class="form-field mb-4">
-              <label>
-                <input type="radio" name="goal" value="improve_endurance"> Improve Endurance
-              </label>
-            </div>
-            <div class="form-field mb-4">
-              <label>
-                <input type="radio" name="goal" value="flexibility"> Flexibility
-              </label>
-            </div>
-            <div class="form-field mb-8">
-              <label>
-                <input type="radio" name="goal" value="general_fitness"> General Fitness
-              </label>
-            </div>
-            <div class="flex justify-between">
-              <div></div>
-              <button type="button" class="btn btn-primary" onclick="nextStep(2)">Next Step</button>
-            </div>
-          </div>
+        <div class="card" style="padding: var(--space-8);">
+          <form id="recommend-form">
 
-          <!-- Step 2: Equipment -->
-          <div class="wizard-step visually-hidden" id="step-2">
-            <h2 class="mb-6" style="font-size: var(--text-xl)">What equipment do you have?</h2>
-            <div id="equipment-checkboxes" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);" class="mb-8">
-              <!-- Populated by JS -->
-            </div>
-            <div class="flex justify-between">
-              <button type="button" class="btn btn-secondary" onclick="nextStep(1)">Back</button>
-              <button type="button" class="btn btn-primary" onclick="nextStep(3)">Next Step</button>
-            </div>
-          </div>
-
-          <!-- Step 3: Details -->
-          <div class="wizard-step visually-hidden" id="step-3">
-            <h2 class="mb-6" style="font-size: var(--text-xl)">Fine-tune your plan</h2>
-            
-            <div class="form-field mb-6">
-              <label for="fitness_level">Fitness Level</label>
-              <select name="fitness_level" id="fitness_level" class="select">
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
-              </select>
+            <!-- Step 1: Goal -->
+            <div class="wizard-step active" id="step-1">
+              <h2 style="margin-bottom: var(--space-6);">What's Your Primary Goal?</h2>
+              <div class="goal-grid" role="radiogroup" aria-label="Select your primary goal">
+                <div class="goal-card">
+                  <input type="radio" name="goal" id="goal-muscle" value="build_muscle" checked>
+                  <label for="goal-muscle">
+                    <span class="goal-icon" aria-hidden="true">💪</span>
+                    <span class="goal-name">Build Muscle</span>
+                  </label>
+                </div>
+                <div class="goal-card">
+                  <input type="radio" name="goal" id="goal-weight" value="lose_weight">
+                  <label for="goal-weight">
+                    <span class="goal-icon" aria-hidden="true">🔥</span>
+                    <span class="goal-name">Lose Weight</span>
+                  </label>
+                </div>
+                <div class="goal-card">
+                  <input type="radio" name="goal" id="goal-endurance" value="improve_endurance">
+                  <label for="goal-endurance">
+                    <span class="goal-icon" aria-hidden="true">⚡</span>
+                    <span class="goal-name">Endurance</span>
+                  </label>
+                </div>
+                <div class="goal-card">
+                  <input type="radio" name="goal" id="goal-flex" value="flexibility">
+                  <label for="goal-flex">
+                    <span class="goal-icon" aria-hidden="true">🧘</span>
+                    <span class="goal-name">Flexibility</span>
+                  </label>
+                </div>
+                <div class="goal-card">
+                  <input type="radio" name="goal" id="goal-general" value="general_fitness">
+                  <label for="goal-general">
+                    <span class="goal-icon" aria-hidden="true">🏆</span>
+                    <span class="goal-name">General Fitness</span>
+                  </label>
+                </div>
+              </div>
+              <div class="wizard-nav">
+                <div></div>
+                <button type="button" class="btn btn-primary" onclick="nextStep(2)">Next: Equipment</button>
+              </div>
             </div>
 
-            <div class="form-field mb-6">
-              <label for="session_duration">Session Duration</label>
-              <select name="session_duration" id="session_duration" class="select">
-                <option value="30">30 minutes (Quick)</option>
-                <option value="45">45 minutes</option>
-                <option value="60" selected>60 minutes (Standard)</option>
-                <option value="90">90 minutes (Extended)</option>
-              </select>
+            <!-- Step 2: Equipment -->
+            <div class="wizard-step" id="step-2">
+              <h2 style="margin-bottom: var(--space-2);">Your Available Equipment</h2>
+              <p class="text-muted" style="margin-bottom: var(--space-6); font-family: var(--font-body); text-transform: none; letter-spacing: 0; font-size: var(--text-sm);">
+                Select everything available to you. We'll only recommend what you can actually do.
+              </p>
+              <div class="equipment-grid" id="equipment-checkboxes" role="group" aria-label="Select available equipment">
+                <!-- Populated by JS -->
+              </div>
+              <div class="wizard-nav">
+                <button type="button" class="btn btn-ghost" onclick="nextStep(1)">Back</button>
+                <button type="button" class="btn btn-primary" onclick="nextStep(3)">Next: Details</button>
+              </div>
             </div>
 
-            <div class="form-field mb-8">
-              <label for="days_per_week">Days per week</label>
-              <select name="days_per_week" id="days_per_week" class="select">
-                <option value="2">2 Days</option>
-                <option value="3" selected>3 Days</option>
-                <option value="4">4 Days</option>
-                <option value="5">5 Days</option>
-                <option value="6">6 Days</option>
-              </select>
+            <!-- Step 3: Details -->
+            <div class="wizard-step" id="step-3">
+              <h2 style="margin-bottom: var(--space-6);">Fine-Tune Your Plan</h2>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-5); margin-bottom: var(--space-8);">
+                <div class="form-field">
+                  <label for="fitness_level">Fitness Level</label>
+                  <select name="fitness_level" id="fitness_level" class="select">
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate" selected>Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="session_duration">Session Duration</label>
+                  <select name="session_duration" id="session_duration" class="select">
+                    <option value="30">30 min — Quick</option>
+                    <option value="45">45 min</option>
+                    <option value="60" selected>60 min — Standard</option>
+                    <option value="90">90 min — Extended</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="days_per_week">Days Per Week</label>
+                  <select name="days_per_week" id="days_per_week" class="select">
+                    <option value="2">2 Days</option>
+                    <option value="3" selected>3 Days</option>
+                    <option value="4">4 Days</option>
+                    <option value="5">5 Days</option>
+                    <option value="6">6 Days</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="wizard-nav">
+                <button type="button" class="btn btn-ghost" onclick="nextStep(2)">Back</button>
+                <button type="submit" class="btn btn-primary" id="generate-btn">Generate Plan</button>
+              </div>
             </div>
 
-            <div class="flex justify-between">
-              <button type="button" class="btn btn-secondary" onclick="nextStep(2)">Back</button>
-              <button type="submit" class="btn btn-primary" id="generate-btn">Generate Plan</button>
-            </div>
-          </div>
-
-        </form>
+          </form>
+        </div>
       </div>
 
       <!-- Results Area -->
-      <div id="results-container" class="visually-hidden mt-8">
+      <div id="results-container" style="display: none; max-width: 1100px; margin: 0 auto;" class="mt-8">
+
         <div class="section-header">
-          <h2>Your Weekly Plan</h2>
+          <h2 class="section-heading-red">Your Weekly Plan</h2>
           <div class="flex gap-4">
-            <button class="btn btn-secondary" id="restart-btn">Start Over</button>
-            <button class="btn btn-primary" id="save-schedule-btn">Save to My Schedule</button>
+            <button class="btn btn-ghost btn-sm" id="restart-btn">Start Over</button>
+            <button class="btn btn-primary" id="save-schedule-btn">Save to Schedule</button>
           </div>
         </div>
 
-        <div class="stats-grid mb-8" id="plan-stats">
-          <!-- Populated by JS -->
-        </div>
+        <div class="stats-grid mb-8" id="plan-stats"></div>
 
-        <div id="plan-days" class="flex-col gap-6">
-          <!-- Populated by JS -->
-        </div>
+        <div id="plan-days"></div>
       </div>
 
     </section>
   </main>
+
+  <footer class="site-footer">
+    <address>
+      Data sourced from <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
+    </address>
+    <p>FitData Hub &mdash; Data Engineering &amp; Analytics learning project.</p>
+  </footer>
 
   <script src="/js/app.js" type="module"></script>
   <script src="/js/recommend.js" type="module"></script>

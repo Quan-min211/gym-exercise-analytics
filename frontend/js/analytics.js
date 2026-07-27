@@ -1,18 +1,20 @@
 import { $, api, el } from './app.js';
 
-// Chart.js global defaults
-Chart.defaults.color = 'hsl(210, 12%, 72%)';
-Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
-Chart.defaults.plugins.tooltip.backgroundColor = 'hsl(222, 22%, 5%)';
-Chart.defaults.plugins.tooltip.titleColor = 'hsl(210, 20%, 94%)';
-Chart.defaults.plugins.tooltip.bodyColor = 'hsl(210, 12%, 72%)';
-Chart.defaults.plugins.tooltip.borderColor = 'hsl(222, 14%, 22%)';
+// Chart.js global defaults — Iron Plate palette
+Chart.defaults.color = '#707888';
+Chart.defaults.font.family = "'Barlow', system-ui, sans-serif";
+Chart.defaults.plugins.tooltip.backgroundColor = '#0b0d11';
+Chart.defaults.plugins.tooltip.titleColor = '#F5F5F5';
+Chart.defaults.plugins.tooltip.bodyColor = '#B0B8C8';
+Chart.defaults.plugins.tooltip.borderColor = '#2e3240';
 Chart.defaults.plugins.tooltip.borderWidth = 1;
+Chart.defaults.plugins.tooltip.titleFont = { family: "'Barlow Condensed', sans-serif", weight: '700', size: 14 };
 
-// Brand colors
-const colorAccent = 'hsl(162, 72%, 40%)';
-const colorWarm = 'hsl(38, 90%, 56%)';
-const colorSurface = 'hsl(222, 16%, 16%)';
+// Iron Plate brand colors
+const colorRed    = '#D32F2F';
+const colorRedLight = '#EF5350';
+const colorGold   = '#FFC107';
+const colorIron   = '#3a3f50';
 
 async function init() {
   try {
@@ -60,8 +62,9 @@ function renderEquipmentChart(data) {
       datasets: [{
         label: 'Exercises',
         data: data.map(d => d.count),
-        backgroundColor: colorAccent,
-        borderRadius: 4,
+        backgroundColor: colorRed,
+        hoverBackgroundColor: colorRedLight,
+        borderRadius: 3,
       }]
     },
     options: {
@@ -93,8 +96,9 @@ function renderTargetMuscleChart(data) {
       datasets: [{
         label: 'Exercises',
         data: data.map(d => d.count),
-        backgroundColor: colorWarm,
-        borderRadius: 4,
+        backgroundColor: colorGold,
+        hoverBackgroundColor: '#FFD54F',
+        borderRadius: 3,
       }]
     },
     options: {
@@ -119,8 +123,12 @@ function renderTargetMuscleChart(data) {
 function renderBodyPartChart(data) {
   const ctx = $('#bodyPartChart').getContext('2d');
   
-  // Generate a distinct color palette
-  const colors = data.map((_, i) => `hsl(${160 + (i * 20)}, 60%, 45%)`);
+  // Iron plate: shades from red to iron-gray
+  const colors = data.map((_, i) => {
+    const hues = [0, 20, 200, 220, 240, 260, 280, 300, 340];
+    const h = hues[i % hues.length];
+    return `hsl(${h}, 55%, 42%)`;
+  });
 
   new Chart(ctx, {
     type: 'doughnut',
@@ -130,17 +138,17 @@ function renderBodyPartChart(data) {
         data: data.map(d => d.count),
         backgroundColor: colors,
         borderWidth: 2,
-        borderColor: 'hsl(222, 20%, 8%)' // match page background
+        borderColor: '#111318'
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '70%',
+      cutout: '72%',
       plugins: {
         legend: {
           position: 'right',
-          labels: { boxWidth: 12 }
+          labels: { boxWidth: 12, padding: 14, font: { family: "'Barlow Condensed', sans-serif", weight: '700', size: 12 } }
         }
       }
     }
@@ -152,12 +160,11 @@ function renderCooccurrenceTable(data) {
   tbody.innerHTML = '';
 
   data.forEach((row, i) => {
-    const tr = el('tr', { style: 'border-bottom: 1px solid var(--color-border);' });
-    if (i % 2 !== 0) tr.style.backgroundColor = 'hsl(222, 16%, 12%)';
+    const tr = el('tr', {});
 
-    const td1 = el('td', { style: 'padding: var(--space-2) 0; text-transform: capitalize;', text: row.muscle_a });
-    const td2 = el('td', { style: 'padding: var(--space-2) 0; text-transform: capitalize;', text: row.muscle_b });
-    const td3 = el('td', { style: 'padding: var(--space-2) 0; text-align: right; color: var(--color-accent); font-weight: var(--weight-medium);', text: row.co_occurrence_count });
+    const td1 = el('td', { text: row.muscle_a });
+    const td2 = el('td', { text: row.muscle_b });
+    const td3 = el('td', { class: 'count-cell', text: String(row.co_occurrence_count) });
 
     tr.appendChild(td1);
     tr.appendChild(td2);
