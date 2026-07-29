@@ -72,3 +72,41 @@ def test_analytics_overview(client):
     data = response.json()
     assert data["total_exercises"] == 3
     assert data["total_body_parts"] >= 1
+
+
+def test_schedule_crud(client):
+    payload = {
+        "name": "My Test Plan",
+        "schedule_type": "weekly",
+        "days": [
+            {
+                "day_index": 0,
+                "label": "Monday",
+                "is_rest_day": False,
+                "exercises": [
+                    {
+                        "exercise_id": "ex_1",
+                        "sets": 3,
+                        "reps": "10-12",
+                        "rest_seconds": 60
+                    }
+                ]
+            }
+        ]
+    }
+    # Create schedule
+    create_res = client.post("/api/schedules", json=payload)
+    assert create_res.status_code == 201
+    created_data = create_res.json()
+    assert created_data["name"] == "My Test Plan"
+    schedule_id = created_data["id"]
+
+    # Get schedule
+    get_res = client.get(f"/api/schedules/{schedule_id}")
+    assert get_res.status_code == 200
+    assert get_res.json()["id"] == schedule_id
+
+    # Get non-existent schedule
+    get_404_res = client.get("/api/schedules/non_existent_id")
+    assert get_404_res.status_code == 404
+

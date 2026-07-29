@@ -22,7 +22,7 @@ from backend.schemas import ScheduleCreate, ScheduleOut
 router = APIRouter(prefix="/api/schedules", tags=["schedules"])
 
 # ---------------------------------------------------------------------------
-# Ensure schedules table exists (created lazily on first request)
+# Ensure schedules table exists (created lazily per request session)
 # ---------------------------------------------------------------------------
 
 _SCHEDULES_TABLE_SQL = """
@@ -31,17 +31,18 @@ CREATE TABLE IF NOT EXISTS schedules (
     name        TEXT NOT NULL,
     schedule_type TEXT NOT NULL DEFAULT 'weekly',
     days_json   TEXT NOT NULL,
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    created_at  TIMESTAMP NOT NULL,
+    updated_at  TIMESTAMP NOT NULL
 );
 """
 
-def _ensure_table() -> None:
-    with engine.connect() as conn:
-        conn.execute(text(_SCHEDULES_TABLE_SQL))
-        conn.commit()
+def _ensure_table(db: Session) -> None:
+    try:
+        db.execute(text(_SCHEDULES_TABLE_SQL))
+        db.commit()
+    except Exception:
+        db.rollback()
 
-_ensure_table()
 
 
 # ---------------------------------------------------------------------------
@@ -66,6 +67,7 @@ def _row_to_out(row) -> ScheduleOut:
 @router.post("", response_model=ScheduleOut, status_code=201)
 def create_schedule(payload: ScheduleCreate, db: Session = Depends(get_db)):
     """Persist a new custom workout schedule."""
+    _ensure_table(db)
     schedule_id = str(uuid.uuid4())
     now = datetime.now(tz=timezone.utc)
     days_json = json.dumps([d.model_dump() for d in payload.days])
@@ -95,6 +97,7 @@ def create_schedule(payload: ScheduleCreate, db: Session = Depends(get_db)):
 @router.get("/{schedule_id}", response_model=ScheduleOut)
 def get_schedule(schedule_id: str, db: Session = Depends(get_db)):
     """Retrieve a schedule by ID."""
+    _ensure_table(db)
     row = db.execute(
         text("SELECT * FROM schedules WHERE id = :id"), {"id": schedule_id}
     ).fetchone()
@@ -108,6 +111,7 @@ def update_schedule(
     schedule_id: str, payload: ScheduleCreate, db: Session = Depends(get_db)
 ):
     """Update an existing schedule."""
+    _ensure_table(db)
     existing = db.execute(
         text("SELECT id FROM schedules WHERE id = :id"), {"id": schedule_id}
     ).fetchone()
@@ -141,9 +145,11 @@ def update_schedule(
 @router.delete("/{schedule_id}", status_code=204)
 def delete_schedule(schedule_id: str, db: Session = Depends(get_db)):
     """Delete a schedule."""
+    _ensure_table(db)
     result = db.execute(
         text("DELETE FROM schedules WHERE id = :id"), {"id": schedule_id}
     )
     db.commit()
     if result.rowcount == 0:
         raise HTTPException(status_code=404, detail="Schedule not found.")
+
