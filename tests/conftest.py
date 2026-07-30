@@ -3,6 +3,7 @@ Pytest configuration & fixtures.
 Uses an in-memory SQLite database pre-populated with test exercises.
 """
 
+from datetime import datetime, timezone
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -11,7 +12,7 @@ from sqlalchemy.pool import StaticPool
 
 from backend.database import get_db
 from backend.main import app
-from de_pipeline.models import Base, BodyPart, EquipmentType, Exercise, Muscle, TargetMuscle
+from de_pipeline.models import Base, BodyPart, EquipmentType, Exercise, Instruction, Muscle
 
 # In-memory SQLite engine for fast testing
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
@@ -30,61 +31,93 @@ def db_session():
     Base.metadata.create_all(bind=engine)
     session = TestingSessionLocal()
 
-    # Seed BodyParts
-    bp_chest = BodyPart(id="bp_1", name="chest")
-    bp_back = BodyPart(id="bp_2", name="back")
-    bp_legs = BodyPart(id="bp_3", name="upper legs")
+    now = datetime.now(timezone.utc)
+
+    # Seed BodyParts (integer PK)
+    bp_chest = BodyPart(id=1, name="chest")
+    bp_back = BodyPart(id=2, name="back")
+    bp_legs = BodyPart(id=3, name="upper legs")
     session.add_all([bp_chest, bp_back, bp_legs])
 
-    # Seed Equipment
-    eq_bw = EquipmentType(id="eq_1", name="body weight")
-    eq_db = EquipmentType(id="eq_2", name="dumbbell")
+    # Seed Equipment (integer PK)
+    eq_bw = EquipmentType(id=1, name="body weight")
+    eq_db = EquipmentType(id=2, name="dumbbell")
     session.add_all([eq_bw, eq_db])
 
-    # Seed TargetMuscles
-    tm_pectorals = TargetMuscle(id="tm_1", name="pectorals")
-    tm_lats = TargetMuscle(id="tm_2", name="lats")
-    tm_quads = TargetMuscle(id="tm_3", name="quads")
+    # Seed Muscles (integer PK)
+    tm_pectorals = Muscle(id=1, name="pectorals")
+    tm_lats = Muscle(id=2, name="lats")
+    tm_quads = Muscle(id=3, name="quads")
     session.add_all([tm_pectorals, tm_lats, tm_quads])
 
     # Seed Exercises
     ex1 = Exercise(
-        id="ex_1",
+        id="0001",
         name="Push Up",
         category="calisthenics",
-        body_part_id="bp_1",
-        equipment_id="eq_1",
-        target_muscle_id="tm_1",
+        body_part_id=1,
+        equipment_id=1,
+        target_muscle_id=1,
         muscle_group="chest",
-        image="images/ex_1.jpg",
-        gif_url="videos/ex_1.gif",
-        instructions_json={"steps": ["Get into plank position.", "Lower chest to ground.", "Push back up."]},
+        media_id="m1",
+        image="images/0001.jpg",
+        gif_url="videos/0001.gif",
+        attribution="GymVisual",
+        created_at=now,
     )
     ex2 = Exercise(
-        id="ex_2",
+        id="0002",
         name="Dumbbell Row",
         category="strength",
-        body_part_id="bp_2",
-        equipment_id="eq_2",
-        target_muscle_id="tm_2",
+        body_part_id=2,
+        equipment_id=2,
+        target_muscle_id=2,
         muscle_group="back",
-        image="images/ex_2.jpg",
-        gif_url="videos/ex_2.gif",
-        instructions_json={"steps": ["Hinge at hips.", "Pull dumbbell to ribcage."]},
+        media_id="m2",
+        image="images/0002.jpg",
+        gif_url="videos/0002.gif",
+        attribution="GymVisual",
+        created_at=now,
     )
     ex3 = Exercise(
-        id="ex_3",
+        id="0003",
         name="Squat",
         category="calisthenics",
-        body_part_id="bp_3",
-        equipment_id="eq_1",
-        target_muscle_id="tm_3",
+        body_part_id=3,
+        equipment_id=1,
+        target_muscle_id=3,
         muscle_group="upper legs",
-        image="images/ex_3.jpg",
-        gif_url="videos/ex_3.gif",
-        instructions_json={"steps": ["Stand feet shoulder-width.", "Bend knees.", "Stand back up."]},
+        media_id="m3",
+        image="images/0003.jpg",
+        gif_url="videos/0003.gif",
+        attribution="GymVisual",
+        created_at=now,
     )
     session.add_all([ex1, ex2, ex3])
+
+    # Seed Instructions
+    inst1 = Instruction(
+        id=1,
+        exercise_id="0001",
+        lang_code="en",
+        full_text="Get into plank position and push.",
+        steps=["Get into plank position.", "Lower chest to ground.", "Push back up."],
+    )
+    inst2 = Instruction(
+        id=2,
+        exercise_id="0002",
+        lang_code="en",
+        full_text="Pull dumbbell to ribcage.",
+        steps=["Hinge at hips.", "Pull dumbbell to ribcage."],
+    )
+    inst3 = Instruction(
+        id=3,
+        exercise_id="0003",
+        lang_code="en",
+        full_text="Squat down and up.",
+        steps=["Stand feet shoulder-width.", "Bend knees.", "Stand back up."],
+    )
+    session.add_all([inst1, inst2, inst3])
     session.commit()
 
     yield session

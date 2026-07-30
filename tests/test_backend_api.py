@@ -20,10 +20,10 @@ def test_list_exercises(client):
 
 
 def test_get_exercise_by_id(client):
-    response = client.get("/api/exercises/ex_1")
+    response = client.get("/api/exercises/0001")
     assert response.status_code == 200
     data = response.json()
-    assert data["id"] == "ex_1"
+    assert data["id"] == "0001"
     assert data["name"] == "Push Up"
     assert data["body_part"] == "chest"
 
@@ -85,7 +85,7 @@ def test_schedule_crud(client):
                 "is_rest_day": False,
                 "exercises": [
                     {
-                        "exercise_id": "ex_1",
+                        "exercise_id": "0001",
                         "sets": 3,
                         "reps": "10-12",
                         "rest_seconds": 60
