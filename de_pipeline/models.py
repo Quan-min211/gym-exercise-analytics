@@ -19,11 +19,11 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
+    JSON,
     String,
     Text,
     UniqueConstraint,
 )
-from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, relationship
 
 
@@ -183,7 +183,7 @@ class Instruction(Base):
     exercise_id = Column(String(4), ForeignKey("exercises.id"), nullable=False, index=True)
     lang_code = Column(String(8), nullable=False)   # ISO 639-1 code, e.g. 'en'
     full_text = Column(Text, nullable=False)
-    steps = Column(JSONB, nullable=False)            # list[str]
+    steps = Column(JSON, nullable=False)            # list[str]
 
     exercise = relationship("Exercise", back_populates="instructions")
 
