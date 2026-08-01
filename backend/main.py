@@ -5,6 +5,11 @@ Serves:
   - REST API  at /api/...
   - Static media  at /images/ and /videos/ (exercise thumbnails & GIFs)
   - Frontend HTML/CSS/JS  at / (SPA)
+
+Route registration order is critical: all API routes (include_router + bare
+@app.get decorators) MUST be registered before any app.mount() call.
+In Starlette, mount("/") is terminal — it intercepts every request that
+reaches it, so API routes defined after the mount are unreachable.
 """
 
 from pathlib import Path
@@ -46,7 +51,16 @@ app.add_middleware(
 )
 
 # ---------------------------------------------------------------------------
-# API routers
+# Health check — registered FIRST, before any mount()
+# ---------------------------------------------------------------------------
+
+@app.get("/api/health", tags=["health"])
+def health_check():
+    return {"status": "ok", "service": "FitData Hub API"}
+
+
+# ---------------------------------------------------------------------------
+# API routers — registered before static file mounts
 # ---------------------------------------------------------------------------
 
 app.include_router(exercises.router)
@@ -55,23 +69,22 @@ app.include_router(schedules.router)
 app.include_router(analytics.router)
 
 # ---------------------------------------------------------------------------
-# Static file mounts
+# Static file mounts — registered LAST
+# Mount("/") is terminal: it intercepts all remaining requests.
+# Everything above this point is safe from being shadowed.
 # ---------------------------------------------------------------------------
 
 # Exercise thumbnails (JPG)
-app.mount("/images", StaticFiles(directory=str(PROJECT_ROOT / "images")), name="images")
+_images_dir = PROJECT_ROOT / "images"
+if _images_dir.exists():
+    app.mount("/images", StaticFiles(directory=str(_images_dir)), name="images")
 
 # Exercise animation GIFs
-app.mount("/videos", StaticFiles(directory=str(PROJECT_ROOT / "videos")), name="videos")
+_videos_dir = PROJECT_ROOT / "videos"
+if _videos_dir.exists():
+    app.mount("/videos", StaticFiles(directory=str(_videos_dir)), name="videos")
 
-# Frontend SPA (served last so it doesn't shadow API routes)
-app.mount("/", StaticFiles(directory=str(PROJECT_ROOT / "frontend"), html=True), name="frontend")
-
-
-# ---------------------------------------------------------------------------
-# Health check
-# ---------------------------------------------------------------------------
-
-@app.get("/api/health", tags=["health"])
-def health_check():
-    return {"status": "ok", "service": "FitData Hub API"}
+# Frontend SPA — must be last
+_frontend_dir = PROJECT_ROOT / "frontend"
+if _frontend_dir.exists():
+    app.mount("/", StaticFiles(directory=str(_frontend_dir), html=True), name="frontend")
