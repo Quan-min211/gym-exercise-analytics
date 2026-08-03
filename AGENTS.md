@@ -5,6 +5,27 @@
 
 ---
 
+## 0. MANDATORY — Read System Context First
+
+> **TRƯỚC KHI LÀM BẤT KỲ TASK NÀO**, AI agent **BẮT BUỘC** phải đọc file [`docs/SYSTEM_CONTEXT.md`](./docs/SYSTEM_CONTEXT.md).
+
+File này chứa toàn bộ kiến trúc hệ thống, ý tưởng, công nghệ, nội dung chi tiết, và các lưu ý kỹ thuật quan trọng cho **mọi phần** của dự án (Data, DE Pipeline, Backend API, Recommendation Engine, Frontend, Docker, CI/CD).
+
+**Mục đích**: Đảm bảo AI agent hiểu rõ hệ thống đã xây dựng trước khi thêm/sửa bất cứ điều gì, tránh:
+- Phá vỡ design system (Iron Plate) đang dùng
+- Tạo lại model/schema không khớp với ORM models hiện tại
+- Import sai tên class (ví dụ: `TargetMuscle` không tồn tại, phải dùng `Muscle`)
+- Đăng ký route sau `app.mount("/")` (sẽ bị Starlette chặn)
+- Dùng `JSONB` thay vì `JSON` (không tương thích SQLite test)
+
+**Quy trình bắt buộc**:
+1. Đọc `docs/SYSTEM_CONTEXT.md` để nắm kiến trúc tổng thể
+2. Đọc `DESIGN.md` nếu task liên quan đến UI/Frontend
+3. Thực hiện task
+4. **Cập nhật `docs/SYSTEM_CONTEXT.md`** nếu task thay đổi kiến trúc, thêm endpoint, thêm bảng DB, thêm trang FE, hoặc thay đổi pipeline
+
+---
+
 ## 1. Semantic HTML5 — 100% MANDATORY
 
 ### Core Principles
