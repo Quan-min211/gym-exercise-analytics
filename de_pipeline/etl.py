@@ -26,6 +26,8 @@ from typing import Any
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
 
+from de_pipeline.etl_metrics import ETLMetrics
+
 from de_pipeline.config import (
     BATCH_SIZE,
     DATABASE_URL,
@@ -298,43 +300,47 @@ def load(session: Session, records: list[dict]) -> None:
 
 
 def run_etl() -> None:
-    start = time.perf_counter()
     log.info("=" * 60)
     log.info("FitData Hub — ETL Pipeline")
     log.info("=" * 60)
 
-    # Extract
-    raw_records = extract(EXERCISES_JSON)
+    with ETLMetrics() as metrics:
+        # Extract
+        raw_records = extract(EXERCISES_JSON)
+        metrics.set_extracted(len(raw_records))
 
-    # Validate
-    valid_records, invalid_records = validate(raw_records)
+        # Validate
+        valid_records, invalid_records = validate(raw_records)
+        metrics.set_valid(len(valid_records), len(invalid_records))
 
-    if not valid_records:
-        log.error("No valid records to load. Aborting.")
-        sys.exit(1)
+        if not valid_records:
+            log.error("No valid records to load. Aborting.")
+            sys.exit(1)
 
-    # Create DB engine and tables
-    log.info("Connecting to database: %s", DATABASE_URL.split("@")[-1])
-    engine = create_engine(DATABASE_URL, echo=False, future=True)
+        # Create DB engine and tables
+        log.info("Connecting to database: %s", DATABASE_URL.split("@")[-1])
+        engine = create_engine(DATABASE_URL, echo=False, future=True)
 
-    log.info("Creating tables if they do not exist...")
-    Base.metadata.create_all(engine)
+        log.info("Creating tables if they do not exist...")
+        Base.metadata.create_all(engine)
+        metrics.set_tables_created(True)
 
-    # Verify connection
-    with engine.connect() as conn:
-        conn.execute(text("SELECT 1"))
-    log.info("Database connection OK.")
+        # Verify connection
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        log.info("Database connection OK.")
 
-    # Load
-    with Session(engine) as session:
-        load(session, valid_records)
+        # Load
+        with Session(engine) as session:
+            load(session, valid_records)
+        metrics.set_loaded(len(valid_records))
 
-    elapsed = time.perf_counter() - start
     log.info("=" * 60)
-    log.info("ETL finished in %.2f seconds.", elapsed)
+    log.info("ETL finished in %.2f seconds.", metrics.duration_seconds)
     log.info("  Total records:   %d", len(raw_records))
     log.info("  Valid / loaded:  %d", len(valid_records))
     log.info("  Invalid skipped: %d", len(invalid_records))
+    log.info("  Run ID: %s | Status: %s", metrics.run_id, metrics.status)
     log.info("=" * 60)
 
 

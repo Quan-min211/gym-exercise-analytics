@@ -1,11 +1,12 @@
 """Analytics router — pre-computed dataset statistics for the DA dashboard."""
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from backend.database import get_db
 from backend.schemas import DatasetOverview, DistributionItem, MuscleCoOccurrence
+from de_pipeline.etl_metrics import load_run_history
 from de_pipeline.models import BodyPart, EquipmentType, Exercise, ExerciseMuscle, Muscle
 
 router = APIRouter(prefix="/api/analytics", tags=["analytics"])
@@ -108,3 +109,12 @@ def get_muscle_cooccurrence(
         )
         for r in rows
     ]
+
+
+@router.get("/etl-history", response_model=list[dict])
+def get_etl_history(limit: int = Query(default=20, ge=1, le=100)):
+    """
+    Return the last *limit* ETL pipeline run records (newest first).
+    Sourced from docs/etl_runs.jsonl written by de_pipeline.etl_metrics.
+    """
+    return load_run_history(limit=limit)
