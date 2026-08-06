@@ -1,4 +1,8 @@
 import { $, el, api } from './app.js';
+import { buildFavoriteButton, initFavoritesNavBadge } from './favorites.js';
+
+// Keep nav badge in sync on this page too
+initFavoritesNavBadge();
 
 async function init() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -12,6 +16,7 @@ async function init() {
   try {
     const data = await api.get(`/exercises/${id}`);
     renderDetail(data);
+    fetchAlternatives(data);
     fetchRelated(data);
   } catch (err) {
     console.error(err);
@@ -68,6 +73,12 @@ function renderDetail(ex) {
   $('#add-to-schedule-btn').addEventListener('click', () => {
     alert('Schedule builder coming soon!');
   });
+
+  // ---- Favourite button ----
+  const favWrapper = $('#fav-btn-wrapper');
+  if (favWrapper) {
+    favWrapper.appendChild(buildFavoriteButton(ex.id));
+  }
 }
 
 function createBenefitItem(title, text) {
@@ -77,14 +88,72 @@ function createBenefitItem(title, text) {
   return item;
 }
 
+// ---------------------------------------------------------------------------
+// Alternatives — same target muscle, different equipment
+// ---------------------------------------------------------------------------
+
+async function fetchAlternatives(ex) {
+  const section = document.getElementById('alternatives-section');
+  const grid    = document.getElementById('alternatives-grid');
+  if (!grid) return;
+
+  try {
+    const data = await api.get(`/exercises/${ex.id}/alternatives`);
+
+    if (!data || data.length === 0) {
+      section.hidden = true;
+      return;
+    }
+
+    grid.innerHTML = '';
+    data.forEach(item => {
+      const card = el('a', {
+        class: 'card exercise-card',
+        href: `/exercise.html?id=${item.id}`,
+        'aria-label': `View ${item.name}`,
+      });
+
+      const img = el('img', {
+        src: `/${item.image}`,
+        alt: `${item.name} demonstration`,
+        loading: 'lazy',
+        width: '200',
+        height: '200',
+      });
+
+      const body = el('div', { class: 'card-body' });
+      body.appendChild(el('h3', { text: item.name, style: 'font-size: var(--text-sm)' }));
+
+      const badge = el('span', {
+        class: 'alt-badge',
+        text: item.equipment_name || item.equipment,
+      });
+      body.appendChild(badge);
+
+      card.appendChild(img);
+      card.appendChild(body);
+      grid.appendChild(card);
+    });
+
+  } catch (err) {
+    // Hide silently if the endpoint doesn't exist yet (e.g., local dev without new BE)
+    section.hidden = true;
+    console.warn('Alternatives unavailable:', err.message);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Related — same target muscle, any equipment
+// ---------------------------------------------------------------------------
+
 async function fetchRelated(ex) {
   try {
-    const data = await api.get('/exercises', { target: ex.target, page_size: 4 });
+    const data = await api.get('/exercises', { target: ex.target, page_size: 5 });
     const grid = $('#related-grid');
     grid.innerHTML = '';
     
     // Filter out the current exercise
-    const related = data.items.filter(item => item.id !== ex.id).slice(0, 3);
+    const related = data.items.filter(item => item.id !== ex.id).slice(0, 4);
     
     if (related.length === 0) {
       grid.innerHTML = '<p class="text-muted">No related exercises found.</p>';
@@ -93,7 +162,11 @@ async function fetchRelated(ex) {
 
     related.forEach(item => {
       const card = el('a', { class: 'card exercise-card', href: `/exercise.html?id=${item.id}` });
-      const img = el('img', { src: `/${item.image}`, loading: 'lazy' });
+      const img = el('img', {
+        src: `/${item.image}`,
+        alt: `${item.name} demonstration`,
+        loading: 'lazy',
+      });
       const body = el('div', { class: 'card-body', style: 'padding: 1rem;' });
       body.appendChild(el('h3', { text: item.name, style: 'font-size: var(--text-sm)' }));
       
@@ -108,3 +181,4 @@ async function fetchRelated(ex) {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+

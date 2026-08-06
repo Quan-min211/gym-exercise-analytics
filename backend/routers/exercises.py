@@ -235,3 +235,57 @@ def get_exercise(
         created_at=ex.created_at,
         instructions=instruction_out,
     )
+
+
+# ---------------------------------------------------------------------------
+# GET /api/exercises/{id}/alternatives
+# ---------------------------------------------------------------------------
+
+@router.get("/{exercise_id}/alternatives", response_model=list[ExerciseSummary])
+def get_alternatives(
+    exercise_id: str,
+    limit: int = Query(default=6, ge=1, le=20),
+    db: Session = Depends(get_db),
+):
+    """
+    Return up to *limit* alternative exercises that target the same primary muscle.
+
+    Ordering priority:
+      1. Exercises with a **different** equipment type (useful substitutions).
+      2. Exercises with the same body part (closest movement pattern).
+      3. Alphabetical by name (deterministic fallback).
+    """
+    source = (
+        db.query(Exercise)
+        .options(
+            joinedload(Exercise.body_part_ref),
+            joinedload(Exercise.equipment_ref),
+            joinedload(Exercise.target_muscle_ref),
+        )
+        .filter(Exercise.id == exercise_id)
+        .first()
+    )
+    if not source:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail=f"Exercise '{exercise_id}' not found.")
+
+    query = (
+        db.query(Exercise)
+        .options(
+            joinedload(Exercise.body_part_ref),
+            joinedload(Exercise.equipment_ref),
+            joinedload(Exercise.target_muscle_ref),
+        )
+        .filter(Exercise.target_muscle_id == source.target_muscle_id)
+        .filter(Exercise.id != exercise_id)
+        # Prefer different equipment (True sorts after False in SQL, so negate)
+        .order_by(
+            (Exercise.equipment_id == source.equipment_id),   # 0 = different equipment first
+            (Exercise.body_part_id != source.body_part_id),   # 0 = same body part first
+            Exercise.name,
+        )
+        .limit(limit)
+    )
+
+    return [ExerciseSummary(**_exercise_to_summary(ex)) for ex in query.all()]
+
