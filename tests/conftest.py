@@ -95,6 +95,37 @@ def db_session():
     )
     session.add_all([ex1, ex2, ex3])
 
+    # Extra exercises to test alternatives (same target muscle as Push Up)
+    ex4 = Exercise(
+        id="0004",
+        name="Dumbbell Fly",
+        category="strength",
+        body_part_id=1,          # chest
+        equipment_id=2,          # dumbbell (different from Push Up)
+        target_muscle_id=1,      # pectorals (same as Push Up)
+        muscle_group="chest",
+        media_id="m4",
+        image="images/0004.jpg",
+        gif_url="videos/0004.gif",
+        attribution="GymVisual",
+        created_at=now,
+    )
+    ex5 = Exercise(
+        id="0005",
+        name="Chest Dip",
+        category="calisthenics",
+        body_part_id=1,          # chest
+        equipment_id=1,          # body weight (same as Push Up)
+        target_muscle_id=1,      # pectorals (same as Push Up)
+        muscle_group="chest",
+        media_id="m5",
+        image="images/0005.jpg",
+        gif_url="videos/0005.gif",
+        attribution="GymVisual",
+        created_at=now,
+    )
+    session.add_all([ex4, ex5])
+
     # Seed Instructions
     inst1 = Instruction(
         id=1,
