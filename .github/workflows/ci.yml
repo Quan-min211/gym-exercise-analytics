@@ -87,7 +87,7 @@ jobs:
             --cov=backend \
             --cov=de_pipeline \
             --cov-report=term-missing \
-            --cov-fail-under=50
+            --cov-fail-under=70
 
   # =========================================================================
   # JOB 3: Docker Build & Integration Check

@@ -33,6 +33,9 @@ async function init() {
     console.error('Failed to load analytics:', err);
     $('#overview-stats').innerHTML = '<p class="text-danger" style="grid-column: 1/-1;">Failed to load data. Is the backend running?</p>';
   }
+
+  // ETL history (non-blocking — load independently)
+  fetchETLHistory();
 }
 
 function renderStats(data) {
@@ -173,4 +176,66 @@ function renderCooccurrenceTable(data) {
   });
 }
 
+
+// ---------------------------------------------------------------------------
+// ETL Pipeline History
+// ---------------------------------------------------------------------------
+
+async function fetchETLHistory() {
+  const tbody = document.getElementById('etl-history-body');
+  if (!tbody) return;
+
+  try {
+    const runs = await api.get('/analytics/etl-history?limit=10');
+
+    if (!runs || runs.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--color-text-muted);padding:var(--space-8)">No ETL runs recorded yet. Run the pipeline to generate history.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = '';
+    runs.forEach(run => {
+      const tr = document.createElement('tr');
+
+      // Status badge
+      const statusColor = run.status === 'SUCCESS' ? '#66BB6A'
+        : run.status === 'FAILED' ? '#EF5350'
+        : '#FFC107';
+
+      const statusBadge = `<mark style="
+        display:inline-block; padding:2px 8px; border-radius:99px;
+        background:${statusColor}22; color:${statusColor};
+        font-size:11px; font-weight:700; text-transform:uppercase;
+      ">${run.status || '—'}</mark>`;
+
+      // Format date
+      const started = run.started_at
+        ? new Date(run.started_at).toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'medium' })
+        : '—';
+
+      // Duration
+      const dur = run.duration_seconds != null
+        ? `${run.duration_seconds.toFixed(1)}s`
+        : '—';
+
+      tr.innerHTML = `
+        <td><code style="font-size:var(--text-xs)">${run.run_id || '—'}</code></td>
+        <td>${statusBadge}</td>
+        <td class="count-cell">${run.records_extracted ?? '—'}</td>
+        <td class="count-cell">${run.records_valid ?? '—'}</td>
+        <td class="count-cell">${run.records_invalid ?? '—'}</td>
+        <td class="count-cell">${run.records_loaded ?? '—'}</td>
+        <td class="count-cell">${dur}</td>
+        <td style="font-size:var(--text-xs)">${started}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+  } catch (err) {
+    console.warn('ETL history unavailable:', err.message);
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--color-text-muted);padding:var(--space-8)">ETL history endpoint not available.</td></tr>';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', init);
+

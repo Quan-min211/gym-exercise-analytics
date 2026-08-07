@@ -77,6 +77,7 @@
           <li><a href="/recommend.html">Recommender</a></li>
           <li><a href="/schedule.html">My Schedule</a></li>
           <li><a href="/analytics.html" aria-current="page">Analytics</a></li>
+          <li><a href="/favorites.html">Favourites</a></li>
         </ul>
       </nav>
     </div>
@@ -166,6 +167,36 @@
 
         </div>
       </div>
+
+      <!-- ETL Pipeline History -->
+      <section class="mt-12" aria-labelledby="etl-heading">
+        <header class="section-header">
+          <h2 id="etl-heading">ETL Pipeline History</h2>
+          <p style="font-size:var(--text-xs);color:var(--color-text-muted)">Last 10 pipeline runs (newest first)</p>
+        </header>
+
+        <div style="overflow-x: auto; margin-top: var(--space-4);">
+          <table class="co-table" aria-label="ETL run history" id="etl-history-table">
+            <thead>
+              <tr>
+                <th scope="col">Run ID</th>
+                <th scope="col">Status</th>
+                <th scope="col" style="text-align:right">Extracted</th>
+                <th scope="col" style="text-align:right">Valid</th>
+                <th scope="col" style="text-align:right">Invalid</th>
+                <th scope="col" style="text-align:right">Loaded</th>
+                <th scope="col" style="text-align:right">Duration</th>
+                <th scope="col">Started</th>
+              </tr>
+            </thead>
+            <tbody id="etl-history-body">
+              <tr>
+                <td colspan="8" style="text-align:center;color:var(--color-text-muted);padding:var(--space-8)">Loading ETL history…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
     </section>
   </main>

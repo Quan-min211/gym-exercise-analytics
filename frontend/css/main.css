@@ -389,6 +389,66 @@ p { line-height: var(--leading-relaxed); }
   gap: var(--space-1);
 }
 
+/* ---- Mini favourite button (on card image) ---- */
+.fav-btn--mini {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: 5;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: hsla(0, 0%, 7%, 0.7);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.15s, border-color 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.fav-btn--mini svg {
+  width: 16px;
+  height: 16px;
+}
+
+.fav-btn--mini:hover {
+  background: hsla(0, 72%, 50%, 0.2);
+  color: var(--color-accent);
+  border-color: var(--color-accent-dim);
+  transform: scale(1.15);
+}
+
+.fav-btn--mini[aria-pressed='true'] {
+  color: var(--color-accent);
+  background: hsla(0, 72%, 50%, 0.25);
+  border-color: var(--color-accent-dim);
+}
+
+.fav-btn--mini[aria-pressed='true']:hover {
+  transform: scale(1.15);
+}
+
+/* ---- Favourites nav badge ---- */
+.fav-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
 /* ============================================================
    GRID
    ============================================================ */

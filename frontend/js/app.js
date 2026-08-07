@@ -114,6 +114,15 @@ export function buildExerciseCard(exercise) {
   fig.appendChild(img);
   fig.appendChild(figcap);
 
+  // ---- Mini favourite button (top-right corner) ----
+  try {
+    // Dynamic import so pages that don't have favorites.js still work
+    import('./favorites.js').then(({ buildFavoriteButton }) => {
+      const favBtn = buildFavoriteButton(exercise.id, { mini: true });
+      fig.appendChild(favBtn);
+    }).catch(() => {}); // silent fail if module unavailable
+  } catch { /* ignore */ }
+
   const body = el('div', { class: 'card-body' });
   const title = el('h3', { text: exercise.name });
   const tags = el('div', { class: 'tags' });
@@ -145,6 +154,7 @@ export function buildExerciseCard(exercise) {
 
   return card;
 }
+
 
 // ---------------------------------------------------------------------------
 // Pagination builder

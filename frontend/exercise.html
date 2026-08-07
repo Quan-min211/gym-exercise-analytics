@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="FitData Hub — View detailed instructions, animated demonstration, benefits, and tips for any gym exercise.">
+  <meta name="description"
+    content="FitData Hub — View detailed instructions, animated demonstration, benefits, and tips for any gym exercise.">
   <title>Exercise Detail — FitData Hub</title>
   <link rel="stylesheet" href="/css/main.css">
   <style>
@@ -15,7 +17,9 @@
     }
 
     @media (max-width: 767px) {
-      .detail-layout { grid-template-columns: 1fr; }
+      .detail-layout {
+        grid-template-columns: 1fr;
+      }
     }
 
     .media-panel {
@@ -207,6 +211,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <header class="site-header">
@@ -243,7 +248,9 @@
         <!-- Left: animated GIF + metadata -->
         <aside aria-label="Exercise media and metadata">
           <figure class="gif-player">
-            <img id="exercise-gif" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="Exercise demonstration" loading="lazy">
+            <img id="exercise-gif"
+              src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
+              alt="Exercise demonstration" loading="lazy">
             <figcaption id="exercise-name-caption" class="visually-hidden"></figcaption>
           </figure>
 
@@ -267,12 +274,8 @@
             <div id="muscles-tags" class="tags" style="display:flex;flex-wrap:wrap;gap:var(--space-2)"></div>
           </section>
 
-          <button
-            id="add-to-schedule-btn"
-            class="btn btn-primary w-full mt-6"
-            type="button"
-            aria-label="Add this exercise to my schedule"
-          >
+          <button id="add-to-schedule-btn" class="btn btn-primary w-full mt-6" type="button"
+            aria-label="Add this exercise to my schedule">
             Add to Schedule
           </button>
 
@@ -314,7 +317,8 @@
       <section class="mt-12" aria-labelledby="alternatives-heading" id="alternatives-section">
         <header class="section-header">
           <h2 id="alternatives-heading">Alternative Exercises</h2>
-          <p style="font-size:var(--text-xs);color:var(--color-text-muted)">Same target muscle &mdash; different equipment</p>
+          <p style="font-size:var(--text-xs);color:var(--color-text-muted)">Same target muscle &mdash; different
+            equipment</p>
         </header>
         <div id="alternatives-grid" class="alt-grid" aria-label="Alternative exercises" aria-live="polite"></div>
       </section>
@@ -342,4 +346,5 @@
   <script src="/js/exercise-detail.js" type="module"></script>
   <script src="/js/favorites.js" type="module"></script>
 </body>
+
 </html>

@@ -10,7 +10,7 @@ GET  /api/exercises/{id}         single exercise detail
 """
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import func, or_
+from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
 
 from backend.database import get_db
@@ -34,6 +34,24 @@ from de_pipeline.models import (
 
 router = APIRouter(prefix="/api/exercises", tags=["exercises"])
 
+# ---------------------------------------------------------------------------
+# Simple TTL in-memory cache (avoids repeated DB hits on static data)
+# ---------------------------------------------------------------------------
+
+import time as _time
+
+_cache: dict = {}
+_CACHE_TTL = 600  # 10 minutes
+
+
+def _cached(key: str, fn):
+    """Return cached value or recompute and store with TTL."""
+    entry = _cache.get(key)
+    if entry and (_time.monotonic() - entry["ts"] < _CACHE_TTL):
+        return entry["value"]
+    value = fn()
+    _cache[key] = {"value": value, "ts": _time.monotonic()}
+    return value
 
 # ---------------------------------------------------------------------------
 # Helper: map ORM Exercise → ExerciseSummary dict
@@ -59,23 +77,27 @@ def _exercise_to_summary(ex: Exercise) -> dict:
 
 @router.get("/filters", response_model=FilterOptions)
 def get_filters(db: Session = Depends(get_db)):
-    """Return all distinct filter values for the UI filter panel."""
-    body_parts = [r.name for r in db.query(BodyPart).order_by(BodyPart.name).all()]
-    equipment = [r.name for r in db.query(EquipmentType).order_by(EquipmentType.name).all()]
-    muscles = [r.name for r in db.query(Muscle).order_by(Muscle.name).all()]
-    muscle_groups = [
-        r[0]
-        for r in db.query(Exercise.muscle_group)
-        .distinct()
-        .order_by(Exercise.muscle_group)
-        .all()
-    ]
-    return FilterOptions(
-        body_parts=body_parts,
-        equipment_types=equipment,
-        target_muscles=muscles,
-        muscle_groups=muscle_groups,
-    )
+    """Return all distinct filter values for the UI filter panel. Results cached for 10 minutes."""
+
+    def _query():
+        body_parts = [r.name for r in db.query(BodyPart).order_by(BodyPart.name).all()]
+        equipment = [r.name for r in db.query(EquipmentType).order_by(EquipmentType.name).all()]
+        muscles = [r.name for r in db.query(Muscle).order_by(Muscle.name).all()]
+        muscle_groups = [
+            r[0]
+            for r in db.query(Exercise.muscle_group)
+            .distinct()
+            .order_by(Exercise.muscle_group)
+            .all()
+        ]
+        return FilterOptions(
+            body_parts=body_parts,
+            equipment_types=equipment,
+            target_muscles=muscles,
+            muscle_groups=muscle_groups,
+        )
+
+    return _cached("filters", _query)
 
 
 # ---------------------------------------------------------------------------

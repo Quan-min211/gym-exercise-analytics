@@ -2,7 +2,7 @@
 
 > **Mục đích**: File này ghi lại toàn bộ kiến trúc, ý tưởng, công nghệ, và nội dung chi tiết của từng phần trong hệ thống FitData Hub. AI agent hoặc developer mới **BẮT BUỘC** phải đọc file này trước khi thực hiện bất kỳ task nào để không phá vỡ những gì đã xây dựng.
 >
-> **Cập nhật lần cuối**: 2026-08-03
+> **Cập nhật lần cuối**: 2026-08-07
 
 ---
 
@@ -198,6 +198,13 @@ Cung cấp REST API cho frontend SPA: duyệt bài tập, tìm kiếm, lọc, xe
 | `DELETE` | `/api/schedules/{id}` | Xóa schedule |
 | `GET` | `/api/analytics/overview` | Tổng quan dataset: counts + distributions |
 | `GET` | `/api/analytics/muscle-cooccurrence` | Top cặp cơ thường tập chung |
+| `GET` | `/api/analytics/etl-history` | Lịch sử ETL runs (từ etl_runs.jsonl) |
+| `GET` | `/api/exercises/{id}/alternatives` | Top 6 bài tập cùng target muscle, ưu tiên khác equipment |
+
+### API Performance
+
+- **In-memory TTL cache** (`_cached()` — 10 phút) cho `/api/exercises/filters` — static data chỉ thay đổi khi ETL chạy lại.
+- **ETL Metrics**: Mỗi ETL run tự ghi metrics (records, duration, status) vào `docs/etl_runs.jsonl` qua module `de_pipeline/etl_metrics.py`.
 
 ### Lưu ý kỹ thuật quan trọng
 
@@ -284,22 +291,25 @@ Giao diện web SPA phong cách **"Iron Plate / Powerlifting Meet"** — mạnh 
 
 | File | Trang | Chức năng |
 |---|---|---|
-| `frontend/index.html` | Exercise Library | Hero banner + search bar + filter sidebar + exercise grid (phân trang) |
-| `frontend/exercise.html` | Exercise Detail | GIF player + metadata strip + instructions + secondary muscles + related exercises |
+| `frontend/index.html` | Exercise Library | Hero banner + search bar + filter sidebar + exercise grid (phân trang) + mini ❤️ fav button |
+| `frontend/exercise.html` | Exercise Detail | GIF player + metadata strip + instructions + secondary muscles + ❤️ fav button + alternative exercises + related exercises |
 | `frontend/recommend.html` | Smart Recommender | Wizard 3 bước: Goal → Equipment → Details → Generate Plan |
 | `frontend/schedule.html` | My Schedule | Hiển thị lịch tập tuần, empty state, delete/regenerate |
-| `frontend/analytics.html` | Analytics Dashboard | 4 stat cards + equipment bar chart (đỏ) + muscle bar chart (vàng) + body part doughnut + co-occurrence table |
+| `frontend/analytics.html` | Analytics Dashboard | 4 stat cards + equipment bar chart (đỏ) + muscle bar chart (vàng) + body part doughnut + co-occurrence table + ETL history table |
+| `frontend/favorites.html` | My Favourites | Grid view bài tập đã lưu, animated remove, empty state, clear all |
 
 ### Nội dung chi tiết — JavaScript Modules
 
 | File | Vai trò |
 |---|---|
-| `frontend/js/app.js` | Core utilities: `$()`, `$$()`, `el()`, `api` (fetch wrapper), `buildExerciseCard()`, pagination builder |
+| `frontend/js/app.js` | Core utilities: `$()`, `$$()`, `el()`, `api` (fetch wrapper), `buildExerciseCard()` (với mini ❤️), pagination builder |
 | `frontend/js/exercises.js` | Trang index: load filters, bind search/filter events, render exercise grid |
-| `frontend/js/exercise-detail.js` | Trang detail: load exercise by ID from URL params, render GIF + instructions |
+| `frontend/js/exercise-detail.js` | Trang detail: load exercise by ID, render GIF + instructions + fav button + alternatives |
 | `frontend/js/recommend.js` | Wizard logic: step navigation, equipment checkboxes, form submit → render results |
 | `frontend/js/schedule.js` | Load schedule from localStorage ID, render calendar grid, delete handler |
-| `frontend/js/analytics.js` | Chart.js initialization: equipment chart (đỏ), muscle chart (vàng), doughnut, co-occurrence table |
+| `frontend/js/analytics.js` | Chart.js initialization + ETL history table rendering |
+| `frontend/js/favorites.js` | Favorites module: localStorage CRUD, heart button builder, nav badge, cross-component events |
+| `frontend/js/favorites-page.js` | Favorites page controller: parallel API fetch, animated card removal, clear-all |
 
 ### Nội dung chi tiết — CSS
 
