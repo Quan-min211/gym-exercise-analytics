@@ -6,8 +6,9 @@
  *   isFavorite(id)           → boolean
  *   getFavorites()           → string[]
  *   getFavoriteCount()       → number
- *   initFavoriteButton(btn, exerciseId)  → wires up a toggle button + live count
- *   dispatchFavoritesChange()           → fires custom event
+ *   buildFavoriteButton(id, opts)  → creates a ❤️ toggle button
+ *   initFavoritesNavBadge()        → wires nav badge count
+ *   dispatchFavoritesChange()      → fires custom event
  */
 
 const STORAGE_KEY = 'fitdata_favorites';
@@ -42,9 +43,11 @@ export function toggleFavorite(id) {
   const favs = getFavorites();
   if (favs.includes(id_)) {
     saveFavorites(favs.filter(f => f !== id_));
+    showToast('Removed from favourites');
     return false;
   } else {
     saveFavorites([...favs, id_]);
+    showToast('Added to favourites ❤️');
     return true;
   }
 }
@@ -53,6 +56,55 @@ export function dispatchFavoritesChange() {
   window.dispatchEvent(new CustomEvent('favorites-changed', {
     detail: { count: getFavoriteCount() },
   }));
+}
+
+// ---------------------------------------------------------------------------
+// Toast notification
+// ---------------------------------------------------------------------------
+
+let _toastTimeout;
+
+function showToast(message) {
+  let container = document.getElementById('fav-toast');
+  if (!container) {
+    container = document.createElement('output');
+    container.id = 'fav-toast';
+    container.setAttribute('role', 'status');
+    container.setAttribute('aria-live', 'polite');
+    Object.assign(container.style, {
+      position: 'fixed',
+      bottom: '80px',
+      right: '24px',
+      zIndex: '200',
+      padding: '10px 20px',
+      background: 'rgba(17, 19, 24, 0.95)',
+      border: '1px solid hsl(0, 72%, 50%)',
+      borderRadius: '6px',
+      color: '#F5F5F5',
+      fontSize: '13px',
+      fontWeight: '600',
+      fontFamily: "'Barlow', system-ui, sans-serif",
+      backdropFilter: 'blur(8px)',
+      boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+      transform: 'translateY(20px)',
+      opacity: '0',
+      transition: 'opacity 0.25s, transform 0.25s',
+      pointerEvents: 'none',
+    });
+    document.body.appendChild(container);
+  }
+
+  container.textContent = message;
+  // Trigger reflow then animate in
+  container.offsetHeight; // eslint-disable-line no-unused-expressions
+  container.style.opacity = '1';
+  container.style.transform = 'translateY(0)';
+
+  clearTimeout(_toastTimeout);
+  _toastTimeout = setTimeout(() => {
+    container.style.opacity = '0';
+    container.style.transform = 'translateY(20px)';
+  }, 2000);
 }
 
 // ---------------------------------------------------------------------------
@@ -113,4 +165,14 @@ export function initFavoritesNavBadge() {
 
   updateBadges();
   window.addEventListener('favorites-changed', updateBadges);
+}
+
+// ---------------------------------------------------------------------------
+// Auto-init: wire up nav badge on every page (module is lazy-loaded)
+// ---------------------------------------------------------------------------
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => initFavoritesNavBadge());
+} else {
+  initFavoritesNavBadge();
 }
