@@ -8,6 +8,9 @@ def test_health_check(client):
     data = response.json()
     assert data["status"] == "ok"
     assert data["service"] == "FitData Hub API"
+    assert "version" in data
+    assert "uptime_seconds" in data
+    assert "timestamp" in data
 
 
 def test_list_exercises(client):

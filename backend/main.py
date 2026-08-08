@@ -54,9 +54,21 @@ app.add_middleware(
 # Health check — registered FIRST, before any mount()
 # ---------------------------------------------------------------------------
 
+import time as _time
+from datetime import datetime, timezone as _tz
+
+_start_time = _time.monotonic()
+
 @app.get("/api/health", tags=["health"])
 def health_check():
-    return {"status": "ok", "service": "FitData Hub API"}
+    uptime_s = round(_time.monotonic() - _start_time, 1)
+    return {
+        "status": "ok",
+        "service": "FitData Hub API",
+        "version": "1.0.0",
+        "uptime_seconds": uptime_s,
+        "timestamp": datetime.now(_tz.utc).isoformat(),
+    }
 
 
 # ---------------------------------------------------------------------------
