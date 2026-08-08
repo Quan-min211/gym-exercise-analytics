@@ -188,3 +188,79 @@ export function buildPagination(container, { page, totalPages, onPageChange }) {
 
 // Init nav
 markCurrentNav();
+
+// ---------------------------------------------------------------------------
+// Mobile hamburger menu toggle
+// ---------------------------------------------------------------------------
+
+(function initMobileNav() {
+  const header = document.querySelector('.header-inner');
+  const nav = document.querySelector('.main-nav');
+  if (!header || !nav) return;
+
+  const toggle = document.createElement('button');
+  toggle.className = 'nav-toggle';
+  toggle.type = 'button';
+  toggle.setAttribute('aria-label', 'Toggle navigation menu');
+  toggle.setAttribute('aria-expanded', 'false');
+  toggle.innerHTML = `
+    <svg class="icon-open" aria-hidden="true" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M3 6h18M3 12h18M3 18h18"/>
+    </svg>
+    <svg class="icon-close" aria-hidden="true" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      style="display:none">
+      <path d="M18 6L6 18M6 6l12 12"/>
+    </svg>`;
+  header.appendChild(toggle);
+
+  toggle.addEventListener('click', () => {
+    const open = nav.classList.toggle('is-open');
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.querySelector('.icon-open').style.display = open ? 'none' : '';
+    toggle.querySelector('.icon-close').style.display = open ? '' : 'none';
+  });
+
+  // Close menu when a link is clicked
+  nav.addEventListener('click', (e) => {
+    if (e.target.closest('a')) {
+      nav.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.querySelector('.icon-open').style.display = '';
+      toggle.querySelector('.icon-close').style.display = 'none';
+    }
+  });
+})();
+
+// ---------------------------------------------------------------------------
+// Scroll-to-top button
+// ---------------------------------------------------------------------------
+
+(function initScrollToTop() {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'scroll-top-btn';
+  btn.setAttribute('aria-label', 'Scroll to top');
+  btn.innerHTML = `
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 15l-6-6-6 6"/>
+    </svg>`;
+  document.body.appendChild(btn);
+
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        btn.classList.toggle('is-visible', window.scrollY > 400);
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
