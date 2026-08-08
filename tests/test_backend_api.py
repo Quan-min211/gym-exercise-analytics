@@ -220,5 +220,7 @@ def test_list_with_body_part_filter(client):
     response = client.get("/api/exercises?body_part=chest")
     assert response.status_code == 200
     data = response.json()
+    assert len(data["items"]) > 0
     for ex in data["items"]:
-        assert ex["body_part"] == "chest"
+        # ExerciseSummary uses Field(alias="body_part_name")
+        assert ex.get("body_part") == "chest" or ex.get("body_part_name") == "chest"
