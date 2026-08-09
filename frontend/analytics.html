@@ -73,11 +73,11 @@
       </a>
       <nav class="main-nav" aria-label="Main navigation">
         <ul>
-          <li><a href="/">Exercises</a></li>
-          <li><a href="/recommend.html">Recommender</a></li>
-          <li><a href="/schedule.html">My Schedule</a></li>
-          <li><a href="/analytics.html" aria-current="page">Analytics</a></li>
-          <li><a href="/favorites.html">Favourites</a></li>
+          <li><a href="/" data-i18n="nav.exercises">Exercises</a></li>
+          <li><a href="/recommend.html" data-i18n="nav.recommender">Recommender</a></li>
+          <li><a href="/schedule.html" data-i18n="nav.schedule">My Schedule</a></li>
+          <li><a href="/analytics.html" aria-current="page" data-i18n="nav.analytics">Analytics</a></li>
+          <li><a href="/favorites.html" data-i18n="nav.favourites">Favourites</a></li>
         </ul>
       </nav>
     </div>
@@ -88,8 +88,8 @@
     <!-- Page Hero -->
     <section class="page-hero" aria-labelledby="page-title">
       <div class="hero-inner">
-        <h1 id="page-title">Dataset<br><strong>Analytics</strong></h1>
-        <p>Explore the distribution of exercises, equipment, and targeted muscles across the FitData Hub library.</p>
+        <h1 id="page-title" data-i18n="analytics.title">Dataset<br><strong>Analytics</strong></h1>
+        <p data-i18n="analytics.subtitle">Explore the distribution of exercises, equipment, and targeted muscles across the FitData Hub library.</p>
       </div>
     </section>
 
@@ -111,8 +111,8 @@
 
           <article class="chart-card">
             <header>
-              <h3>Equipment Popularity</h3>
-              <p>Top 15 most common equipment types across all exercises.</p>
+              <h3 data-i18n="analytics.equipment_chart">Equipment Popularity</h3>
+              <p data-i18n="analytics.equipment_desc">Top 15 most common equipment types across all exercises.</p>
             </header>
             <div class="chart-container">
               <canvas id="equipmentChart" aria-label="Bar chart showing equipment popularity" role="img"></canvas>
@@ -121,8 +121,8 @@
 
           <article class="chart-card">
             <header>
-              <h3>Target Muscle Distribution</h3>
-              <p>Exercises grouped by their primary target muscle.</p>
+              <h3 data-i18n="analytics.muscle_chart">Target Muscle Distribution</h3>
+              <p data-i18n="analytics.muscle_desc">Exercises grouped by their primary target muscle.</p>
             </header>
             <div class="chart-container">
               <canvas id="targetMuscleChart" aria-label="Bar chart showing target muscle distribution" role="img"></canvas>
@@ -136,8 +136,8 @@
 
           <article class="chart-card">
             <header>
-              <h3>Body Part Focus</h3>
-              <p>High-level regional breakdown.</p>
+              <h3 data-i18n="analytics.bodypart_chart">Body Part Focus</h3>
+              <p data-i18n="analytics.bodypart_desc">High-level regional breakdown.</p>
             </header>
             <div class="chart-container" style="min-height: 320px;">
               <canvas id="bodyPartChart" aria-label="Doughnut chart showing body part focus" role="img"></canvas>
@@ -146,16 +146,16 @@
 
           <article class="chart-card">
             <header>
-              <h3>Muscle Co-occurrences</h3>
-              <p>Muscles most frequently trained together.</p>
+              <h3 data-i18n="analytics.cooccurrence">Muscle Co-occurrences</h3>
+              <p data-i18n="analytics.cooccurrence_desc">Muscles most frequently trained together.</p>
             </header>
             <div style="max-height: 400px; overflow-y: auto;">
               <table class="co-table" aria-label="Muscle co-occurrence data">
                 <thead>
                   <tr>
-                    <th scope="col">Muscle A</th>
-                    <th scope="col">Muscle B</th>
-                    <th scope="col" style="text-align: right;">Count</th>
+                    <th scope="col" data-i18n="analytics.muscle_a">Muscle A</th>
+                    <th scope="col" data-i18n="analytics.muscle_b">Muscle B</th>
+                    <th scope="col" style="text-align: right;" data-i18n="analytics.count">Count</th>
                   </tr>
                 </thead>
                 <tbody id="cooccurrence-table-body">
@@ -171,22 +171,22 @@
       <!-- ETL Pipeline History -->
       <section class="mt-12" aria-labelledby="etl-heading">
         <header class="section-header">
-          <h2 id="etl-heading">ETL Pipeline History</h2>
-          <p style="font-size:var(--text-xs);color:var(--color-text-muted)">Last 10 pipeline runs (newest first)</p>
+          <h2 id="etl-heading" data-i18n="analytics.etl_title">ETL Pipeline History</h2>
+          <p style="font-size:var(--text-xs);color:var(--color-text-muted)" data-i18n="analytics.etl_desc">Last 10 pipeline runs (newest first)</p>
         </header>
 
         <div style="overflow-x: auto; margin-top: var(--space-4);">
           <table class="co-table" aria-label="ETL run history" id="etl-history-table">
             <thead>
               <tr>
-                <th scope="col">Run ID</th>
-                <th scope="col">Status</th>
-                <th scope="col" style="text-align:right">Extracted</th>
-                <th scope="col" style="text-align:right">Valid</th>
-                <th scope="col" style="text-align:right">Invalid</th>
-                <th scope="col" style="text-align:right">Loaded</th>
-                <th scope="col" style="text-align:right">Duration</th>
-                <th scope="col">Started</th>
+                <th scope="col" data-i18n="analytics.run_id">Run ID</th>
+                <th scope="col" data-i18n="analytics.status">Status</th>
+                <th scope="col" style="text-align:right" data-i18n="analytics.extracted">Extracted</th>
+                <th scope="col" style="text-align:right" data-i18n="analytics.valid">Valid</th>
+                <th scope="col" style="text-align:right" data-i18n="analytics.invalid">Invalid</th>
+                <th scope="col" style="text-align:right" data-i18n="analytics.loaded">Loaded</th>
+                <th scope="col" style="text-align:right" data-i18n="analytics.duration">Duration</th>
+                <th scope="col" data-i18n="analytics.started">Started</th>
               </tr>
             </thead>
             <tbody id="etl-history-body">
@@ -203,12 +203,13 @@
 
   <footer class="site-footer">
     <address>
-      Data sourced from <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
+      <span data-i18n="footer.source">Data sourced from</span> <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
     </address>
-    <p>FitData Hub &mdash; Data Engineering &amp; Analytics learning project.</p>
+    <p data-i18n="footer.tagline">FitData Hub &mdash; Data Engineering &amp; Analytics learning project.</p>
   </footer>
 
   <script src="/js/app.js" type="module"></script>
+  <script src="/js/i18n.js" type="module"></script>
   <script src="/js/analytics.js" type="module"></script>
 </body>
 </html>

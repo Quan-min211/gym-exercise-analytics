@@ -62,11 +62,11 @@
       </a>
       <nav class="main-nav" aria-label="Main navigation">
         <ul>
-          <li><a href="/">Exercises</a></li>
-          <li><a href="/recommend.html">Recommender</a></li>
-          <li><a href="/schedule.html" aria-current="page">My Schedule</a></li>
-          <li><a href="/analytics.html">Analytics</a></li>
-          <li><a href="/favorites.html">Favourites</a></li>
+          <li><a href="/" data-i18n="nav.exercises">Exercises</a></li>
+          <li><a href="/recommend.html" data-i18n="nav.recommender">Recommender</a></li>
+          <li><a href="/schedule.html" aria-current="page" data-i18n="nav.schedule">My Schedule</a></li>
+          <li><a href="/analytics.html" data-i18n="nav.analytics">Analytics</a></li>
+          <li><a href="/favorites.html" data-i18n="nav.favourites">Favourites</a></li>
         </ul>
       </nav>
     </div>
@@ -77,8 +77,8 @@
     <!-- Page Hero -->
     <section class="page-hero" aria-labelledby="page-title">
       <div class="hero-inner">
-        <h1 id="page-title">My <strong>Schedule</strong></h1>
-        <p id="schedule-subtitle">Loading your workout schedule…</p>
+        <h1 id="page-title" data-i18n="schedule.title">My <strong>Schedule</strong></h1>
+        <p id="schedule-subtitle" data-i18n="schedule.loading">Loading your workout schedule…</p>
       </div>
     </section>
 
@@ -88,16 +88,16 @@
       <div class="section-header" id="schedule-actions" style="display: none;">
         <div></div>
         <div class="flex gap-4">
-          <a href="/recommend.html" class="btn btn-ghost btn-sm">Generate New Plan</a>
-          <button id="delete-schedule-btn" class="btn btn-outline-red btn-sm">Delete Schedule</button>
+          <a href="/recommend.html" class="btn btn-ghost btn-sm" data-i18n="schedule.generate_new">Generate New Plan</a>
+          <button id="delete-schedule-btn" class="btn btn-outline-red btn-sm" data-i18n="schedule.delete">Delete Schedule</button>
         </div>
       </div>
 
       <!-- Empty state -->
       <div class="empty-state" id="no-schedule-msg" style="display: none;">
-        <h2>No Schedule Found</h2>
-        <p>You don't have an active workout schedule yet. Generate one in seconds.</p>
-        <a href="/recommend.html" class="btn btn-primary btn-lg">Generate My Plan</a>
+        <h2 data-i18n="schedule.empty_title">No Schedule Found</h2>
+        <p data-i18n="schedule.empty_text">You don't have an active workout schedule yet. Generate one in seconds.</p>
+        <a href="/recommend.html" class="btn btn-primary btn-lg" data-i18n="schedule.generate">Generate My Plan</a>
       </div>
 
       <!-- Schedule calendar -->
@@ -112,12 +112,13 @@
 
   <footer class="site-footer">
     <address>
-      Data sourced from <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
+      <span data-i18n="footer.source">Data sourced from</span> <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
     </address>
-    <p>FitData Hub &mdash; Data Engineering &amp; Analytics learning project.</p>
+    <p data-i18n="footer.tagline">FitData Hub &mdash; Data Engineering &amp; Analytics learning project.</p>
   </footer>
 
   <script src="/js/app.js" type="module"></script>
+  <script src="/js/i18n.js" type="module"></script>
   <script src="/js/schedule.js" type="module"></script>
 </body>
 </html>

@@ -137,6 +137,78 @@ input, select, textarea {
   background: rgba(211, 47, 47, 0.1);
 }
 
+/* ---- Language switcher ---- */
+.lang-switcher {
+  position: relative;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.lang-toggle:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text-primary);
+}
+
+.lang-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 150px;
+  background: rgba(11, 13, 17, 0.98);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-1) 0;
+  z-index: 120;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+  list-style: none;
+}
+
+.lang-dropdown.is-open { display: block; }
+
+.lang-dropdown li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.lang-dropdown li:hover {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.lang-dropdown li[aria-selected="true"] {
+  color: var(--color-accent);
+  font-weight: var(--weight-bold);
+}
+
+.lang-flag { font-size: 1.1rem; }
+
 /* ============================================================
    LAYOUT
    ============================================================ */

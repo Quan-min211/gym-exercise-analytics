@@ -13,6 +13,10 @@
 
 const STORAGE_KEY = 'fitdata_favorites';
 
+// Dynamic import to avoid circular dependency
+let _t = (key, fallback) => fallback || key;
+import('./i18n.js').then(mod => { _t = mod.t; }).catch(() => {});
+
 // ---------------------------------------------------------------------------
 // Core helpers
 // ---------------------------------------------------------------------------
@@ -43,11 +47,11 @@ export function toggleFavorite(id) {
   const favs = getFavorites();
   if (favs.includes(id_)) {
     saveFavorites(favs.filter(f => f !== id_));
-    showToast('Removed from favourites');
+    showToast(_t('fav.toast_removed', 'Removed from favourites'));
     return false;
   } else {
     saveFavorites([...favs, id_]);
-    showToast('Added to favourites ❤️');
+    showToast(_t('fav.toast_added', 'Added to favourites ❤️'));
     return true;
   }
 }

@@ -221,11 +221,11 @@
       </a>
       <nav class="main-nav" aria-label="Main navigation">
         <ul>
-          <li><a href="/" aria-current="page">Exercises</a></li>
-          <li><a href="/recommend.html">Recommender</a></li>
-          <li><a href="/schedule.html">My Schedule</a></li>
-          <li><a href="/analytics.html">Analytics</a></li>
-          <li><a href="/favorites.html" id="fav-nav-link">Favourites</a></li>
+          <li><a href="/" aria-current="page" data-i18n="nav.exercises">Exercises</a></li>
+          <li><a href="/recommend.html" data-i18n="nav.recommender">Recommender</a></li>
+          <li><a href="/schedule.html" data-i18n="nav.schedule">My Schedule</a></li>
+          <li><a href="/analytics.html" data-i18n="nav.analytics">Analytics</a></li>
+          <li><a href="/favorites.html" id="fav-nav-link" data-i18n="nav.favourites">Favourites</a></li>
         </ul>
       </nav>
     </div>
@@ -237,7 +237,7 @@
       <!-- Breadcrumb -->
       <nav aria-label="Breadcrumb" class="mb-6">
         <ol style="display:flex;gap:var(--space-2);font-size:var(--text-sm);color:var(--color-text-muted)">
-          <li><a href="/">Exercises</a></li>
+          <li><a href="/" data-i18n="nav.exercises">Exercises</a></li>
           <li aria-hidden="true" style="margin:0 2px">/</li>
           <li id="breadcrumb-name" aria-current="page" style="color:var(--color-text-primary)">Loading…</li>
         </ol>
@@ -256,26 +256,26 @@
 
           <dl class="meta-strip">
             <div class="meta-item">
-              <dt>Body Part</dt>
+              <dt data-i18n="detail.body_part">Body Part</dt>
               <dd id="meta-body-part">—</dd>
             </div>
             <div class="meta-item">
-              <dt>Equipment</dt>
+              <dt data-i18n="detail.equipment">Equipment</dt>
               <dd id="meta-equipment">—</dd>
             </div>
             <div class="meta-item">
-              <dt>Target</dt>
+              <dt data-i18n="detail.target">Target</dt>
               <dd id="meta-target">—</dd>
             </div>
           </dl>
 
           <section class="mt-6" aria-labelledby="muscles-heading">
-            <h3 id="muscles-heading" style="font-size:var(--text-sm);margin-bottom:var(--space-3)">Muscles involved</h3>
+            <h3 id="muscles-heading" style="font-size:var(--text-sm);margin-bottom:var(--space-3)" data-i18n="detail.muscles">Muscles involved</h3>
             <div id="muscles-tags" class="tags" style="display:flex;flex-wrap:wrap;gap:var(--space-2)"></div>
           </section>
 
           <button id="add-to-schedule-btn" class="btn btn-primary w-full mt-6" type="button"
-            aria-label="Add this exercise to my schedule">
+            aria-label="Add this exercise to my schedule" data-i18n="detail.add_schedule">
             Add to Schedule
           </button>
 
@@ -292,14 +292,14 @@
           </header>
 
           <section class="mt-8" aria-labelledby="instructions-heading">
-            <h2 id="instructions-heading">Step-by-step Instructions</h2>
+            <h2 id="instructions-heading" data-i18n="detail.instructions">Step-by-step Instructions</h2>
             <ol id="instruction-steps" class="step-list mt-6" aria-label="Exercise instructions">
               <!-- Populated by JS -->
             </ol>
           </section>
 
           <section class="mt-10" aria-labelledby="benefits-heading">
-            <h2 id="benefits-heading">Benefits & Tips</h2>
+            <h2 id="benefits-heading" data-i18n="detail.benefits">Benefits & Tips</h2>
             <ul id="benefits-list" class="benefit-list mt-6" aria-label="Exercise benefits">
               <!-- Populated by JS based on target muscle and body part -->
             </ul>
@@ -316,8 +316,8 @@
       <!-- Alternative exercises (same muscle, different equipment) -->
       <section class="mt-12" aria-labelledby="alternatives-heading" id="alternatives-section">
         <header class="section-header">
-          <h2 id="alternatives-heading">Alternative Exercises</h2>
-          <p style="font-size:var(--text-xs);color:var(--color-text-muted)">Same target muscle &mdash; different
+          <h2 id="alternatives-heading" data-i18n="detail.alternatives">Alternative Exercises</h2>
+          <p style="font-size:var(--text-xs);color:var(--color-text-muted)" data-i18n="detail.alt_subtitle">Same target muscle &mdash; different
             equipment</p>
         </header>
         <div id="alternatives-grid" class="alt-grid" aria-label="Alternative exercises" aria-live="polite"></div>
@@ -326,8 +326,8 @@
       <!-- Related exercises -->
       <section class="mt-12" aria-labelledby="related-heading">
         <header class="section-header">
-          <h2 id="related-heading">Related Exercises</h2>
-          <a href="/" class="btn btn-ghost btn-sm">View all</a>
+          <h2 id="related-heading" data-i18n="detail.related">Related Exercises</h2>
+          <a href="/" class="btn btn-ghost btn-sm" data-i18n="common.view_all">View all</a>
         </header>
         <div id="related-grid" class="related-grid" aria-label="Related exercises"></div>
       </section>
@@ -337,12 +337,13 @@
 
   <footer class="site-footer">
     <address>
-      Data sourced from <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
+      <span data-i18n="footer.source">Data sourced from</span> <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
     </address>
-    <p>FitData Hub &mdash; Built as a Data Engineering &amp; Analytics learning project.</p>
+    <p data-i18n="footer.tagline">FitData Hub &mdash; Data Engineering &amp; Analytics learning project.</p>
   </footer>
 
   <script src="/js/app.js" type="module"></script>
+  <script src="/js/i18n.js" type="module"></script>
   <script src="/js/exercise-detail.js" type="module"></script>
   <script src="/js/favorites.js" type="module"></script>
 </body>

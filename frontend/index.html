@@ -16,11 +16,11 @@
       </a>
       <nav class="main-nav" aria-label="Main navigation">
         <ul>
-          <li><a href="/" aria-current="page">Exercises</a></li>
-          <li><a href="/recommend.html">Recommender</a></li>
-          <li><a href="/schedule.html">My Schedule</a></li>
-          <li><a href="/analytics.html">Analytics</a></li>
-          <li><a href="/favorites.html">Favourites</a></li>
+          <li><a href="/" aria-current="page" data-i18n="nav.exercises">Exercises</a></li>
+          <li><a href="/recommend.html" data-i18n="nav.recommender">Recommender</a></li>
+          <li><a href="/schedule.html" data-i18n="nav.schedule">My Schedule</a></li>
+          <li><a href="/analytics.html" data-i18n="nav.analytics">Analytics</a></li>
+          <li><a href="/favorites.html" data-i18n="nav.favourites">Favourites</a></li>
         </ul>
       </nav>
     </div>
@@ -31,14 +31,14 @@
     <!-- Hero Block -->
     <section class="page-hero" aria-labelledby="page-title">
       <div class="hero-inner">
-        <h1 id="page-title">Exercise<br><strong>Library</strong></h1>
+        <h1 id="page-title" data-i18n="index.title">Exercise<br><strong>Library</strong></h1>
         <p>
-          Browse <strong id="total-count">—</strong> exercises across all muscle groups,
-          equipment types, and body regions. Find your move.
+          <span data-i18n="index.browse">Browse</span> <strong id="total-count">—</strong>
+          <span data-i18n="index.hero_text">exercises across all muscle groups, equipment types, and body regions. Find your move.</span>
         </p>
         <div class="flex gap-4 mt-8" style="flex-wrap: wrap;">
-          <a href="/recommend.html" class="btn btn-primary">Generate My Plan</a>
-          <a href="/analytics.html" class="btn btn-outline-red">View Dataset Stats</a>
+          <a href="/recommend.html" class="btn btn-primary" data-i18n="index.cta_plan">Generate My Plan</a>
+          <a href="/analytics.html" class="btn btn-outline-red" data-i18n="index.cta_stats">View Dataset Stats</a>
         </div>
       </div>
     </section>
@@ -59,6 +59,7 @@
               id="search-input"
               class="input"
               placeholder="Search by name, muscle, or movement…"
+              data-i18n="index.search_placeholder"
               autocomplete="off"
               aria-label="Search exercises"
             >
@@ -72,27 +73,27 @@
         <aside class="filter-sidebar" aria-label="Exercise filters">
 
           <section class="filter-group" aria-labelledby="filter-bodypart">
-            <h3 id="filter-bodypart">Body Part</h3>
+            <h3 id="filter-bodypart" data-i18n="index.filter_body_part">Body Part</h3>
             <fieldset id="filter-body-part-list" aria-labelledby="filter-bodypart">
               <legend class="visually-hidden">Filter by body part</legend>
             </fieldset>
           </section>
 
           <section class="filter-group" aria-labelledby="filter-equipment-label">
-            <h3 id="filter-equipment-label">Equipment</h3>
+            <h3 id="filter-equipment-label" data-i18n="index.filter_equipment">Equipment</h3>
             <fieldset id="filter-equipment-list" aria-labelledby="filter-equipment-label">
               <legend class="visually-hidden">Filter by equipment</legend>
             </fieldset>
           </section>
 
           <section class="filter-group" aria-labelledby="filter-muscle-label">
-            <h3 id="filter-muscle-label">Target Muscle</h3>
+            <h3 id="filter-muscle-label" data-i18n="index.filter_muscle">Target Muscle</h3>
             <fieldset id="filter-muscle-list" aria-labelledby="filter-muscle-label">
               <legend class="visually-hidden">Filter by target muscle</legend>
             </fieldset>
           </section>
 
-          <button class="btn btn-ghost btn-sm w-full" id="clear-filters-btn" type="button">
+          <button class="btn btn-ghost btn-sm w-full" id="clear-filters-btn" type="button" data-i18n="index.clear_filters">
             Clear Filters
           </button>
         </aside>
@@ -117,12 +118,13 @@
 
   <footer class="site-footer">
     <address>
-      Data sourced from <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
+      <span data-i18n="footer.source">Data sourced from</span> <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
     </address>
-    <p>FitData Hub &mdash; Data Engineering &amp; Analytics learning project.</p>
+    <p data-i18n="footer.tagline">FitData Hub &mdash; Data Engineering &amp; Analytics learning project.</p>
   </footer>
 
   <script src="/js/app.js" type="module"></script>
+  <script src="/js/i18n.js" type="module"></script>
   <script src="/js/exercises.js" type="module"></script>
 </body>
 </html>

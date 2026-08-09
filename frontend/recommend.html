@@ -183,11 +183,11 @@
       </a>
       <nav class="main-nav" aria-label="Main navigation">
         <ul>
-          <li><a href="/">Exercises</a></li>
-          <li><a href="/recommend.html" aria-current="page">Recommender</a></li>
-          <li><a href="/schedule.html">My Schedule</a></li>
-          <li><a href="/analytics.html">Analytics</a></li>
-          <li><a href="/favorites.html">Favourites</a></li>
+          <li><a href="/" data-i18n="nav.exercises">Exercises</a></li>
+          <li><a href="/recommend.html" aria-current="page" data-i18n="nav.recommender">Recommender</a></li>
+          <li><a href="/schedule.html" data-i18n="nav.schedule">My Schedule</a></li>
+          <li><a href="/analytics.html" data-i18n="nav.analytics">Analytics</a></li>
+          <li><a href="/favorites.html" data-i18n="nav.favourites">Favourites</a></li>
         </ul>
       </nav>
     </div>
@@ -198,8 +198,8 @@
     <!-- Page Hero -->
     <section class="page-hero" aria-labelledby="page-title">
       <div class="hero-inner">
-        <h1 id="page-title">Smart<br><strong>Recommender</strong></h1>
-        <p>Tell us your goal and equipment. We'll build a balanced, science-backed weekly plan in seconds.</p>
+        <h1 id="page-title" data-i18n="recommend.title">Smart<br><strong>Recommender</strong></h1>
+        <p data-i18n="recommend.subtitle">Tell us your goal and equipment. We'll build a balanced, science-backed weekly plan in seconds.</p>
       </div>
     </section>
 
@@ -212,17 +212,17 @@
         <div class="step-indicator" aria-label="Setup progress">
           <div class="step-item active" id="step-ind-1">
             <div class="step-bubble" aria-hidden="true">1</div>
-            <div class="step-label">Goal</div>
+            <div class="step-label" data-i18n="recommend.step1">Goal</div>
           </div>
           <div class="step-connector"></div>
           <div class="step-item" id="step-ind-2">
             <div class="step-bubble" aria-hidden="true">2</div>
-            <div class="step-label">Equipment</div>
+            <div class="step-label" data-i18n="recommend.step2">Equipment</div>
           </div>
           <div class="step-connector"></div>
           <div class="step-item" id="step-ind-3">
             <div class="step-bubble" aria-hidden="true">3</div>
-            <div class="step-label">Details</div>
+            <div class="step-label" data-i18n="recommend.step3">Details</div>
           </div>
         </div>
 
@@ -237,41 +237,41 @@
                   <input type="radio" name="goal" id="goal-muscle" value="build_muscle" checked>
                   <label for="goal-muscle">
                     <span class="goal-icon" aria-hidden="true">💪</span>
-                    <span class="goal-name">Build Muscle</span>
+                    <span class="goal-name" data-i18n="recommend.goal_muscle">Build Muscle</span>
                   </label>
                 </div>
                 <div class="goal-card">
                   <input type="radio" name="goal" id="goal-weight" value="lose_weight">
                   <label for="goal-weight">
                     <span class="goal-icon" aria-hidden="true">🔥</span>
-                    <span class="goal-name">Lose Weight</span>
+                    <span class="goal-name" data-i18n="recommend.goal_weight">Lose Weight</span>
                   </label>
                 </div>
                 <div class="goal-card">
                   <input type="radio" name="goal" id="goal-endurance" value="improve_endurance">
                   <label for="goal-endurance">
                     <span class="goal-icon" aria-hidden="true">⚡</span>
-                    <span class="goal-name">Endurance</span>
+                    <span class="goal-name" data-i18n="recommend.goal_endurance">Endurance</span>
                   </label>
                 </div>
                 <div class="goal-card">
                   <input type="radio" name="goal" id="goal-flex" value="flexibility">
                   <label for="goal-flex">
                     <span class="goal-icon" aria-hidden="true">🧘</span>
-                    <span class="goal-name">Flexibility</span>
+                    <span class="goal-name" data-i18n="recommend.goal_flexibility">Flexibility</span>
                   </label>
                 </div>
                 <div class="goal-card">
                   <input type="radio" name="goal" id="goal-general" value="general_fitness">
                   <label for="goal-general">
                     <span class="goal-icon" aria-hidden="true">🏆</span>
-                    <span class="goal-name">General Fitness</span>
+                    <span class="goal-name" data-i18n="recommend.goal_general">General Fitness</span>
                   </label>
                 </div>
               </div>
               <div class="wizard-nav">
                 <div></div>
-                <button type="button" class="btn btn-primary" onclick="nextStep(2)">Next: Equipment</button>
+                <button type="button" class="btn btn-primary" onclick="nextStep(2)" data-i18n="recommend.next">Next: Equipment</button>
               </div>
             </div>
 
@@ -285,8 +285,8 @@
                 <!-- Populated by JS -->
               </div>
               <div class="wizard-nav">
-                <button type="button" class="btn btn-ghost" onclick="nextStep(1)">Back</button>
-                <button type="button" class="btn btn-primary" onclick="nextStep(3)">Next: Details</button>
+                <button type="button" class="btn btn-ghost" onclick="nextStep(1)" data-i18n="recommend.back">Back</button>
+                <button type="button" class="btn btn-primary" onclick="nextStep(3)" data-i18n="recommend.next">Next: Details</button>
               </div>
             </div>
 
@@ -296,7 +296,7 @@
 
               <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-5); margin-bottom: var(--space-8);">
                 <div class="form-field">
-                  <label for="fitness_level">Fitness Level</label>
+                  <label for="fitness_level" data-i18n="recommend.fitness_level">Fitness Level</label>
                   <select name="fitness_level" id="fitness_level" class="select">
                     <option value="beginner">Beginner</option>
                     <option value="intermediate" selected>Intermediate</option>
@@ -304,7 +304,7 @@
                   </select>
                 </div>
                 <div class="form-field">
-                  <label for="session_duration">Session Duration</label>
+                  <label for="session_duration" data-i18n="recommend.duration">Session Duration</label>
                   <select name="session_duration" id="session_duration" class="select">
                     <option value="30">30 min — Quick</option>
                     <option value="45">45 min</option>
@@ -313,7 +313,7 @@
                   </select>
                 </div>
                 <div class="form-field">
-                  <label for="days_per_week">Days Per Week</label>
+                  <label for="days_per_week" data-i18n="recommend.days_per_week">Days Per Week</label>
                   <select name="days_per_week" id="days_per_week" class="select">
                     <option value="2">2 Days</option>
                     <option value="3" selected>3 Days</option>
@@ -325,8 +325,8 @@
               </div>
 
               <div class="wizard-nav">
-                <button type="button" class="btn btn-ghost" onclick="nextStep(2)">Back</button>
-                <button type="submit" class="btn btn-primary" id="generate-btn">Generate Plan</button>
+                <button type="button" class="btn btn-ghost" onclick="nextStep(2)" data-i18n="recommend.back">Back</button>
+                <button type="submit" class="btn btn-primary" id="generate-btn" data-i18n="recommend.generate">Generate Plan</button>
               </div>
             </div>
 
@@ -338,10 +338,10 @@
       <div id="results-container" style="display: none; max-width: 1100px; margin: 0 auto;" class="mt-8">
 
         <div class="section-header">
-          <h2 class="section-heading-red">Your Weekly Plan</h2>
+          <h2 class="section-heading-red" data-i18n="recommend.plan_result">Your Weekly Plan</h2>
           <div class="flex gap-4">
-            <button class="btn btn-ghost btn-sm" id="restart-btn">Start Over</button>
-            <button class="btn btn-primary" id="save-schedule-btn">Save to Schedule</button>
+            <button class="btn btn-ghost btn-sm" id="restart-btn" data-i18n="recommend.back">Start Over</button>
+            <button class="btn btn-primary" id="save-schedule-btn" data-i18n="recommend.save_schedule">Save to Schedule</button>
           </div>
         </div>
 
@@ -355,12 +355,13 @@
 
   <footer class="site-footer">
     <address>
-      Data sourced from <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
+      <span data-i18n="footer.source">Data sourced from</span> <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
     </address>
-    <p>FitData Hub &mdash; Data Engineering &amp; Analytics learning project.</p>
+    <p data-i18n="footer.tagline">FitData Hub &mdash; Data Engineering &amp; Analytics learning project.</p>
   </footer>
 
   <script src="/js/app.js" type="module"></script>
+  <script src="/js/i18n.js" type="module"></script>
   <script src="/js/recommend.js" type="module"></script>
 </body>
 </html>

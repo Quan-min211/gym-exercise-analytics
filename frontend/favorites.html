@@ -143,11 +143,11 @@
       </a>
       <nav class="main-nav" aria-label="Main navigation">
         <ul>
-          <li><a href="/">Exercises</a></li>
-          <li><a href="/recommend.html">Recommender</a></li>
-          <li><a href="/schedule.html">My Schedule</a></li>
-          <li><a href="/analytics.html">Analytics</a></li>
-          <li><a href="/favorites.html" aria-current="page">Favourites</a></li>
+          <li><a href="/" data-i18n="nav.exercises">Exercises</a></li>
+          <li><a href="/recommend.html" data-i18n="nav.recommender">Recommender</a></li>
+          <li><a href="/schedule.html" data-i18n="nav.schedule">My Schedule</a></li>
+          <li><a href="/analytics.html" data-i18n="nav.analytics">Analytics</a></li>
+          <li><a href="/favorites.html" aria-current="page" data-i18n="nav.favourites">Favourites</a></li>
         </ul>
       </nav>
     </div>
@@ -161,19 +161,19 @@
           <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0 1 7.5 3c1.74 0 3.41.81 4.5 2.09A5.989 5.989 0 0 1 16.5 3 5.5 5.5 0 0 1 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
           </svg>
-          My Favourites
+          <span data-i18n="fav.title">My Favourites</span>
         </h1>
         <div class="fav-meta">
           <output id="fav-count" class="fav-count" aria-live="polite">0</output>
-          <span class="fav-count-label">saved exercises</span>
+          <span class="fav-count-label" data-i18n="fav.count_label">saved exercises</span>
         </div>
       </div>
     </section>
 
     <div id="fav-content">
       <div class="clear-all-bar" id="clear-all-bar" hidden>
-        <p>Click ❤️ on any exercise to remove it from your favourites.</p>
-        <button type="button" id="clear-all-btn" class="btn btn-ghost btn-sm">
+        <p data-i18n="fav.remove_hint">Click ❤️ on any exercise to remove it from your favourites.</p>
+        <button type="button" id="clear-all-btn" class="btn btn-ghost btn-sm" data-i18n="fav.clear_all">
           Clear all
         </button>
       </div>
@@ -185,21 +185,22 @@
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
       </svg>
-      <h2 id="empty-heading">No favourites yet</h2>
-      <p>Browse exercises and tap ❤️ to save your go-to moves here.</p>
-      <a href="/" class="btn btn-primary">Browse Exercises</a>
+      <h2 id="empty-heading" data-i18n="fav.empty_title">No favourites yet</h2>
+      <p data-i18n="fav.empty_text">Browse exercises and tap ❤️ to save your go-to moves here.</p>
+      <a href="/" class="btn btn-primary" data-i18n="fav.browse">Browse Exercises</a>
     </section>
 
   </main>
 
   <footer class="site-footer">
     <address>
-      Data sourced from <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
+      <span data-i18n="footer.source">Data sourced from</span> <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
     </address>
-    <p>FitData Hub &mdash; Data Engineering &amp; Analytics learning project.</p>
+    <p data-i18n="footer.tagline">FitData Hub &mdash; Data Engineering &amp; Analytics learning project.</p>
   </footer>
 
   <script src="/js/app.js" type="module"></script>
+  <script src="/js/i18n.js" type="module"></script>
   <script src="/js/favorites-page.js" type="module"></script>
 </body>
 </html>
