@@ -2,7 +2,7 @@
 
 > **Mục đích**: File này ghi lại toàn bộ kiến trúc, ý tưởng, công nghệ, và nội dung chi tiết của từng phần trong hệ thống FitData Hub. AI agent hoặc developer mới **BẮT BUỘC** phải đọc file này trước khi thực hiện bất kỳ task nào để không phá vỡ những gì đã xây dựng.
 >
-> **Cập nhật lần cuối**: 2026-08-08
+> **Cập nhật lần cuối**: 2026-08-09
 
 ---
 
@@ -308,15 +308,16 @@ Giao diện web SPA phong cách **"Iron Plate / Powerlifting Meet"** — mạnh 
 | `frontend/js/recommend.js` | Wizard logic: step navigation, equipment checkboxes, form submit → render results |
 | `frontend/js/schedule.js` | Load schedule from localStorage ID, render calendar grid, delete handler |
 | `frontend/js/analytics.js` | Chart.js initialization + ETL history table rendering |
-| `frontend/js/favorites.js` | Favorites module: localStorage CRUD, heart button builder, nav badge (auto-init), toast notifications, cross-component events |
+| `frontend/js/favorites.js` | Favorites module: localStorage CRUD, heart button builder, nav badge (auto-init), toast notifications (i18n-aware), cross-component events |
 | `frontend/js/favorites-page.js` | Favorites page controller: parallel API fetch, animated card removal, clear-all |
+| `frontend/js/i18n.js` | Internationalisation module: EN/VI dictionaries, `t()` translate function, `data-i18n` DOM translation, language switcher dropdown, localStorage persistence, `lang-changed` event |
 
 ### Nội dung chi tiết — CSS
 
 | File | Vai trò |
 |---|---|
 | `frontend/css/tokens.css` | Design tokens: colors, fonts, spacing, shadows, transitions — biến `--var` dùng toàn cục |
-| `frontend/css/main.css` | Global styles: reset, layout, header, buttons, cards, tags, stat cards, hero, pagination, forms, skeleton, charts, step indicator, mobile hamburger menu, scroll-to-top button, mini favourite button overlay, nav badge |
+| `frontend/css/main.css` | Global styles: reset, layout, header, buttons, cards, tags, stat cards, hero, pagination, forms, skeleton, charts, step indicator, mobile hamburger menu, scroll-to-top button, mini favourite button overlay, nav badge, language switcher dropdown |
 
 ### Anti-patterns (CẤM trong design này)
 - ❌ Không dùng teal, purple, hoặc generic blue CTA
