@@ -97,6 +97,9 @@ export function debounce(fn, delay = 300) {
 // Exercise card builder (shared across pages)
 // ---------------------------------------------------------------------------
 
+let _t = (key, fallback) => fallback || key;
+import('./i18n.js').then(mod => { _t = mod.t; }).catch(() => {});
+
 export function buildExerciseCard(exercise) {
   const card = el('article', { class: 'card exercise-card' });
 
@@ -109,7 +112,8 @@ export function buildExerciseCard(exercise) {
     height: '240',
   });
   const figcap = el('figcaption');
-  const viewBtn = el('span', { class: 'btn btn-primary btn-sm', text: 'View Exercise' });
+  const viewBtn = el('span', { class: 'btn btn-primary btn-sm', text: _t('common.view_exercise', 'View Exercise') });
+  viewBtn.setAttribute('data-i18n', 'common.view_exercise');
   figcap.appendChild(viewBtn);
   fig.appendChild(img);
   fig.appendChild(figcap);
