@@ -302,8 +302,8 @@ Giao diện web SPA phong cách **"Iron Plate / Powerlifting Meet"** — mạnh 
 
 | File | Vai trò |
 |---|---|
-| `frontend/js/app.js` | Core utilities: `$()`, `$$()`, `el()`, `api` (fetch wrapper), `buildExerciseCard()` (với mini ❤️), pagination builder, mobile hamburger menu toggle, scroll-to-top button |
-| `frontend/js/exercises.js` | Trang index: load filters, bind search/filter events, render exercise grid |
+| `frontend/js/app.js` | Core utilities: `$()`, `$$()`, `el()`, `api` (fetch wrapper), `buildExerciseCard()` (với mini ❤️), pagination builder, mobile hamburger menu toggle, scroll-to-top button, Rest Timer floating widget (30s/45s/60s/90s + Web Audio API beep) |
+| `frontend/js/exercises.js` | Trang index: load filters, bind search/filter events, render exercise grid, Exercise of the Day (seeded rotation) |
 | `frontend/js/exercise-detail.js` | Trang detail: load exercise by ID, render GIF + instructions + fav button + alternatives |
 | `frontend/js/recommend.js` | Wizard logic: step navigation, equipment checkboxes, form submit → render results |
 | `frontend/js/schedule.js` | Load schedule from localStorage ID, render calendar grid, delete handler |
@@ -318,7 +318,7 @@ Giao diện web SPA phong cách **"Iron Plate / Powerlifting Meet"** — mạnh 
 | File | Vai trò |
 |---|---|
 | `frontend/css/tokens.css` | Design tokens: colors, fonts, spacing, shadows, transitions — biến `--var` dùng toàn cục |
-| `frontend/css/main.css` | Global styles: reset, layout, header, buttons, cards, tags, stat cards, hero, pagination, forms, skeleton, charts, step indicator, mobile hamburger menu, scroll-to-top button, mini favourite button overlay, nav badge, language switcher dropdown |
+| `frontend/css/main.css` | Global styles: reset, layout, header, buttons, cards, tags, stat cards, hero, pagination, forms, skeleton, charts, step indicator, mobile hamburger menu, scroll-to-top button, mini favourite button overlay, nav badge, language switcher dropdown, Rest Timer widget, Exercise of the Day card, @media print schedule styles |
 
 ### Anti-patterns (CẤM trong design này)
 - ❌ Không dùng teal, purple, hoặc generic blue CTA
