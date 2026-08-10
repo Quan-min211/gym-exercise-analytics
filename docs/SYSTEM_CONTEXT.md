@@ -2,7 +2,7 @@
 
 > **Mục đích**: File này ghi lại toàn bộ kiến trúc, ý tưởng, công nghệ, và nội dung chi tiết của từng phần trong hệ thống FitData Hub. AI agent hoặc developer mới **BẮT BUỘC** phải đọc file này trước khi thực hiện bất kỳ task nào để không phá vỡ những gì đã xây dựng.
 >
-> **Cập nhật lần cuối**: 2026-08-09
+> **Cập nhật lần cuối**: 2026-08-10
 
 ---
 
@@ -311,6 +311,7 @@ Giao diện web SPA phong cách **"Iron Plate / Powerlifting Meet"** — mạnh 
 | `frontend/js/favorites.js` | Favorites module: localStorage CRUD, heart button builder, nav badge (auto-init), toast notifications (i18n-aware), cross-component events |
 | `frontend/js/favorites-page.js` | Favorites page controller: parallel API fetch, animated card removal, clear-all |
 | `frontend/js/i18n.js` | Internationalisation module: EN/VI dictionaries, `t()` translate function, `data-i18n` DOM translation, language switcher dropdown, localStorage persistence, `lang-changed` event |
+| `frontend/js/calculator.js` | BMI/BMR/TDEE calculator: Mifflin-St Jeor equation, metric/imperial toggle, BMI gauge, calorie targets, personalized recommendations |
 
 ### Nội dung chi tiết — CSS
 
