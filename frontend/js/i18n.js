@@ -24,6 +24,7 @@ const translations = {
     'nav.recommender': 'Gợi ý',
     'nav.schedule': 'Lịch tập',
     'nav.analytics': 'Thống kê',
+    'nav.calculator': 'Máy tính',
     'nav.favourites': 'Yêu thích',
 
     // ── Common ──
@@ -144,6 +145,33 @@ const translations = {
     'lang.label': 'Ngôn ngữ',
     'lang.en': 'English',
     'lang.vi': 'Tiếng Việt',
+
+    // ── Calculator page ──
+    'calc.title': 'Máy tính\nChỉ số cơ thể',
+    'calc.subtitle': 'Tính chỉ số BMI, BMR và TDEE để hiểu thành phần cơ thể và nhu cầu calo hàng ngày.',
+    'calc.your_stats': 'Chỉ số cơ thể',
+    'calc.metric': 'Hệ mét (kg/cm)',
+    'calc.imperial': 'Hệ Anh (lb/in)',
+    'calc.gender': 'Giới tính',
+    'calc.male': 'Nam',
+    'calc.female': 'Nữ',
+    'calc.age': 'Tuổi',
+    'calc.height_cm': 'Chiều cao (cm)',
+    'calc.weight_kg': 'Cân nặng (kg)',
+    'calc.activity_level': 'Mức vận động',
+    'calc.sedentary': 'Ít vận động (ngồi văn phòng)',
+    'calc.light': 'Nhẹ (1–3 ngày/tuần)',
+    'calc.moderate': 'Trung bình (3–5 ngày/tuần)',
+    'calc.very_active': 'Nhiều (6–7 ngày/tuần)',
+    'calc.extra_active': 'Rất nhiều (vận động viên)',
+    'calc.calculate': 'Tính toán',
+    'calc.bmi_title': 'Chỉ số khối cơ thể (BMI)',
+    'calc.daily_calories': 'Nhu cầu Calo hàng ngày',
+    'calc.bmr_label': 'BMR',
+    'calc.tdee_label': 'TDEE',
+    'calc.lose_label': 'Để giảm cân',
+    'calc.gain_label': 'Để tăng cơ',
+    'calc.recommendation': 'Khuyến nghị',
   },
 };
 
