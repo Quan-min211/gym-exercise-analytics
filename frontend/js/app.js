@@ -268,3 +268,137 @@ markCurrentNav();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 })();
+
+// ---------------------------------------------------------------------------
+// Rest Timer Widget (Global)
+// ---------------------------------------------------------------------------
+
+(function initRestTimer() {
+  const container = document.createElement('div');
+  container.className = 'rest-timer-widget';
+  container.innerHTML = `
+    <button type="button" class="rest-timer-toggle" aria-label="Rest timer" aria-expanded="false">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+      <span class="timer-label">00:60</span>
+    </button>
+    <div class="rest-timer-panel" role="dialog" aria-label="Rest timer controls">
+      <div class="rest-timer-display">01:00</div>
+      <div class="rest-timer-presets">
+        <button type="button" class="rest-timer-preset-btn" data-sec="30">30s</button>
+        <button type="button" class="rest-timer-preset-btn" data-sec="45">45s</button>
+        <button type="button" class="rest-timer-preset-btn active" data-sec="60">60s</button>
+        <button type="button" class="rest-timer-preset-btn" data-sec="90">90s</button>
+      </div>
+      <div class="rest-timer-controls">
+        <button type="button" class="btn btn-primary btn-sm timer-start-btn">Start</button>
+        <button type="button" class="btn btn-ghost btn-sm timer-reset-btn">Reset</button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(container);
+
+  const toggle = container.querySelector('.rest-timer-toggle');
+  const panel = container.querySelector('.rest-timer-panel');
+  const label = container.querySelector('.timer-label');
+  const display = container.querySelector('.rest-timer-display');
+  const startBtn = container.querySelector('.timer-start-btn');
+  const resetBtn = container.querySelector('.timer-reset-btn');
+  const presetBtns = container.querySelectorAll('.rest-timer-preset-btn');
+
+  let duration = 60;
+  let remaining = 60;
+  let timerId = null;
+  let isRunning = false;
+
+  function fmt(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  function updateUI() {
+    display.textContent = fmt(remaining);
+    label.textContent = fmt(remaining);
+    startBtn.textContent = isRunning ? 'Pause' : 'Start';
+    toggle.classList.toggle('is-running', isRunning);
+  }
+
+  function playBeep() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime); // A5
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.6);
+    } catch { /* AudioContext fallback */ }
+  }
+
+  function startTimer() {
+    if (isRunning) {
+      clearInterval(timerId);
+      isRunning = false;
+      updateUI();
+      return;
+    }
+
+    if (remaining <= 0) remaining = duration;
+    isRunning = true;
+    toggle.classList.remove('is-finished');
+    updateUI();
+
+    timerId = setInterval(() => {
+      remaining--;
+      updateUI();
+      if (remaining <= 0) {
+        clearInterval(timerId);
+        isRunning = false;
+        toggle.classList.remove('is-running');
+        toggle.classList.add('is-finished');
+        updateUI();
+        playBeep();
+      }
+    }, 1000);
+  }
+
+  function resetTimer() {
+    clearInterval(timerId);
+    isRunning = false;
+    remaining = duration;
+    toggle.classList.remove('is-running', 'is-finished');
+    updateUI();
+  }
+
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = panel.classList.toggle('is-open');
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      presetBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      duration = parseInt(btn.dataset.sec, 10);
+      resetTimer();
+    });
+  });
+
+  startBtn.addEventListener('click', startTimer);
+  resetBtn.addEventListener('click', resetTimer);
+
+  document.addEventListener('click', (e) => {
+    if (!container.contains(e.target)) {
+      panel.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+})();
+

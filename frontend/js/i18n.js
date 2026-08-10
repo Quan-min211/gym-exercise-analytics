@@ -49,6 +49,7 @@ const translations = {
     'index.filter_equipment': 'Thiết bị',
     'index.filter_muscle': 'Cơ mục tiêu',
     'index.clear_filters': 'Xóa bộ lọc',
+    'index.eod_badge': '⭐ Bài tập trong ngày',
 
     // ── Exercise detail ──
     'detail.back': '← Quay lại thư viện',

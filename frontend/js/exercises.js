@@ -11,7 +11,32 @@ let currentState = {
 async function init() {
   await loadFilters();
   setupEventListeners();
+  loadExerciseOfDay();
   await fetchAndRender();
+}
+
+async function loadExerciseOfDay() {
+  try {
+    const data = await api.get('/exercises', { page: 1 });
+    if (!data.items || data.items.length === 0) return;
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    let hash = 0;
+    for (let i = 0; i < todayStr.length; i++) {
+      hash = (hash * 31 + todayStr.charCodeAt(i)) >>> 0;
+    }
+    const selected = data.items[hash % data.items.length];
+
+    const card = $('#exercise-of-day');
+    if (card && selected) {
+      $('#eod-name').textContent = selected.name;
+      $('#eod-meta').textContent = `${selected.body_part} • ${selected.equipment} • Target: ${selected.target}`;
+      $('#eod-link').href = `/exercise.html?id=${selected.id}`;
+      card.style.display = 'block';
+    }
+  } catch (err) {
+    console.error('Failed to load Exercise of the Day:', err);
+  }
 }
 
 async function loadFilters() {
