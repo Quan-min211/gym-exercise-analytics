@@ -79,6 +79,15 @@ function renderDetail(ex) {
   if (favWrapper) {
     favWrapper.appendChild(buildFavoriteButton(ex.id));
   }
+
+  // ---- Personal notes ----
+  initNotes(ex.id);
+
+  // ---- Compare link ----
+  const compareLink = $('#compare-link');
+  if (compareLink) {
+    compareLink.href = `/compare.html?a=${ex.id}`;
+  }
 }
 
 function createBenefitItem(title, text) {
@@ -178,6 +187,41 @@ async function fetchRelated(ex) {
   } catch (err) {
     console.error('Failed to load related:', err);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Personal Notes (localStorage)
+// ---------------------------------------------------------------------------
+
+const NOTES_KEY = 'fitdata_exercise_notes';
+
+function getAllNotes() {
+  try { return JSON.parse(localStorage.getItem(NOTES_KEY)) || {}; }
+  catch { return {}; }
+}
+
+function initNotes(exerciseId) {
+  const textarea = $('#exercise-notes');
+  const saveBtn = $('#save-notes-btn');
+  const status = $('#notes-status');
+  if (!textarea || !saveBtn) return;
+
+  const id = String(exerciseId);
+  const notes = getAllNotes();
+  if (notes[id]) textarea.value = notes[id];
+
+  saveBtn.addEventListener('click', () => {
+    const all = getAllNotes();
+    const text = textarea.value.trim();
+    if (text) {
+      all[id] = text;
+    } else {
+      delete all[id];
+    }
+    localStorage.setItem(NOTES_KEY, JSON.stringify(all));
+    status.textContent = '✓ Saved!';
+    setTimeout(() => { status.textContent = ''; }, 2000);
+  });
 }
 
 document.addEventListener('DOMContentLoaded', init);

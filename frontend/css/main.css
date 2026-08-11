@@ -1164,6 +1164,34 @@ p { line-height: var(--leading-relaxed); }
 }
 
 /* ============================================================
+   EXERCISE NOTES
+   ============================================================ */
+
+.exercise-notes-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: var(--space-4);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  resize: vertical;
+  transition: border-color var(--transition-fast);
+}
+
+.exercise-notes-textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.exercise-notes-textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* ============================================================
    EXERCISE OF THE DAY
    ============================================================ */
 

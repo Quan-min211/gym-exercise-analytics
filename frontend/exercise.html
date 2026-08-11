@@ -306,6 +306,27 @@
             </ul>
           </section>
 
+          <!-- Personal notes (localStorage) -->
+          <section class="mt-10" aria-labelledby="notes-heading">
+            <h2 id="notes-heading" data-i18n="detail.notes_title">My Notes</h2>
+            <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--space-2)" data-i18n="detail.notes_hint">Personal notes are saved locally in your browser.</p>
+            <textarea id="exercise-notes" class="exercise-notes-textarea mt-4"
+              placeholder="Write your notes about this exercise…"
+              aria-label="Personal notes for this exercise"
+              rows="4"></textarea>
+            <div class="flex gap-3 mt-3">
+              <button type="button" id="save-notes-btn" class="btn btn-primary btn-sm" data-i18n="detail.notes_save">Save Notes</button>
+              <span id="notes-status" class="text-muted" style="font-size:var(--text-xs);align-self:center" aria-live="polite"></span>
+            </div>
+          </section>
+
+          <!-- Compare exercise button -->
+          <section class="mt-10" aria-labelledby="compare-heading">
+            <h2 id="compare-heading" data-i18n="detail.compare_title">Compare Exercises</h2>
+            <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--space-2)" data-i18n="detail.compare_hint">Compare this exercise side-by-side with another one.</p>
+            <a id="compare-link" href="#" class="btn btn-outline-red mt-4" data-i18n="detail.compare_btn">🔀 Compare with Another Exercise</a>
+          </section>
+
           <section class="mt-10" aria-labelledby="attribution-heading">
             <h2 id="attribution-heading" class="visually-hidden">Attribution</h2>
             <p id="attribution-text" style="font-size:var(--text-xs);color:var(--color-text-muted)"></p>

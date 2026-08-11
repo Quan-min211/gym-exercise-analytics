@@ -65,6 +65,18 @@ const translations = {
     'detail.alt_subtitle': 'Cùng cơ mục tiêu — khác thiết bị',
     'detail.related': 'Bài tập liên quan',
     'detail.attribution': 'Nguồn',
+    'detail.notes_title': 'Ghi chú của tôi',
+    'detail.notes_hint': 'Ghi chú cá nhân được lưu trên trình duyệt của bạn.',
+    'detail.notes_save': 'Lưu ghi chú',
+    'detail.compare_title': 'So sánh bài tập',
+    'detail.compare_hint': 'So sánh bài tập này với một bài tập khác.',
+    'detail.compare_btn': '🔀 So sánh với bài tập khác',
+
+    // ── Compare page ──
+    'compare.title': 'So sánh<br><strong>Bài tập</strong>',
+    'compare.subtitle': 'Chọn hai bài tập để so sánh song song — GIF, nhóm cơ, thiết bị và hướng dẫn chi tiết.',
+    'compare.select_a': 'Tìm và chọn bài tập đầu tiên',
+    'compare.select_b': 'Tìm và chọn bài tập thứ hai',
 
     // ── Recommend page ──
     'recommend.title': 'Gợi ý\nThông minh',
