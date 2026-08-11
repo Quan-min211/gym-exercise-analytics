@@ -304,7 +304,7 @@ Giao diện web SPA phong cách **"Iron Plate / Powerlifting Meet"** — mạnh 
 |---|---|
 | `frontend/js/app.js` | Core utilities: `$()`, `$$()`, `el()`, `api` (fetch wrapper), `buildExerciseCard()` (với mini ❤️), pagination builder, mobile hamburger menu toggle, scroll-to-top button, Rest Timer floating widget (30s/45s/60s/90s + Web Audio API beep) |
 | `frontend/js/exercises.js` | Trang index: load filters, bind search/filter events, render exercise grid, Exercise of the Day (seeded rotation) |
-| `frontend/js/exercise-detail.js` | Trang detail: load exercise by ID, render GIF + instructions + fav button + alternatives |
+| `frontend/js/exercise-detail.js` | Trang detail: load exercise by ID, render GIF + instructions + fav button + alternatives + personal notes (localStorage) + compare link |
 | `frontend/js/recommend.js` | Wizard logic: step navigation, equipment checkboxes, form submit → render results |
 | `frontend/js/schedule.js` | Load schedule from localStorage ID, render calendar grid, delete handler |
 | `frontend/js/analytics.js` | Chart.js initialization + ETL history table rendering |
@@ -312,6 +312,7 @@ Giao diện web SPA phong cách **"Iron Plate / Powerlifting Meet"** — mạnh 
 | `frontend/js/favorites-page.js` | Favorites page controller: parallel API fetch, animated card removal, clear-all |
 | `frontend/js/i18n.js` | Internationalisation module: EN/VI dictionaries, `t()` translate function, `data-i18n` DOM translation, language switcher dropdown, localStorage persistence, `lang-changed` event |
 | `frontend/js/calculator.js` | BMI/BMR/TDEE calculator: Mifflin-St Jeor equation, metric/imperial toggle, BMI gauge, calorie targets, personalized recommendations |
+| `frontend/js/compare.js` | Exercise comparison page: dual search autocomplete, side-by-side render (GIF/meta/muscles/instructions), VS header, swap, URL param pre-load |
 
 ### Nội dung chi tiết — CSS
 
