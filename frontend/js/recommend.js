@@ -1,11 +1,32 @@
-import { $, $$, api, buildExerciseCard, el } from './app.js';
-
-let generatedPlan = null;
-
 async function init() {
   await loadEquipment();
   setupWizard();
+  setupTemplates();
   setupForm();
+}
+
+function setupTemplates() {
+  $$('.template-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const goal = btn.dataset.goal;
+      const days = btn.dataset.days;
+      const duration = btn.dataset.duration;
+
+      // Select goal radio
+      const radio = $(`#goal-${goal === 'build_muscle' ? 'muscle' : goal === 'lose_weight' ? 'weight' : goal === 'general_fitness' ? 'general' : goal}`);
+      if (radio) radio.checked = true;
+
+      // Select days and duration
+      const daysSelect = $('#days_per_week');
+      if (daysSelect) daysSelect.value = days;
+
+      const durSelect = $('#session_duration');
+      if (durSelect) durSelect.value = duration;
+
+      // Move to Step 2: Equipment
+      nextStep(2);
+    });
+  });
 }
 
 async function loadEquipment() {
@@ -86,9 +107,36 @@ function setupForm() {
 
   $('#restart-btn').addEventListener('click', () => {
     $('#wizard-container').style.display = '';
+    $('.template-bar').style.display = '';
     $('#results-container').style.display = 'none';
     nextStep(1);
   });
+
+  const copyBtn = $('#copy-plan-btn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      if (!generatedPlan) return;
+      let text = `🏋️ FitData Hub — Weekly Plan (${generatedPlan.goal.replace('_', ' ').toUpperCase()})\n`;
+      text += `Level: ${generatedPlan.fitness_level} | Duration: ${generatedPlan.session_duration}m | Days: ${generatedPlan.days_per_week}/week\n\n`;
+
+      generatedPlan.days.forEach(d => {
+        text += `📅 ${d.day_label}: ${d.is_rest_day ? 'Rest Day 😴' : d.focus}\n`;
+        if (!d.is_rest_day && d.exercises) {
+          d.exercises.forEach(ex => {
+            text += `  • ${ex.name} (${ex.target} | ${ex.equipment})\n`;
+          });
+        }
+        text += '\n';
+      });
+
+      navigator.clipboard.writeText(text).then(() => {
+        copyBtn.textContent = '✓ Copied!';
+        setTimeout(() => { copyBtn.textContent = '📋 Copy Summary'; }, 2000);
+      }).catch(() => {
+        alert('Could not copy to clipboard.');
+      });
+    });
+  }
 
   $('#save-schedule-btn').addEventListener('click', async () => {
     if (!generatedPlan) return;
@@ -120,8 +168,22 @@ function setupForm() {
   });
 }
 
+function getGoalGuidance(goal) {
+  const map = {
+    build_muscle: { sets: '3–4 sets', reps: '8–12 reps', rest: '60–90s rest', note: 'Focus on progressive overload & mechanical tension.' },
+    lose_weight: { sets: '3–4 sets', reps: '12–15 reps', rest: '30–45s rest', note: 'Keep rest intervals short to maximize calorie burn.' },
+    improve_endurance: { sets: '3 sets', reps: '15–20 reps', rest: '30s rest', note: 'Emphasize high repetitions and muscular stamina.' },
+    flexibility: { sets: '2–3 sets', reps: '10–12 controlled reps', rest: '45s rest', note: 'Focus on full range of motion & controlled tempo.' },
+    general_fitness: { sets: '3 sets', reps: '10–12 reps', rest: '60s rest', note: 'Balanced volume for overall health & strength.' },
+  };
+  return map[goal] || map.general_fitness;
+}
+
 function renderResults(plan) {
   $('#wizard-container').style.display = 'none';
+  const templateBar = $('.template-bar');
+  if (templateBar) templateBar.style.display = 'none';
+
   const resultsContainer = $('#results-container');
   resultsContainer.style.display = 'block';
 
@@ -141,9 +203,19 @@ function renderResults(plan) {
   addStat(plan.muscles_covered.length, 'Muscles Targeted');
   addStat(plan.fitness_level, 'Level');
 
-  // Days
+  // Days container
   const daysContainer = $('#plan-days');
   daysContainer.innerHTML = '';
+
+  // Goal guidance banner
+  const g = getGoalGuidance(plan.goal);
+  const guidance = el('div', { class: 'guidance-banner' });
+  guidance.innerHTML = `
+    <span style="font-size: 1.25rem;">💡</span>
+    <div>
+      <strong>Target Guidance:</strong> ${g.sets} × ${g.reps} • ${g.rest}. <em>${g.note}</em>
+    </div>`;
+  daysContainer.appendChild(guidance);
 
   plan.days.forEach(day => {
     const dayCard = el('article', { class: `plan-day-card${day.is_rest_day ? ' rest-day' : ''}` });
@@ -164,6 +236,13 @@ function renderResults(plan) {
         body.appendChild(buildExerciseCard(ex));
       });
       dayCard.appendChild(body);
+
+      // Warm-up box
+      const warmup = el('div', { class: 'warmup-box' });
+      warmup.innerHTML = `
+        <span aria-hidden="true">🔥</span>
+        <span><strong>Warm-up:</strong> 5–8 min dynamic mobility (arm circles, leg swings, light cardio) before starting.</span>`;
+      dayCard.appendChild(warmup);
     }
 
     daysContainer.appendChild(dayCard);

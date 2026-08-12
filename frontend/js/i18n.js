@@ -81,6 +81,8 @@ const translations = {
     // ── Recommend page ──
     'recommend.title': 'Gợi ý\nThông minh',
     'recommend.subtitle': 'Tạo lịch tập cá nhân hóa dựa trên mục tiêu, thiết bị và trình độ của bạn.',
+    'recommend.templates_title': '⚡ Lịch tập mẫu nhanh',
+    'recommend.templates_hint': 'Nhấp để tự động thiết lập tùy chọn',
     'recommend.step1': 'Chọn mục tiêu',
     'recommend.step2': 'Thiết bị của bạn',
     'recommend.step3': 'Chi tiết',

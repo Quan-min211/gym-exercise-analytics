@@ -172,6 +172,96 @@
       border-style: dashed;
       opacity: 0.55;
     }
+
+    /* ---- Workout templates bar ---- */
+    .template-bar {
+      max-width: 860px;
+      margin: 0 auto var(--space-8);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .template-bar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+
+    .template-bar-header h2 {
+      font-size: var(--text-sm);
+      font-weight: var(--weight-bold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+    }
+
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: var(--space-3);
+    }
+
+    .template-card {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      cursor: pointer;
+      transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+      text-align: left;
+      width: 100%;
+    }
+
+    .template-card:hover {
+      border-color: var(--color-accent);
+      background: rgba(211, 47, 47, 0.06);
+      transform: translateY(-2px);
+    }
+
+    .template-card-title {
+      font-family: var(--font-display);
+      font-size: var(--text-sm);
+      font-weight: var(--weight-bold);
+      color: var(--color-text-primary);
+      margin-bottom: 2px;
+    }
+
+    .template-card-sub {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+    }
+
+    /* ---- Sets & Reps Guidance ---- */
+    .guidance-banner {
+      background: rgba(255, 193, 7, 0.08);
+      border: 1px solid rgba(255, 193, 7, 0.25);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4) var(--space-5);
+      margin-bottom: var(--space-6);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+    }
+
+    .guidance-banner strong {
+      color: var(--color-gold);
+    }
+
+    .warmup-box {
+      background: var(--color-bg);
+      border-top: 1px solid var(--color-border);
+      padding: var(--space-3) var(--space-4);
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
   </style>
 </head>
 <body>
@@ -205,6 +295,32 @@
     </section>
 
     <section class="page-content" aria-labelledby="page-title">
+
+      <!-- Quick Templates Bar -->
+      <section class="template-bar" aria-label="Popular workout templates">
+        <header class="template-bar-header">
+          <h2 data-i18n="recommend.templates_title">⚡ Quick Workout Templates</h2>
+          <span style="font-size:var(--text-xs);color:var(--color-text-muted)" data-i18n="recommend.templates_hint">Click to auto-set preferences</span>
+        </header>
+        <div class="template-grid">
+          <button type="button" class="template-card" data-goal="build_muscle" data-days="3" data-duration="60">
+            <div class="template-card-title">💪 Push / Pull / Legs</div>
+            <div class="template-card-sub">3 Days • 60 min • Hypertrophy</div>
+          </button>
+          <button type="button" class="template-card" data-goal="build_muscle" data-days="4" data-duration="60">
+            <div class="template-card-title">🏋️ Upper / Lower Split</div>
+            <div class="template-card-sub">4 Days • 60 min • Strength</div>
+          </button>
+          <button type="button" class="template-card" data-goal="general_fitness" data-days="3" data-duration="45">
+            <div class="template-card-title">🏆 3-Day Full Body</div>
+            <div class="template-card-sub">3 Days • 45 min • Balanced</div>
+          </button>
+          <button type="button" class="template-card" data-goal="lose_weight" data-days="4" data-duration="30">
+            <div class="template-card-title">🔥 HIIT Fat Burn</div>
+            <div class="template-card-sub">4 Days • 30 min • High Intensity</div>
+          </button>
+        </div>
+      </section>
 
       <!-- Wizard Container -->
       <div id="wizard-container" style="max-width: 860px; margin: 0 auto;">
@@ -341,6 +457,7 @@
         <div class="section-header">
           <h2 class="section-heading-red" data-i18n="recommend.plan_result">Your Weekly Plan</h2>
           <div class="flex gap-4">
+            <button class="btn btn-ghost btn-sm" id="copy-plan-btn">📋 Copy Summary</button>
             <button class="btn btn-ghost btn-sm" id="restart-btn" data-i18n="recommend.back">Start Over</button>
             <button class="btn btn-primary" id="save-schedule-btn" data-i18n="recommend.save_schedule">Save to Schedule</button>
           </div>
