@@ -306,7 +306,7 @@ Giao diện web SPA phong cách **"Iron Plate / Powerlifting Meet"** — mạnh 
 | `frontend/js/exercises.js` | Trang index: load filters, bind search/filter events, render exercise grid, Exercise of the Day (seeded rotation) |
 | `frontend/js/exercise-detail.js` | Trang detail: load exercise by ID, render GIF + instructions + fav button + alternatives + personal notes (localStorage) + compare link |
 | `frontend/js/recommend.js` | Wizard logic: step navigation, quick workout templates (PPL, Upper/Lower, Full Body, HIIT), equipment checkboxes, form submit → render results with target guidance banner & warmup tips, copy summary |
-| `frontend/js/schedule.js` | Load schedule from localStorage ID, render calendar grid, delete handler |
+| `frontend/js/schedule.js` | Schedule controller: GET /api/schedules list dropdown selector, switch active plans, PUT rename schedule, delete schedule, today's workout highlight (🔥 Today), exercise completion checkboxes & session progress bar |
 | `frontend/js/analytics.js` | Chart.js initialization + ETL history table rendering |
 | `frontend/js/favorites.js` | Favorites module: localStorage CRUD, heart button builder, nav badge (auto-init), toast notifications (i18n-aware), cross-component events |
 | `frontend/js/favorites-page.js` | Favorites page controller: parallel API fetch, animated card removal, clear-all |
