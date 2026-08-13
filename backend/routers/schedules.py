@@ -94,6 +94,14 @@ def create_schedule(payload: ScheduleCreate, db: Session = Depends(get_db)):
     return _row_to_out(row)
 
 
+@router.get("", response_model=list[ScheduleOut])
+def list_schedules(db: Session = Depends(get_db)):
+    """List all saved workout schedules ordered by created_at DESC."""
+    _ensure_table(db)
+    rows = db.execute(text("SELECT * FROM schedules ORDER BY created_at DESC")).fetchall()
+    return [_row_to_out(r) for r in rows]
+
+
 @router.get("/{schedule_id}", response_model=ScheduleOut)
 def get_schedule(schedule_id: str, db: Session = Depends(get_db)):
     """Retrieve a schedule by ID."""

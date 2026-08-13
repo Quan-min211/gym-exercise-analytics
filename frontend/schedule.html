@@ -86,9 +86,15 @@
     <section class="page-content" aria-labelledby="page-title">
 
       <!-- Action bar -->
-      <div class="section-header" id="schedule-actions" style="display: none;">
-        <div></div>
-        <div class="flex gap-4">
+      <div class="section-header" id="schedule-actions" style="display: none; flex-wrap: wrap; gap: var(--space-4);">
+        <div id="schedule-select-wrap" style="display: flex; align-items: center; gap: var(--space-3);">
+          <label for="schedule-select" class="visually-hidden">Saved Schedules</label>
+          <select id="schedule-select" class="select" style="min-width: 200px; padding: 6px 12px; font-size: 13px;">
+            <option value="">Loading schedules…</option>
+          </select>
+          <button id="rename-schedule-btn" class="btn btn-ghost btn-sm" title="Rename Schedule">✏️ Rename</button>
+        </div>
+        <div class="flex gap-4" style="flex-wrap: wrap;">
           <button id="print-schedule-btn" class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Print Plan</button>
           <a href="/recommend.html" class="btn btn-ghost btn-sm" data-i18n="schedule.generate_new">Generate New Plan</a>
           <button id="delete-schedule-btn" class="btn btn-outline-red btn-sm" data-i18n="schedule.delete">Delete Schedule</button>

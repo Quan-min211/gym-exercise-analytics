@@ -79,6 +79,14 @@ def test_get_schedule_404(client):
     assert "not found" in res.json()["detail"].lower()
 
 
+def test_list_schedules_returns_all(client):
+    _create(client)
+    _create(client)
+    res = client.get("/api/schedules")
+    assert res.status_code == 200
+    assert len(res.json()) >= 2
+
+
 # ---------------------------------------------------------------------------
 # UPDATE (PUT)
 # ---------------------------------------------------------------------------
