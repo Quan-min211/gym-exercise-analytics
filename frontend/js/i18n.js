@@ -119,6 +119,9 @@ const translations = {
     // ── Analytics page ──
     'analytics.title': 'Thống kê\nDữ liệu',
     'analytics.subtitle': 'Khám phá phân bố bài tập, thiết bị và cơ mục tiêu trong thư viện FitData Hub.',
+    'analytics.chart_hint': '💡 Mẹo: Nhấp vào bất kỳ cột hoặc phần biểu đồ nào để lọc bài tập trong Thư viện.',
+    'analytics.export_csv': '📥 Xuất CSV',
+    'analytics.export_json': '📥 Xuất JSON',
     'analytics.total_exercises': 'Tổng bài tập',
     'analytics.equipment_types': 'Loại thiết bị',
     'analytics.target_muscles': 'Cơ mục tiêu',

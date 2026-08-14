@@ -62,6 +62,69 @@
       color: var(--color-accent-light);
       text-align: right;
     }
+
+    .chart-card header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin-bottom: var(--space-4);
+    }
+
+    .chart-pills {
+      display: flex;
+      gap: 4px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 2px;
+    }
+
+    .chart-pill {
+      background: transparent;
+      border: none;
+      color: var(--color-text-muted);
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: var(--weight-bold);
+      padding: 2px 8px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .chart-pill.active {
+      background: var(--color-accent);
+      color: #111;
+    }
+
+    .table-search-input {
+      width: 100%;
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      color: var(--color-text-primary);
+      font-size: var(--text-xs);
+      margin-bottom: var(--space-3);
+    }
+
+    .table-search-input:focus {
+      outline: none;
+      border-color: var(--color-accent);
+    }
+
+    .co-table .table-link {
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+
+    .co-table .table-link:hover {
+      color: var(--color-accent-light);
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -96,6 +159,17 @@
 
     <section class="page-content" aria-labelledby="page-title">
 
+      <!-- Action & Export Bar -->
+      <div class="section-header mb-6" style="flex-wrap: wrap; gap: var(--space-4);">
+        <p style="font-size: var(--text-xs); color: var(--color-text-muted);" data-i18n="analytics.chart_hint">
+          💡 Tip: Click any bar or chart segment to filter exercises in the Library.
+        </p>
+        <div class="flex gap-3" style="margin-left: auto;">
+          <button type="button" id="export-csv-btn" class="btn btn-ghost btn-sm" data-i18n="analytics.export_csv">📥 Export CSV</button>
+          <button type="button" id="export-json-btn" class="btn btn-ghost btn-sm" data-i18n="analytics.export_json">📥 Export JSON</button>
+        </div>
+      </div>
+
       <!-- Overview Stats -->
       <div class="stats-grid mb-8" id="overview-stats">
         <div class="stat-card skeleton" style="height: 130px;"></div>
@@ -112,21 +186,35 @@
 
           <article class="chart-card">
             <header>
-              <h3 data-i18n="analytics.equipment_chart">Equipment Popularity</h3>
-              <p data-i18n="analytics.equipment_desc">Top 15 most common equipment types across all exercises.</p>
+              <div>
+                <h3 data-i18n="analytics.equipment_chart">Equipment Popularity</h3>
+                <p data-i18n="analytics.equipment_desc">Top equipment types across all exercises.</p>
+              </div>
+              <div class="chart-pills" id="eq-pills">
+                <button type="button" class="chart-pill" data-chart="eq" data-n="10">Top 10</button>
+                <button type="button" class="chart-pill active" data-chart="eq" data-n="15">Top 15</button>
+                <button type="button" class="chart-pill" data-chart="eq" data-n="20">All 20</button>
+              </div>
             </header>
             <div class="chart-container">
-              <canvas id="equipmentChart" aria-label="Bar chart showing equipment popularity" role="img"></canvas>
+              <canvas id="equipmentChart" aria-label="Bar chart showing equipment popularity" role="img" style="cursor: pointer;"></canvas>
             </div>
           </article>
 
           <article class="chart-card">
             <header>
-              <h3 data-i18n="analytics.muscle_chart">Target Muscle Distribution</h3>
-              <p data-i18n="analytics.muscle_desc">Exercises grouped by their primary target muscle.</p>
+              <div>
+                <h3 data-i18n="analytics.muscle_chart">Target Muscle Distribution</h3>
+                <p data-i18n="analytics.muscle_desc">Exercises grouped by primary target muscle.</p>
+              </div>
+              <div class="chart-pills" id="target-pills">
+                <button type="button" class="chart-pill" data-chart="target" data-n="10">Top 10</button>
+                <button type="button" class="chart-pill active" data-chart="target" data-n="15">Top 15</button>
+                <button type="button" class="chart-pill" data-chart="target" data-n="20">All 20</button>
+              </div>
             </header>
             <div class="chart-container">
-              <canvas id="targetMuscleChart" aria-label="Bar chart showing target muscle distribution" role="img"></canvas>
+              <canvas id="targetMuscleChart" aria-label="Bar chart showing target muscle distribution" role="img" style="cursor: pointer;"></canvas>
             </div>
           </article>
 
@@ -137,20 +225,25 @@
 
           <article class="chart-card">
             <header>
-              <h3 data-i18n="analytics.bodypart_chart">Body Part Focus</h3>
-              <p data-i18n="analytics.bodypart_desc">High-level regional breakdown.</p>
+              <div>
+                <h3 data-i18n="analytics.bodypart_chart">Body Part Focus</h3>
+                <p data-i18n="analytics.bodypart_desc">High-level regional breakdown.</p>
+              </div>
             </header>
             <div class="chart-container" style="min-height: 320px;">
-              <canvas id="bodyPartChart" aria-label="Doughnut chart showing body part focus" role="img"></canvas>
+              <canvas id="bodyPartChart" aria-label="Doughnut chart showing body part focus" role="img" style="cursor: pointer;"></canvas>
             </div>
           </article>
 
           <article class="chart-card">
             <header>
-              <h3 data-i18n="analytics.cooccurrence">Muscle Co-occurrences</h3>
-              <p data-i18n="analytics.cooccurrence_desc">Muscles most frequently trained together.</p>
+              <div>
+                <h3 data-i18n="analytics.cooccurrence">Muscle Co-occurrences</h3>
+                <p data-i18n="analytics.cooccurrence_desc">Muscles most frequently trained together.</p>
+              </div>
             </header>
-            <div style="max-height: 400px; overflow-y: auto;">
+            <input type="search" class="table-search-input" id="cooccurrence-search" placeholder="Search muscles (e.g. abs, chest)..." aria-label="Search muscle pairs">
+            <div style="max-height: 380px; overflow-y: auto;">
               <table class="co-table" aria-label="Muscle co-occurrence data">
                 <thead>
                   <tr>

@@ -11,17 +11,25 @@ Chart.defaults.plugins.tooltip.borderWidth = 1;
 Chart.defaults.plugins.tooltip.titleFont = { family: "'Barlow Condensed', sans-serif", weight: '700', size: 14 };
 
 // Iron Plate brand colors
-const colorRed    = '#D32F2F';
+const colorRed      = '#D32F2F';
 const colorRedLight = '#EF5350';
-const colorGold   = '#FFC107';
-const colorIron   = '#3a3f50';
+const colorGold     = '#FFC107';
+
+let cachedOverview = null;
+let cachedCooccurrence = [];
+let equipmentChartInstance = null;
+let targetMuscleChartInstance = null;
+let bodyPartChartInstance = null;
 
 async function init() {
   try {
     const [overview, cooccurrence] = await Promise.all([
       api.get('/analytics/overview'),
-      api.get('/analytics/muscle-cooccurrence?limit=15')
+      api.get('/analytics/muscle-cooccurrence?limit=50')
     ]);
+
+    cachedOverview = overview;
+    cachedCooccurrence = cooccurrence;
 
     renderStats(overview);
     renderEquipmentChart(overview.by_equipment.slice(0, 15));
@@ -29,36 +37,44 @@ async function init() {
     renderBodyPartChart(overview.by_body_part);
     renderCooccurrenceTable(cooccurrence);
 
+    setupChartPills();
+    setupCooccurrenceSearch();
+    setupExportButtons();
+
   } catch (err) {
     console.error('Failed to load analytics:', err);
     $('#overview-stats').innerHTML = '<p class="text-danger" style="grid-column: 1/-1;">Failed to load data. Is the backend running?</p>';
   }
 
-  // ETL history (non-blocking — load independently)
+  // ETL history (non-blocking)
   fetchETLHistory();
 }
 
 function renderStats(data) {
   const container = $('#overview-stats');
-  container.innerHTML = ''; // clear skeletons
+  container.innerHTML = '';
 
-  const addStat = (val, label) => {
+  const addStat = (val, label, subtitle) => {
     const card = el('div', { class: 'stat-card text-center' });
-    card.appendChild(el('div', { class: 'stat-value stat-accent', text: val }));
+    card.appendChild(el('div', { class: 'stat-value stat-accent', text: String(val) }));
     card.appendChild(el('div', { class: 'stat-label', text: label }));
+    if (subtitle) {
+      card.appendChild(el('small', { class: 'text-muted mt-1', style: 'font-size: 11px; display: block;', text: subtitle }));
+    }
     container.appendChild(card);
   };
 
-  addStat(data.total_exercises, 'Total Exercises');
-  addStat(data.total_equipment_types, 'Equipment Types');
-  addStat(data.total_target_muscles, 'Target Muscles');
-  addStat(data.total_body_parts, 'Body Regions');
+  addStat(data.total_exercises, 'Total Exercises', '100% Validated');
+  addStat(data.total_equipment_types, 'Equipment Types', 'Across Gym & Home');
+  addStat(data.total_target_muscles, 'Target Muscles', 'Primary Muscle Groups');
+  addStat(data.total_body_parts, 'Body Regions', 'Full-body Coverage');
 }
 
 function renderEquipmentChart(data) {
   const ctx = $('#equipmentChart').getContext('2d');
-  
-  new Chart(ctx, {
+  if (equipmentChartInstance) equipmentChartInstance.destroy();
+
+  equipmentChartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: data.map(d => d.label),
@@ -67,14 +83,26 @@ function renderEquipmentChart(data) {
         data: data.map(d => d.count),
         backgroundColor: colorRed,
         hoverBackgroundColor: colorRedLight,
-        borderRadius: 3,
+        borderRadius: 4,
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      onClick: (event, elements) => {
+        if (elements && elements.length > 0) {
+          const idx = elements[0].index;
+          const label = data[idx].label;
+          window.location.href = `/?equipment=${encodeURIComponent(label)}`;
+        }
+      },
       plugins: {
-        legend: { display: false }
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            footer: () => '👉 Click to view exercises'
+          }
+        }
       },
       scales: {
         y: {
@@ -82,7 +110,12 @@ function renderEquipmentChart(data) {
           grid: { color: 'hsl(222, 14%, 22%)' }
         },
         x: {
-          grid: { display: false }
+          grid: { display: false },
+          ticks: {
+            maxRotation: 45,
+            minRotation: 0,
+            font: { size: 11 }
+          }
         }
       }
     }
@@ -91,8 +124,9 @@ function renderEquipmentChart(data) {
 
 function renderTargetMuscleChart(data) {
   const ctx = $('#targetMuscleChart').getContext('2d');
-  
-  new Chart(ctx, {
+  if (targetMuscleChartInstance) targetMuscleChartInstance.destroy();
+
+  targetMuscleChartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: data.map(d => d.label),
@@ -101,14 +135,26 @@ function renderTargetMuscleChart(data) {
         data: data.map(d => d.count),
         backgroundColor: colorGold,
         hoverBackgroundColor: '#FFD54F',
-        borderRadius: 3,
+        borderRadius: 4,
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      onClick: (event, elements) => {
+        if (elements && elements.length > 0) {
+          const idx = elements[0].index;
+          const label = data[idx].label;
+          window.location.href = `/?target=${encodeURIComponent(label)}`;
+        }
+      },
       plugins: {
-        legend: { display: false }
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            footer: () => '👉 Click to view exercises'
+          }
+        }
       },
       scales: {
         y: {
@@ -116,7 +162,12 @@ function renderTargetMuscleChart(data) {
           grid: { color: 'hsl(222, 14%, 22%)' }
         },
         x: {
-          grid: { display: false }
+          grid: { display: false },
+          ticks: {
+            maxRotation: 45,
+            minRotation: 0,
+            font: { size: 11 }
+          }
         }
       }
     }
@@ -125,15 +176,15 @@ function renderTargetMuscleChart(data) {
 
 function renderBodyPartChart(data) {
   const ctx = $('#bodyPartChart').getContext('2d');
-  
-  // Iron plate: shades from red to iron-gray
+  if (bodyPartChartInstance) bodyPartChartInstance.destroy();
+
   const colors = data.map((_, i) => {
-    const hues = [0, 20, 200, 220, 240, 260, 280, 300, 340];
+    const hues = [0, 20, 45, 140, 200, 220, 260, 290, 330];
     const h = hues[i % hues.length];
-    return `hsl(${h}, 55%, 42%)`;
+    return `hsl(${h}, 60%, 45%)`;
   });
 
-  new Chart(ctx, {
+  bodyPartChartInstance = new Chart(ctx, {
     type: 'doughnut',
     data: {
       labels: data.map(d => d.label),
@@ -147,11 +198,23 @@ function renderBodyPartChart(data) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '72%',
+      cutout: '70%',
+      onClick: (event, elements) => {
+        if (elements && elements.length > 0) {
+          const idx = elements[0].index;
+          const label = data[idx].label;
+          window.location.href = `/?body_part=${encodeURIComponent(label)}`;
+        }
+      },
       plugins: {
         legend: {
           position: 'right',
-          labels: { boxWidth: 12, padding: 14, font: { family: "'Barlow Condensed', sans-serif", weight: '700', size: 12 } }
+          labels: { boxWidth: 12, padding: 12, font: { family: "'Barlow Condensed', sans-serif", weight: '700', size: 12 } }
+        },
+        tooltip: {
+          callbacks: {
+            footer: () => '👉 Click to view exercises'
+          }
         }
       }
     }
@@ -162,11 +225,22 @@ function renderCooccurrenceTable(data) {
   const tbody = $('#cooccurrence-table-body');
   tbody.innerHTML = '';
 
-  data.forEach((row, i) => {
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--color-text-muted);padding:var(--space-4);">No muscle pairs found.</td></tr>';
+    return;
+  }
+
+  data.forEach(row => {
     const tr = el('tr', {});
 
-    const td1 = el('td', { text: row.muscle_a });
-    const td2 = el('td', { text: row.muscle_b });
+    const td1 = el('td');
+    const linkA = el('a', { class: 'table-link', href: `/?target=${encodeURIComponent(row.muscle_a)}`, text: row.muscle_a });
+    td1.appendChild(linkA);
+
+    const td2 = el('td');
+    const linkB = el('a', { class: 'table-link', href: `/?target=${encodeURIComponent(row.muscle_b)}`, text: row.muscle_b });
+    td2.appendChild(linkB);
+
     const td3 = el('td', { class: 'count-cell', text: String(row.co_occurrence_count) });
 
     tr.appendChild(td1);
@@ -176,6 +250,81 @@ function renderCooccurrenceTable(data) {
   });
 }
 
+function setupChartPills() {
+  document.querySelectorAll('.chart-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const chartType = btn.dataset.chart;
+      const n = parseInt(btn.dataset.n, 10);
+
+      // Toggle active class inside its parent group
+      btn.parentElement.querySelectorAll('.chart-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      if (chartType === 'eq' && cachedOverview) {
+        renderEquipmentChart(cachedOverview.by_equipment.slice(0, n));
+      } else if (chartType === 'target' && cachedOverview) {
+        renderTargetMuscleChart(cachedOverview.by_target_muscle.slice(0, n));
+      }
+    });
+  });
+}
+
+function setupCooccurrenceSearch() {
+  const searchInput = $('#cooccurrence-search');
+  if (!searchInput) return;
+
+  searchInput.addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase().trim();
+    if (!q) {
+      renderCooccurrenceTable(cachedCooccurrence);
+      return;
+    }
+
+    const filtered = cachedCooccurrence.filter(r => 
+      r.muscle_a.toLowerCase().includes(q) || r.muscle_b.toLowerCase().includes(q)
+    );
+    renderCooccurrenceTable(filtered);
+  });
+}
+
+function setupExportButtons() {
+  $('#export-csv-btn')?.addEventListener('click', () => {
+    if (!cachedOverview) return;
+
+    let csv = 'Category,Item,Count,Percentage\n';
+    cachedOverview.by_body_part.forEach(d => {
+      csv += `Body Part,"${d.label}",${d.count},${d.percentage}%\n`;
+    });
+    cachedOverview.by_equipment.forEach(d => {
+      csv += `Equipment,"${d.label}",${d.count},${d.percentage}%\n`;
+    });
+    cachedOverview.by_target_muscle.forEach(d => {
+      csv += `Target Muscle,"${d.label}",${d.count},${d.percentage}%\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'fitdata_analytics_summary.csv';
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  $('#export-json-btn')?.addEventListener('click', () => {
+    if (!cachedOverview) return;
+
+    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify({
+      overview: cachedOverview,
+      muscle_cooccurrences: cachedCooccurrence
+    }, null, 2));
+
+    const link = document.createElement('a');
+    link.href = dataStr;
+    link.download = 'fitdata_analytics_summary.json';
+    link.click();
+  });
+}
 
 // ---------------------------------------------------------------------------
 // ETL Pipeline History
@@ -197,7 +346,6 @@ async function fetchETLHistory() {
     runs.forEach(run => {
       const tr = document.createElement('tr');
 
-      // Status badge
       const statusColor = run.status === 'SUCCESS' ? '#66BB6A'
         : run.status === 'FAILED' ? '#EF5350'
         : '#FFC107';
@@ -208,12 +356,10 @@ async function fetchETLHistory() {
         font-size:11px; font-weight:700; text-transform:uppercase;
       ">${run.status || '—'}</mark>`;
 
-      // Format date
       const started = run.started_at
         ? new Date(run.started_at).toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'medium' })
         : '—';
 
-      // Duration
       const dur = run.duration_seconds != null
         ? `${run.duration_seconds.toFixed(1)}s`
         : '—';
@@ -238,4 +384,5 @@ async function fetchETLHistory() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
 
