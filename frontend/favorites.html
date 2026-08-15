@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="FitData Hub — Your saved favourite exercises. Access your bookmarked gym exercises anytime.">
+  <meta name="description" content="FitData Hub — Your saved favourite exercises. Access, organise and export your bookmarked gym exercises anytime.">
   <title>My Favourites — FitData Hub</title>
   <link rel="stylesheet" href="/css/main.css">
   <style>
@@ -14,7 +14,7 @@
     }
 
     .fav-hero-inner {
-      max-width: 680px;
+      max-width: 760px;
     }
 
     .fav-hero h1 {
@@ -35,6 +35,7 @@
       align-items: center;
       gap: var(--space-6);
       margin-top: var(--space-4);
+      flex-wrap: wrap;
     }
 
     .fav-count {
@@ -87,6 +88,90 @@
       height: 15px;
     }
 
+    /* Bulk select checkbox on card */
+    .fav-card-wrapper.is-bulk .bulk-check {
+      display: flex;
+    }
+
+    .bulk-check {
+      display: none;
+      position: absolute;
+      top: var(--space-3);
+      left: var(--space-3);
+      z-index: 3;
+      width: 24px;
+      height: 24px;
+      background: var(--color-surface);
+      border: 2px solid var(--color-accent);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bulk-check input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      accent-color: var(--color-accent);
+      cursor: pointer;
+    }
+
+    .fav-card-wrapper.selected .bulk-check {
+      background: var(--color-accent);
+    }
+
+    .fav-card-wrapper.selected {
+      outline: 2px solid var(--color-accent);
+      border-radius: var(--radius-lg);
+    }
+
+    /* Toolbar */
+    .fav-toolbar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-6);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+    }
+
+    .fav-toolbar select {
+      padding: 5px 10px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      color: var(--color-text-primary);
+      font-size: var(--text-xs);
+      cursor: pointer;
+    }
+
+    .fav-toolbar select:focus {
+      outline: none;
+      border-color: var(--color-accent);
+    }
+
+    .toolbar-sep {
+      width: 1px;
+      height: 20px;
+      background: var(--color-border);
+    }
+
+    .bulk-actions-bar {
+      display: none;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: rgba(211, 47, 47, 0.06);
+      border: 1px solid rgba(211, 47, 47, 0.3);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-4);
+    }
+
+    .bulk-actions-bar.is-active { display: flex; }
+
     .empty-state {
       text-align: center;
       padding: var(--space-16) var(--space-4);
@@ -116,7 +201,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: var(--space-6);
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
+      gap: var(--space-3);
     }
 
     .clear-all-bar p {
@@ -132,6 +219,20 @@
     .fav-card-wrapper {
       animation: fav-in 0.25s ease both;
     }
+
+    .share-result {
+      display: none;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      margin-top: var(--space-3);
+      word-break: break-all;
+    }
+
+    .share-result.is-open { display: block; }
   </style>
 </head>
 <body>
@@ -172,12 +273,52 @@
     </section>
 
     <div id="fav-content">
+
+      <!-- Toolbar: Sort / Filter / Export / Share -->
+      <div class="fav-toolbar" id="fav-toolbar" hidden aria-label="Favourites toolbar">
+        <label for="fav-sort" class="visually-hidden">Sort by</label>
+        <select id="fav-sort" aria-label="Sort favourites">
+          <option value="newest">🕐 Newest first</option>
+          <option value="oldest">🕐 Oldest first</option>
+          <option value="alpha">🔤 A → Z</option>
+        </select>
+
+        <div class="toolbar-sep" aria-hidden="true"></div>
+
+        <label for="fav-filter-bp" class="visually-hidden">Filter by body part</label>
+        <select id="fav-filter-bp" aria-label="Filter by body part">
+          <option value="">All body parts</option>
+        </select>
+
+        <label for="fav-filter-eq" class="visually-hidden">Filter by equipment</label>
+        <select id="fav-filter-eq" aria-label="Filter by equipment">
+          <option value="">All equipment</option>
+        </select>
+
+        <div class="toolbar-sep" aria-hidden="true"></div>
+
+        <button type="button" id="bulk-toggle-btn" class="btn btn-ghost btn-sm" data-i18n="fav.bulk_select">☑ Bulk Select</button>
+        <button type="button" id="export-csv-btn" class="btn btn-ghost btn-sm" data-i18n="fav.export_csv">📥 CSV</button>
+        <button type="button" id="export-json-btn" class="btn btn-ghost btn-sm" data-i18n="fav.export_json">📥 JSON</button>
+        <button type="button" id="share-btn" class="btn btn-ghost btn-sm" data-i18n="fav.share">🔗 Share</button>
+      </div>
+
+      <!-- Bulk actions bar (shown in bulk mode) -->
+      <div class="bulk-actions-bar" id="bulk-actions-bar" role="toolbar" aria-label="Bulk actions">
+        <strong id="selected-count" style="font-size: var(--text-sm); color: var(--color-accent);">0 selected</strong>
+        <button type="button" id="bulk-remove-btn" class="btn btn-outline-red btn-sm" data-i18n="fav.bulk_remove">Remove Selected</button>
+        <button type="button" id="bulk-cancel-btn" class="btn btn-ghost btn-sm">Cancel</button>
+      </div>
+
+      <!-- Shared link output -->
+      <output class="share-result" id="share-result" aria-live="polite" aria-label="Shareable link"></output>
+
+      <!-- Clear All Bar -->
       <div class="clear-all-bar" id="clear-all-bar" hidden>
         <p data-i18n="fav.remove_hint">Click ❤️ on any exercise to remove it from your favourites.</p>
-        <button type="button" id="clear-all-btn" class="btn btn-ghost btn-sm" data-i18n="fav.clear_all">
-          Clear all
-        </button>
+        <button type="button" id="clear-all-btn" class="btn btn-ghost btn-sm" data-i18n="fav.clear_all">Clear all</button>
       </div>
+
       <section id="fav-grid" aria-label="Favourite exercises" aria-live="polite"></section>
     </div>
 
