@@ -282,59 +282,122 @@ function createLangSwitcher() {
   const header = document.querySelector('.header-inner');
   if (!header) return;
 
-  const wrapper = document.createElement('div');
+  // Check-mark SVG (shown next to active language)
+  const checkSVG = `<svg class="lang-check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+  const wrapper = document.createElement('nav');
   wrapper.className = 'lang-switcher';
+  wrapper.setAttribute('aria-label', 'Language selector');
+
   wrapper.innerHTML = `
-    <button type="button" class="lang-toggle" aria-label="Change language" aria-expanded="false">
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+    <button type="button" class="lang-toggle" id="lang-toggle-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Change language — current: ${_currentLang === 'vi' ? 'Tiếng Việt' : 'English'}">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
         <circle cx="12" cy="12" r="10"/>
         <path d="M2 12h20"/>
         <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/>
       </svg>
-      <span class="lang-current">${_currentLang === 'vi' ? 'VI' : 'EN'}</span>
+      <span class="lang-current">${_currentLang === 'vi' ? '🇻🇳 VI' : '🇺🇸 EN'}</span>
     </button>
-    <ul class="lang-dropdown" role="listbox" aria-label="Select language">
-      <li role="option" data-lang="en" ${_currentLang === 'en' ? 'aria-selected="true"' : ''}>
-        <span class="lang-flag">🇺🇸</span> English
+    <ul class="lang-dropdown" role="listbox" id="lang-dropdown" aria-labelledby="lang-toggle-btn">
+      <li role="option" data-lang="en" tabindex="-1" ${_currentLang === 'en' ? 'aria-selected="true"' : 'aria-selected="false"'}>
+        <span class="lang-option-left">
+          <span class="lang-flag">🇺🇸</span>
+          <span>English</span>
+        </span>
+        ${checkSVG}
       </li>
-      <li role="option" data-lang="vi" ${_currentLang === 'vi' ? 'aria-selected="true"' : ''}>
-        <span class="lang-flag">🇻🇳</span> Tiếng Việt
+      <li role="option" data-lang="vi" tabindex="-1" ${_currentLang === 'vi' ? 'aria-selected="true"' : 'aria-selected="false"'}>
+        <span class="lang-option-left">
+          <span class="lang-flag">🇻🇳</span>
+          <span>Tiếng Việt</span>
+        </span>
+        ${checkSVG}
       </li>
     </ul>`;
 
   header.appendChild(wrapper);
 
-  const toggle = wrapper.querySelector('.lang-toggle');
+  const toggle   = wrapper.querySelector('.lang-toggle');
   const dropdown = wrapper.querySelector('.lang-dropdown');
-  const currentLabel = wrapper.querySelector('.lang-current');
+  const label    = wrapper.querySelector('.lang-current');
+  const options  = [...dropdown.querySelectorAll('[data-lang]')];
 
-  toggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const open = dropdown.classList.toggle('is-open');
-    toggle.setAttribute('aria-expanded', String(open));
-  });
+  // ── Helpers ──────────────────────────────────────────────
+  function openDropdown() {
+    dropdown.classList.add('is-open');
+    toggle.setAttribute('aria-expanded', 'true');
+    // Focus the active option
+    const active = dropdown.querySelector('[aria-selected="true"]');
+    (active || options[0])?.focus();
+  }
 
-  dropdown.querySelectorAll('[data-lang]').forEach(option => {
-    option.addEventListener('click', () => {
-      const lang = option.dataset.lang;
-      setLang(lang);
-      currentLabel.textContent = lang.toUpperCase();
-      dropdown.classList.remove('is-open');
-      toggle.setAttribute('aria-expanded', 'false');
-
-      // Update aria-selected
-      dropdown.querySelectorAll('[role="option"]').forEach(opt => {
-        opt.setAttribute('aria-selected', opt.dataset.lang === lang ? 'true' : 'false');
-      });
-    });
-  });
-
-  // Close on click outside
-  document.addEventListener('click', () => {
+  function closeDropdown() {
     dropdown.classList.remove('is-open');
     toggle.setAttribute('aria-expanded', 'false');
+    toggle.focus();
+  }
+
+  function selectLang(lang) {
+    setLang(lang);
+    label.textContent = lang === 'vi' ? '🇻🇳 VI' : '🇺🇸 EN';
+    toggle.setAttribute('aria-label', `Change language — current: ${lang === 'vi' ? 'Tiếng Việt' : 'English'}`);
+    options.forEach(opt => {
+      opt.setAttribute('aria-selected', opt.dataset.lang === lang ? 'true' : 'false');
+    });
+    closeDropdown();
+  }
+
+  // ── Toggle button ─────────────────────────────────────────
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = dropdown.classList.contains('is-open');
+    isOpen ? closeDropdown() : openDropdown();
+  });
+
+  // ── Option click ──────────────────────────────────────────
+  options.forEach(opt => {
+    opt.addEventListener('click', () => selectLang(opt.dataset.lang));
+  });
+
+  // ── Keyboard navigation ───────────────────────────────────
+  toggle.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      openDropdown();
+    }
+  });
+
+  dropdown.addEventListener('keydown', (e) => {
+    const focused = document.activeElement;
+    const idx     = options.indexOf(focused);
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        options[(idx + 1) % options.length]?.focus();
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        options[(idx - 1 + options.length) % options.length]?.focus();
+        break;
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        if (focused?.dataset?.lang) selectLang(focused.dataset.lang);
+        break;
+      case 'Escape':
+      case 'Tab':
+        closeDropdown();
+        break;
+    }
+  });
+
+  // ── Close on outside click ────────────────────────────────
+  document.addEventListener('click', (e) => {
+    if (!wrapper.contains(e.target)) closeDropdown();
   });
 }
+
 
 // ---------------------------------------------------------------------------
 // Init
