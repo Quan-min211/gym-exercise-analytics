@@ -238,26 +238,41 @@ markCurrentNav();
 })();
 
 // ---------------------------------------------------------------------------
-// Scroll-to-top button
+// Scroll-to-top button (with scroll-progress ring)
 // ---------------------------------------------------------------------------
 
 (function initScrollToTop() {
+  // Circumference of r=19 circle ≈ 119.4; using r=18 → 113.1
+  const CIRC = 2 * Math.PI * 18; // ≈ 113.1
+
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'scroll-top-btn';
   btn.setAttribute('aria-label', 'Scroll to top');
+  btn.style.position = 'relative';
   btn.innerHTML = `
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <svg class="progress-ring" aria-hidden="true" viewBox="0 0 44 44">
+      <circle cx="22" cy="22" r="18" style="stroke-dasharray:${CIRC};stroke-dashoffset:${CIRC};"/>
+    </svg>
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" style="position:relative;z-index:1"
+      stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
       <path d="M18 15l-6-6-6 6"/>
     </svg>`;
   document.body.appendChild(btn);
+
+  const circle = btn.querySelector('.progress-ring circle');
 
   let ticking = false;
   window.addEventListener('scroll', () => {
     if (!ticking) {
       window.requestAnimationFrame(() => {
-        btn.classList.toggle('is-visible', window.scrollY > 400);
+        const scrolled = window.scrollY;
+        const total    = document.documentElement.scrollHeight - window.innerHeight;
+        const pct      = total > 0 ? Math.min(scrolled / total, 1) : 0;
+
+        btn.classList.toggle('is-visible', scrolled > 300);
+        // Progress ring offset: 0 = full circle shown, CIRC = empty
+        circle.style.strokeDashoffset = CIRC * (1 - pct);
         ticking = false;
       });
       ticking = true;
@@ -268,6 +283,164 @@ markCurrentNav();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 })();
+
+// ---------------------------------------------------------------------------
+// Mobile hamburger nav drawer (injected globally via app.js)
+// ---------------------------------------------------------------------------
+
+(function initMobileNav() {
+  const headerInner = document.querySelector('.header-inner');
+  if (!headerInner) return;
+
+  // ── 1. Hamburger button ──────────────────────────────────
+  const hamburger = document.createElement('button');
+  hamburger.type = 'button';
+  hamburger.className = 'nav-hamburger';
+  hamburger.setAttribute('aria-label', 'Open navigation menu');
+  hamburger.setAttribute('aria-expanded', 'false');
+  hamburger.setAttribute('aria-controls', 'mobile-nav-drawer');
+  hamburger.innerHTML = `
+    <span class="bar" aria-hidden="true"></span>
+    <span class="bar" aria-hidden="true"></span>
+    <span class="bar" aria-hidden="true"></span>`;
+  headerInner.appendChild(hamburger);
+
+  // ── 2. Build nav links from existing desktop nav ─────────
+  const desktopLinks = [...document.querySelectorAll('.main-nav a')];
+
+  const navItems = desktopLinks.map(a => ({
+    href    : a.getAttribute('href'),
+    label   : a.getAttribute('data-i18n') || a.textContent.trim(),
+    text    : a.textContent.trim(),
+    current : a.getAttribute('aria-current') === 'page',
+    i18n    : a.getAttribute('data-i18n'),
+  }));
+
+  // ── 3. Create overlay + drawer ───────────────────────────
+  const overlay = document.createElement('div');
+  overlay.className = 'mobile-nav-overlay';
+  overlay.id = 'mobile-nav-overlay';
+  overlay.setAttribute('aria-hidden', 'true');
+
+  // Detect current lang from localStorage (mirrors i18n.js)
+  const currentLang = localStorage.getItem('fitdata_lang') || 'en';
+
+  const drawer = document.createElement('nav');
+  drawer.className = 'mobile-nav-drawer';
+  drawer.id = 'mobile-nav-drawer';
+  drawer.setAttribute('aria-label', 'Mobile navigation');
+
+  drawer.innerHTML = `
+    <div class="mobile-nav-header">
+      <a href="/" class="mobile-nav-logo" aria-label="FitData Hub home">Fit<strong>Data</strong>Hub</a>
+      <button type="button" class="mobile-nav-close" id="mobile-nav-close-btn" aria-label="Close navigation menu">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <ul class="mobile-nav-list" role="list">
+      ${navItems.map(item => `
+        <li>
+          <a href="${item.href}"
+            ${item.current ? 'aria-current="page"' : ''}
+            ${item.i18n ? `data-i18n="${item.i18n}"` : ''}>
+            ${item.text}
+          </a>
+        </li>`).join('')}
+    </ul>
+    <footer class="mobile-nav-footer">
+      <button type="button" class="mobile-lang-btn ${currentLang === 'en' ? 'is-active' : ''}" data-mobile-lang="en">
+        🇺🇸 EN
+      </button>
+      <button type="button" class="mobile-lang-btn ${currentLang === 'vi' ? 'is-active' : ''}" data-mobile-lang="vi">
+        🇻🇳 VI
+      </button>
+    </footer>`;
+
+  document.body.appendChild(overlay);
+  document.body.appendChild(drawer);
+
+  // ── 4. Open / Close helpers ──────────────────────────────
+  function openDrawer() {
+    overlay.classList.add('is-open');
+    drawer.classList.add('is-open');
+    hamburger.setAttribute('aria-expanded', 'true');
+    hamburger.setAttribute('aria-label', 'Close navigation menu');
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    // Focus first link in drawer
+    drawer.querySelector('a, button')?.focus();
+  }
+
+  function closeDrawer() {
+    overlay.classList.remove('is-open');
+    drawer.classList.remove('is-open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    hamburger.setAttribute('aria-label', 'Open navigation menu');
+    overlay.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    hamburger.focus();
+  }
+
+  // ── 5. Event listeners ───────────────────────────────────
+  hamburger.addEventListener('click', () => {
+    const isOpen = drawer.classList.contains('is-open');
+    isOpen ? closeDrawer() : openDrawer();
+  });
+
+  overlay.addEventListener('click', closeDrawer);
+  drawer.getElementById?.('mobile-nav-close-btn')?.addEventListener('click', closeDrawer);
+  // querySelector fallback (getElementById on element not supported in all browsers)
+  drawer.querySelector('#mobile-nav-close-btn')?.addEventListener('click', closeDrawer);
+
+  // Escape key closes drawer
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && drawer.classList.contains('is-open')) {
+      closeDrawer();
+    }
+  });
+
+  // Trap focus inside drawer when open
+  drawer.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const focusables = [...drawer.querySelectorAll('a, button, [tabindex]:not([tabindex="-1"])')];
+    const first = focusables[0];
+    const last  = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+
+  // ── 6. Mobile lang buttons ───────────────────────────────
+  drawer.querySelectorAll('[data-mobile-lang]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const lang = btn.dataset.mobileLang;
+      // Sync with i18n module
+      window.dispatchEvent(new CustomEvent('mobile-lang-select', { detail: { lang } }));
+      // Visually update buttons
+      drawer.querySelectorAll('[data-mobile-lang]').forEach(b => {
+        b.classList.toggle('is-active', b.dataset.mobileLang === lang);
+      });
+      closeDrawer();
+    });
+  });
+
+  // Listen for lang-changed events from i18n.js to keep buttons in sync
+  window.addEventListener('lang-changed', (e) => {
+    const lang = e.detail?.lang;
+    if (!lang) return;
+    drawer.querySelectorAll('[data-mobile-lang]').forEach(b => {
+      b.classList.toggle('is-active', b.dataset.mobileLang === lang);
+    });
+  });
+})();
+
 
 // ---------------------------------------------------------------------------
 // Rest Timer Widget (Global)

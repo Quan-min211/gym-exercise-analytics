@@ -399,6 +399,7 @@ function createLangSwitcher() {
 }
 
 
+
 // ---------------------------------------------------------------------------
 // Init
 // ---------------------------------------------------------------------------
@@ -413,6 +414,21 @@ function init() {
   if (_currentLang !== 'en') {
     applyTranslations();
   }
+
+  // Wire mobile nav lang buttons (dispatched by app.js initMobileNav)
+  window.addEventListener('mobile-lang-select', (e) => {
+    const lang = e.detail?.lang;
+    if (lang && (lang === 'en' || lang === 'vi')) {
+      setLang(lang);
+      // Also update desktop switcher label if it exists
+      const desktopLabel = document.querySelector('.lang-current');
+      if (desktopLabel) desktopLabel.textContent = lang === 'vi' ? '🇻🇳 VI' : '🇺🇸 EN';
+      const desktopOpts = document.querySelectorAll('.lang-dropdown [data-lang]');
+      desktopOpts.forEach(opt => {
+        opt.setAttribute('aria-selected', opt.dataset.lang === lang ? 'true' : 'false');
+      });
+    }
+  });
 }
 
 if (document.readyState === 'loading') {

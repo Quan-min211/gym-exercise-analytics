@@ -137,7 +137,241 @@ input, select, textarea {
   background: rgba(211, 47, 47, 0.1);
 }
 
-/* ---- Language switcher ---- */
+/* ---- Hamburger button ---- */
+.nav-hamburger {
+  display: none;               /* hidden on desktop */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition: border-color 0.18s, color 0.18s;
+  flex-shrink: 0;
+}
+
+.nav-hamburger:hover,
+.nav-hamburger:focus-visible {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* Three-bar icon → X when open */
+.nav-hamburger .bar {
+  width: 18px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+  transform-origin: center;
+  transition: transform 0.22s ease, opacity 0.22s ease, width 0.22s ease;
+}
+
+.nav-hamburger[aria-expanded="true"] .bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.nav-hamburger[aria-expanded="true"] .bar:nth-child(2) {
+  opacity: 0;
+  width: 0;
+}
+.nav-hamburger[aria-expanded="true"] .bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ---- Mobile nav drawer ---- */
+.mobile-nav-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 98;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.mobile-nav-overlay.is-open {
+  display: block;
+  opacity: 1;
+}
+
+.mobile-nav-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 99;
+  width: min(300px, 85vw);
+  height: 100dvh;
+  background: rgba(11, 13, 17, 0.98);
+  border-left: 1px solid var(--color-border);
+  backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6) var(--space-5);
+  gap: var(--space-2);
+  transform: translateX(100%);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.6);
+}
+
+.mobile-nav-drawer.is-open {
+  transform: translateX(0);
+}
+
+/* Drawer header row */
+.mobile-nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mobile-nav-logo {
+  font-family: var(--font-display);
+  font-weight: var(--weight-black);
+  font-size: 1.2rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.mobile-nav-logo strong { color: var(--color-accent); }
+
+.mobile-nav-close {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: border-color 0.18s, color 0.18s;
+}
+
+.mobile-nav-close:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* Drawer nav links */
+.mobile-nav-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1;
+}
+
+.mobile-nav-list a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-base);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  border-radius: var(--radius-md);
+  border-left: 3px solid transparent;
+  transition: color 0.18s, background 0.18s, border-color 0.18s;
+  text-decoration: none;
+}
+
+.mobile-nav-list a:hover {
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+}
+
+.mobile-nav-list a[aria-current="page"] {
+  color: var(--color-accent);
+  background: rgba(211, 47, 47, 0.1);
+  border-left-color: var(--color-accent);
+}
+
+/* Fav badge in mobile nav */
+.mobile-nav-list a .fav-count-badge {
+  margin-left: auto;
+}
+
+/* Drawer footer — lang switcher clone */
+.mobile-nav-footer {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.mobile-lang-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.18s, color 0.18s, background 0.18s;
+}
+
+.mobile-lang-btn.is-active,
+.mobile-lang-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: rgba(211, 47, 47, 0.1);
+}
+
+/* Show hamburger + hide desktop nav on small screens */
+@media (max-width: 768px) {
+  .main-nav       { display: none; }
+  .nav-hamburger  { display: flex; }
+  .lang-switcher  { display: none; } /* replaced by mobile footer */
+}
+
+/* Scroll-to-top: upgraded with progress ring */
+.scroll-top-btn svg.progress-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.scroll-top-btn svg.progress-ring circle {
+  fill: none;
+  stroke: rgba(255,255,255,0.25);
+  stroke-width: 2;
+  stroke-dasharray: 125.6;
+  stroke-dashoffset: 125.6;
+  transition: stroke-dashoffset 0.1s linear;
+}
+
+
 .lang-switcher {
   position: relative;
   flex-shrink: 0;
@@ -1239,11 +1473,13 @@ p { line-height: var(--leading-relaxed); }
   transform: translateY(12px);
   transition: opacity 0.3s, visibility 0.3s, transform 0.3s, background 0.2s;
   box-shadow: 0 4px 14px rgba(211, 47, 47, 0.35);
+  overflow: hidden;    /* clip progress ring to circle */
 }
 
-.scroll-top-btn svg {
-  width: 20px;
-  height: 20px;
+/* Only size non-progress SVGs */
+.scroll-top-btn svg:not(.progress-ring) {
+  width: 18px;
+  height: 18px;
 }
 
 .scroll-top-btn:hover {
