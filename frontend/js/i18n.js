@@ -204,6 +204,16 @@ const translations = {
     'calc.lose_label': 'Để giảm cân',
     'calc.gain_label': 'Để tăng cơ',
     'calc.recommendation': 'Khuyến nghị',
+    'calc.subtitle': 'BMI · BMR · TDEE · Mục tiêu Macro · Nguy cơ vòng eo — tính toán ngay trên trình duyệt.',
+    'calc.calculate': 'Tính ngay',
+    'calc.goal': 'Mục tiêu chính',
+    'calc.goal_maintain': 'Duy trì cân nặng',
+    'calc.goal_lose': 'Giảm mỡ',
+    'calc.goal_gain': 'Tăng cơ / tăng cân',
+    'calc.macro_title': 'Mục tiêu Macro',
+    'calc.waist_label': 'Chu vi vòng eo (cm)',
+    'calc.history_title': 'Lịch sử tính toán',
+    'calc.history_clear': 'Xoá lịch sử',
   },
 };
 
