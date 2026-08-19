@@ -84,9 +84,10 @@ function renderDetail(ex) {
   initNotes(ex.id);
 
   // ---- Compare link ----
-  const compareLink = $('#compare-link');
+  const compareLink = $('#compare-this-btn') || $('#compare-link');
   if (compareLink) {
     compareLink.href = `/compare.html?a=${ex.id}`;
+    compareLink.title = `Compare ${ex.name} with another exercise`;
   }
 }
 

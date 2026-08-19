@@ -26,6 +26,17 @@ const translations = {
     'nav.analytics': 'Thống kê',
     'nav.calculator': 'Máy tính',
     'nav.favourites': 'Yêu thích',
+    'nav.compare': 'So sánh',
+
+    // ── Compare page ──
+    'compare.title': 'So sánh\nBài tập',
+    'compare.subtitle': 'Chọn 2 bài tập để so sánh GIF, cơ mục tiêu, thiết bị và hướng dẫn thực hiện.',
+    'compare.select_a': 'Tìm và chọn bài tập đầu tiên',
+    'compare.select_b': 'Tìm và chọn bài tập thứ hai',
+    'compare.shared_muscles': 'Cơ chung',
+    'compare.only_in_a': 'Chỉ trong A',
+    'compare.only_in_b': 'Chỉ trong B',
+    'compare.analysis': 'Điểm giống và khác nhau',
 
     // ── Common ──
     'common.view_exercise': 'Xem bài tập',
