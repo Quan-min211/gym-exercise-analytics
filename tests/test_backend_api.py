@@ -36,6 +36,24 @@ def test_get_exercise_not_found(client):
     assert response.status_code == 404
 
 
+def test_get_daily_exercise(client):
+    response = client.get("/api/exercises/daily")
+    assert response.status_code == 200
+    data = response.json()
+    assert "id" in data
+    assert "name" in data
+    assert "target" in data
+    assert "equipment" in data
+    assert "gif_url" in data
+
+    # Verify deterministic behavior for a fixed date
+    res1 = client.get("/api/exercises/daily?date=2026-08-20")
+    res2 = client.get("/api/exercises/daily?date=2026-08-20")
+    assert res1.status_code == 200
+    assert res2.status_code == 200
+    assert res1.json()["id"] == res2.json()["id"]
+
+
 def test_exercise_filters(client):
     response = client.get("/api/exercises/filters")
     assert response.status_code == 200

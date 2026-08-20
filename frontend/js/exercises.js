@@ -16,26 +16,75 @@ async function init() {
 }
 
 async function loadExerciseOfDay() {
+  const card = $('#exercise-of-day');
+  if (!card) return;
+
   try {
-    const data = await api.get('/exercises', { page: 1 });
-    if (!data.items || data.items.length === 0) return;
+    const lang = localStorage.getItem('fitdata_lang') || 'en';
+    const ex = await api.get('/exercises/daily', { lang });
+    if (!ex || !ex.id) return;
 
-    const todayStr = new Date().toISOString().split('T')[0];
-    let hash = 0;
-    for (let i = 0; i < todayStr.length; i++) {
-      hash = (hash * 31 + todayStr.charCodeAt(i)) >>> 0;
+    const img = $('#eod-image');
+    if (img) {
+      img.src = `/${ex.gif_url || ex.image}`;
+      img.alt = `${ex.name} demonstration`;
     }
-    const selected = data.items[hash % data.items.length];
 
-    const card = $('#exercise-of-day');
-    if (card && selected) {
-      $('#eod-name').textContent = selected.name;
-      $('#eod-meta').textContent = `${selected.body_part} • ${selected.equipment} • Target: ${selected.target}`;
-      $('#eod-link').href = `/exercise.html?id=${selected.id}`;
-      card.style.display = 'block';
+    const nameEl = $('#eod-name');
+    if (nameEl) {
+      nameEl.textContent = ex.name;
     }
+
+    const dateEl = $('#eod-date');
+    if (dateEl) {
+      const now = new Date();
+      dateEl.dateTime = now.toISOString().split('T')[0];
+      dateEl.textContent = now.toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+      });
+    }
+
+    const tagsContainer = $('#eod-tags');
+    if (tagsContainer) {
+      tagsContainer.innerHTML = '';
+      if (ex.target) {
+        tagsContainer.appendChild(el('span', { class: 'tag tag-accent', text: `${ex.target} (Target)` }));
+      }
+      if (ex.body_part) {
+        tagsContainer.appendChild(el('span', { class: 'tag tag-warm', text: ex.body_part }));
+      }
+      if (ex.equipment) {
+        tagsContainer.appendChild(el('span', { class: 'tag tag-neutral', text: ex.equipment }));
+      }
+    }
+
+    const instrEl = $('#eod-instruction');
+    if (instrEl) {
+      const firstStep = ex.instructions?.steps?.[0] || ex.instructions?.full_text || '';
+      if (firstStep) {
+        instrEl.textContent = `“${firstStep}”`;
+        instrEl.style.display = '-webkit-box';
+      } else {
+        instrEl.style.display = 'none';
+      }
+    }
+
+    const linkEl = $('#eod-link');
+    if (linkEl) {
+      linkEl.href = `/exercise.html?id=${ex.id}`;
+    }
+
+    const compareLink = $('#eod-compare-link');
+    if (compareLink) {
+      compareLink.href = `/compare.html?a=${ex.id}`;
+    }
+
+    card.style.display = 'grid';
   } catch (err) {
     console.error('Failed to load Exercise of the Day:', err);
+    card.style.display = 'none';
   }
 }
 
@@ -133,5 +182,9 @@ async function fetchAndRender() {
     grid.innerHTML = '<p class="text-danger">Failed to load exercises. Is the API running?</p>';
   }
 }
+
+window.addEventListener('lang-changed', () => {
+  loadExerciseOfDay();
+});
 
 document.addEventListener('DOMContentLoaded', init);

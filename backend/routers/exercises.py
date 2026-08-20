@@ -71,6 +71,44 @@ def _exercise_to_summary(ex: Exercise) -> dict:
     }
 
 
+def _exercise_to_detail(ex: Exercise, lang: str = "en") -> ExerciseDetail:
+    secondary_muscles = [
+        link.muscle.name
+        for link in ex.muscle_links
+        if not link.is_primary
+    ]
+
+    instruction_row = next(
+        (i for i in ex.instructions if i.lang_code == lang),
+        next((i for i in ex.instructions if i.lang_code == "en"), None),
+    )
+    instruction_out = (
+        InstructionOut(
+            lang_code=instruction_row.lang_code,
+            full_text=instruction_row.full_text,
+            steps=instruction_row.steps,
+        )
+        if instruction_row
+        else None
+    )
+
+    return ExerciseDetail(
+        id=ex.id,
+        name=ex.name,
+        category=ex.category,
+        body_part=ex.body_part_ref.name if ex.body_part_ref else "",
+        equipment=ex.equipment_ref.name if ex.equipment_ref else "",
+        target=ex.target_muscle_ref.name if ex.target_muscle_ref else "",
+        muscle_group=ex.muscle_group,
+        secondary_muscles=secondary_muscles,
+        image=ex.image,
+        gif_url=ex.gif_url,
+        attribution=ex.attribution,
+        created_at=ex.created_at,
+        instructions=instruction_out,
+    )
+
+
 # ---------------------------------------------------------------------------
 # GET /api/exercises/filters
 # ---------------------------------------------------------------------------
@@ -194,6 +232,63 @@ def list_exercises(
 
 
 # ---------------------------------------------------------------------------
+# GET /api/exercises/daily
+# ---------------------------------------------------------------------------
+
+@router.get("/daily", response_model=ExerciseDetail)
+def get_daily_exercise(
+    date: str | None = Query(
+        None,
+        description="Optional date in YYYY-MM-DD format (defaults to UTC current date)",
+    ),
+    lang: str = Query("en", description="Instruction language code (e.g. en, es, fr)"),
+    db: Session = Depends(get_db),
+):
+    """
+    Return the featured Exercise of the Day.
+    Uses a deterministic date-based seed so the exact same exercise is featured all day.
+    """
+    import hashlib
+    import random
+    from datetime import datetime, timezone
+
+    if not date:
+        date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    else:
+        try:
+            datetime.strptime(date, "%Y-%m-%d")
+            date_str = date
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD.")
+
+    exercise_ids = [r[0] for r in db.query(Exercise.id).order_by(Exercise.id).all()]
+    if not exercise_ids:
+        raise HTTPException(status_code=404, detail="No exercises found in database.")
+
+    seed = int(hashlib.md5(date_str.encode("utf-8")).hexdigest(), 16)
+    rng = random.Random(seed)
+    chosen_id = rng.choice(exercise_ids)
+
+    ex = (
+        db.query(Exercise)
+        .options(
+            joinedload(Exercise.body_part_ref),
+            joinedload(Exercise.equipment_ref),
+            joinedload(Exercise.target_muscle_ref),
+            joinedload(Exercise.muscle_links).joinedload(ExerciseMuscle.muscle),
+            joinedload(Exercise.instructions),
+        )
+        .filter(Exercise.id == chosen_id)
+        .first()
+    )
+
+    if not ex:
+        raise HTTPException(status_code=404, detail=f"Exercise '{chosen_id}' not found.")
+
+    return _exercise_to_detail(ex, lang=lang)
+
+
+# ---------------------------------------------------------------------------
 # GET /api/exercises/{id}
 # ---------------------------------------------------------------------------
 
@@ -220,43 +315,7 @@ def get_exercise(
     if not ex:
         raise HTTPException(status_code=404, detail=f"Exercise '{exercise_id}' not found.")
 
-    # Secondary muscle names
-    secondary_muscles = [
-        link.muscle.name
-        for link in ex.muscle_links
-        if not link.is_primary
-    ]
-
-    # Instruction for requested language (fall back to English)
-    instruction_row = next(
-        (i for i in ex.instructions if i.lang_code == lang),
-        next((i for i in ex.instructions if i.lang_code == "en"), None),
-    )
-    instruction_out = (
-        InstructionOut(
-            lang_code=instruction_row.lang_code,
-            full_text=instruction_row.full_text,
-            steps=instruction_row.steps,
-        )
-        if instruction_row
-        else None
-    )
-
-    return ExerciseDetail(
-        id=ex.id,
-        name=ex.name,
-        category=ex.category,
-        body_part=ex.body_part_ref.name if ex.body_part_ref else "",
-        equipment=ex.equipment_ref.name if ex.equipment_ref else "",
-        target=ex.target_muscle_ref.name if ex.target_muscle_ref else "",
-        muscle_group=ex.muscle_group,
-        secondary_muscles=secondary_muscles,
-        image=ex.image,
-        gif_url=ex.gif_url,
-        attribution=ex.attribution,
-        created_at=ex.created_at,
-        instructions=instruction_out,
-    )
+    return _exercise_to_detail(ex, lang=lang)
 
 
 # ---------------------------------------------------------------------------

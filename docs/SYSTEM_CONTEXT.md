@@ -190,6 +190,7 @@ Cung cấp REST API cho frontend SPA: duyệt bài tập, tìm kiếm, lọc, xe
 | `GET` | `/api/exercises` | Danh sách bài tập (phân trang, filter: body_part, equipment, target, muscle_group) |
 | `GET` | `/api/exercises/search?q=` | Tìm kiếm theo tên (case-insensitive substring) |
 | `GET` | `/api/exercises/filters` | Lấy tất cả giá trị filter (body_parts, equipment_types, target_muscles, muscle_groups) |
+| `GET` | `/api/exercises/daily` | Bài tập trong ngày (seed = date, trả full ExerciseDetail) |
 | `GET` | `/api/exercises/{id}` | Chi tiết 1 bài tập (kèm instructions theo ngôn ngữ) |
 | `POST` | `/api/recommend/weekly` | Gợi ý lịch tập tuần (input: goal, equipment, duration, days_per_week) |
 | `POST` | `/api/schedules` | Lưu schedule mới |

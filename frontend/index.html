@@ -49,13 +49,32 @@
 
       <!-- Exercise of the Day -->
       <article id="exercise-of-day" class="eod-card mb-8" style="display: none;" aria-label="Exercise of the Day">
-        <span class="eod-badge" data-i18n="index.eod_badge">⭐ Exercise of the Day</span>
-        <div class="eod-content">
-          <div class="eod-info">
+        <figure class="eod-figure">
+          <img id="eod-image" src="" alt="Daily featured exercise thumbnail" class="eod-thumbnail" loading="lazy">
+          <figcaption id="eod-figcaption" class="visually-hidden">Featured exercise of the day</figcaption>
+        </figure>
+
+        <div class="eod-body">
+          <header class="eod-header">
+            <div class="eod-badge-row">
+              <mark class="eod-badge" data-i18n="index.eod_badge">⭐ Exercise of the Day</mark>
+              <time id="eod-date" datetime="" class="eod-date">—</time>
+            </div>
             <h2 id="eod-name" class="eod-title">—</h2>
-            <p id="eod-meta" class="eod-meta">—</p>
+          </header>
+
+          <p id="eod-meta" class="eod-meta" style="display: none;">—</p>
+
+          <div id="eod-tags" class="eod-tags" aria-label="Exercise attributes">
+            <!-- Dynamic tags injected via JS -->
           </div>
-          <a id="eod-link" href="#" class="btn btn-primary btn-sm" data-i18n="common.view_exercise">View Exercise →</a>
+
+          <p id="eod-instruction" class="eod-instruction" style="display: none;">—</p>
+
+          <footer class="eod-actions">
+            <a id="eod-link" href="#" class="btn btn-primary btn-sm" data-i18n="common.view_exercise">View Exercise →</a>
+            <a id="eod-compare-link" href="#" class="btn btn-ghost btn-sm" data-i18n="index.eod_compare">Compare ⚡</a>
+          </footer>
         </div>
       </article>
 

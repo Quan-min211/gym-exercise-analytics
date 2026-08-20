@@ -61,6 +61,7 @@ const translations = {
     'index.filter_muscle': 'Cơ mục tiêu',
     'index.clear_filters': 'Xóa bộ lọc',
     'index.eod_badge': '⭐ Bài tập trong ngày',
+    'index.eod_compare': 'So sánh ⚡',
 
     // ── Exercise detail ──
     'detail.back': '← Quay lại thư viện',
