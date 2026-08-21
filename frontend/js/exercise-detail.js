@@ -1,5 +1,6 @@
 import { $, el, api } from './app.js';
 import { buildFavoriteButton, initFavoritesNavBadge } from './favorites.js';
+import { getExerciseLogs, getExercisePR, quickLogSet } from './workout-logger.js';
 
 // Keep nav badge in sync on this page too
 initFavoritesNavBadge();
@@ -16,6 +17,7 @@ async function init() {
   try {
     const data = await api.get(`/exercises/${id}`);
     renderDetail(data);
+    initExerciseWorkoutLogger(data);
     fetchAlternatives(data);
     fetchRelated(data);
   } catch (err) {
@@ -89,6 +91,103 @@ function renderDetail(ex) {
     compareLink.href = `/compare.html?a=${ex.id}`;
     compareLink.title = `Compare ${ex.name} with another exercise`;
   }
+}
+
+// ---------------------------------------------------------------------------
+// Workout Logger Widget Integration
+// ---------------------------------------------------------------------------
+
+function initExerciseWorkoutLogger(ex) {
+  const sidebarBtn = $('#log-this-exercise-btn');
+  const fullPageLink = $('#log-full-page-link');
+  if (sidebarBtn) sidebarBtn.href = `/log.html?add=${ex.id}`;
+  if (fullPageLink) fullPageLink.href = `/log.html?add=${ex.id}`;
+
+  function refreshWidget() {
+    // 1. Personal Record Card
+    const prCard = $('#exercise-pr-card');
+    const prText = $('#exercise-pr-text');
+    const pr = getExercisePR(ex.id);
+
+    if (pr && pr.maxWeight > 0) {
+      if (prCard) prCard.style.display = 'flex';
+      if (prText) {
+        prText.textContent = `${pr.maxWeight} kg × ${pr.maxWeightReps} reps  (Est. 1RM: ${pr.bestEst1RM} kg)`;
+      }
+    } else {
+      if (prCard) prCard.style.display = 'none';
+    }
+
+    // 2. Recent Sets History Table
+    const tableWrap = $('#exercise-recent-logs');
+    const tbody = $('#exercise-recent-logs-tbody');
+    const logs = getExerciseLogs(ex.id);
+
+    if (logs && logs.length > 0) {
+      if (tableWrap) tableWrap.style.display = 'block';
+      if (tbody) {
+        tbody.innerHTML = '';
+        logs.slice(0, 5).forEach(s => {
+          const tr = el('tr');
+          const dateStr = s.date ? new Date(s.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '—';
+          tr.innerHTML = `
+            <td>${dateStr}</td>
+            <td><strong>${s.weight} kg</strong></td>
+            <td>${s.reps}</td>
+            <td>${s.rpe ?? '—'}</td>
+            <td class="text-accent">${s.est1RM > 0 ? s.est1RM + ' kg' : '—'}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    } else {
+      if (tableWrap) tableWrap.style.display = 'none';
+    }
+  }
+
+  refreshWidget();
+
+  // Quick Log Form Submission
+  const form = $('#quick-log-form');
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const weightInput = $('#quick-log-weight');
+      const repsInput = $('#quick-log-reps');
+      const rpeInput = $('#quick-log-rpe');
+
+      const weight = parseFloat(weightInput?.value) || 0;
+      const reps = parseInt(repsInput?.value, 10);
+      const rpe = rpeInput?.value ? parseFloat(rpeInput.value) : null;
+
+      if (!reps || reps <= 0) {
+        alert('Please enter a valid number of reps.');
+        return;
+      }
+
+      quickLogSet(ex, weight, reps, rpe);
+      refreshWidget();
+
+      // Clear input fields
+      if (repsInput) repsInput.value = '';
+      if (rpeInput) rpeInput.value = '';
+
+      // Visual feedback
+      const submitBtn = $('#quick-log-submit-btn');
+      if (submitBtn) {
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = '✓ Logged!';
+        submitBtn.classList.add('btn-outline-warm');
+        setTimeout(() => {
+          submitBtn.textContent = originalText;
+          submitBtn.classList.remove('btn-outline-warm');
+        }, 1500);
+      }
+    });
+  }
+
+  // Inter-tab / Logger changes sync
+  window.addEventListener('workout-logs-changed', () => refreshWidget());
 }
 
 function createBenefitItem(title, text) {
@@ -226,4 +325,3 @@ function initNotes(exerciseId) {
 }
 
 document.addEventListener('DOMContentLoaded', init);
-

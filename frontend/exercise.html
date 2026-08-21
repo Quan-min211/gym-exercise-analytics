@@ -224,6 +224,7 @@
           <li><a href="/" aria-current="page" data-i18n="nav.exercises">Exercises</a></li>
           <li><a href="/recommend.html" data-i18n="nav.recommender">Recommender</a></li>
           <li><a href="/schedule.html" data-i18n="nav.schedule">My Schedule</a></li>
+          <li><a href="/log.html" data-i18n="nav.logger">Workout Log</a></li>
           <li><a href="/analytics.html" data-i18n="nav.analytics">Analytics</a></li>
           <li><a href="/calculator.html" data-i18n="nav.calculator">Calculator</a></li>
           <li><a href="/favorites.html" id="fav-nav-link" data-i18n="nav.favourites">Favourites</a></li>
@@ -238,25 +239,23 @@
 
       <!-- Breadcrumb -->
       <nav aria-label="Breadcrumb" class="mb-6">
-        <ol style="display:flex;gap:var(--space-2);font-size:var(--text-sm);color:var(--color-text-muted)">
+        <ol class="breadcrumb" style="display:flex;gap:var(--space-2);list-style:none;padding:0;font-size:var(--text-sm)">
           <li><a href="/" data-i18n="nav.exercises">Exercises</a></li>
-          <li aria-hidden="true" style="margin:0 2px">/</li>
-          <li id="breadcrumb-name" aria-current="page" style="color:var(--color-text-primary)">Loading…</li>
+          <li aria-hidden="true">/</li>
+          <li id="breadcrumb-name" aria-current="page" class="text-muted">Loading…</li>
         </ol>
       </nav>
 
-      <div class="detail-layout">
+      <div class="layout-detail">
 
-        <!-- Left: animated GIF + metadata -->
-        <aside aria-label="Exercise media and metadata">
-          <figure class="gif-player">
-            <img id="exercise-gif"
-              src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
-              alt="Exercise demonstration" loading="lazy">
+        <!-- Left: media + quick meta -->
+        <aside class="detail-sidebar" aria-label="Exercise media and properties">
+          <figure class="exercise-media">
+            <img id="exercise-gif" src="" alt="Exercise animation" class="exercise-gif-img" loading="lazy">
             <figcaption id="exercise-name-caption" class="visually-hidden"></figcaption>
           </figure>
 
-          <dl class="meta-strip">
+          <dl class="meta-strip mt-6">
             <div class="meta-item">
               <dt data-i18n="detail.body_part">Body Part</dt>
               <dd id="meta-body-part">—</dd>
@@ -281,6 +280,18 @@
             Add to Schedule
           </button>
 
+          <!-- Log this Exercise CTA -->
+          <a id="log-this-exercise-btn"
+            href="/log.html"
+            class="btn btn-outline-red w-full mt-2"
+            style="display:flex;align-items:center;justify-content:center;gap:6px;">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" width="15" height="15">
+              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+            <span data-i18n="detail.log_this_exercise">Log this Workout</span>
+          </a>
+
           <div id="fav-btn-wrapper" class="mt-3">
             <!-- Favourite toggle inserted by JS -->
           </div>
@@ -298,7 +309,7 @@
           </a>
         </aside>
 
-        <!-- Right: instructions, benefits, tips -->
+        <!-- Right: instructions, benefits, tips, workout history & notes -->
         <section aria-labelledby="exercise-heading">
           <header>
             <h1 id="exercise-heading">Loading exercise…</h1>
@@ -317,6 +328,63 @@
             <ul id="benefits-list" class="benefit-list mt-6" aria-label="Exercise benefits">
               <!-- Populated by JS based on target muscle and body part -->
             </ul>
+          </section>
+
+          <!-- Workout History & Quick Log Widget -->
+          <section class="mt-10 exercise-log-section" aria-labelledby="log-widget-heading">
+            <header class="flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <h2 id="log-widget-heading" data-i18n="detail.log_widget_title">Workout History &amp; Quick Log</h2>
+                <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--space-1)" data-i18n="detail.log_widget_hint">Log your sets for this exercise and track your Personal Record (PR).</p>
+              </div>
+              <a id="log-full-page-link" href="/log.html" class="btn btn-ghost btn-sm" data-i18n="detail.log_open_full">Open Full Logger 📋</a>
+            </header>
+
+            <!-- PR Summary Card -->
+            <div id="exercise-pr-card" class="pr-summary-card mt-4" style="display: none;">
+              <span class="pr-badge" data-i18n="detail.pr_badge">🏆 Personal Record (PR)</span>
+              <p id="exercise-pr-text" class="pr-text">—</p>
+            </div>
+
+            <!-- Quick Log Form -->
+            <form id="quick-log-form" class="quick-log-form mt-4" novalidate>
+              <fieldset class="quick-log-fieldset">
+                <legend class="visually-hidden">Quick log sets</legend>
+                <div class="quick-log-inputs">
+                  <div class="form-field">
+                    <label for="quick-log-weight" data-i18n="logger.weight">Weight (kg)</label>
+                    <input type="number" id="quick-log-weight" min="0" max="1000" step="0.5" placeholder="0" required>
+                  </div>
+                  <div class="form-field">
+                    <label for="quick-log-reps" data-i18n="logger.reps">Reps</label>
+                    <input type="number" id="quick-log-reps" min="1" max="100" placeholder="10" required>
+                  </div>
+                  <div class="form-field">
+                    <label for="quick-log-rpe" data-i18n="logger.rpe">RPE (1-10)</label>
+                    <input type="number" id="quick-log-rpe" min="1" max="10" step="0.5" placeholder="8">
+                  </div>
+                  <div class="form-field flex items-end">
+                    <button type="submit" class="btn btn-primary w-full" id="quick-log-submit-btn" data-i18n="detail.log_add_set">+ Log Set</button>
+                  </div>
+                </div>
+              </fieldset>
+            </form>
+
+            <!-- Recent logs for this exercise -->
+            <div id="exercise-recent-logs" class="recent-logs-table-wrap mt-4" style="display: none;">
+              <table class="recent-logs-table" aria-label="Recent sets logged for this exercise">
+                <thead>
+                  <tr>
+                    <th scope="col" data-i18n="logger.date">Date</th>
+                    <th scope="col" data-i18n="logger.weight">Weight</th>
+                    <th scope="col" data-i18n="logger.reps">Reps</th>
+                    <th scope="col" data-i18n="logger.rpe">RPE</th>
+                    <th scope="col" data-i18n="logger.est_1rm">Est. 1RM</th>
+                  </tr>
+                </thead>
+                <tbody id="exercise-recent-logs-tbody"></tbody>
+              </table>
+            </div>
           </section>
 
           <!-- Personal notes (localStorage) -->

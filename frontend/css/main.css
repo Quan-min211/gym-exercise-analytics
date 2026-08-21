@@ -1652,6 +1652,89 @@ p { line-height: var(--leading-relaxed); }
   }
 }
 
+/* ============================================================
+   WORKOUT LOG WIDGET (EXERCISE DETAIL PAGE)
+   ============================================================ */
+
+.exercise-log-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+}
+
+.pr-summary-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: rgba(255, 193, 7, 0.08);
+  border: 1px solid rgba(255, 193, 7, 0.25);
+  border-radius: var(--radius-lg);
+  flex-wrap: wrap;
+}
+
+.pr-badge {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  color: var(--color-accent-warm);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.pr-text {
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  font-weight: var(--weight-semibold);
+  margin: 0;
+}
+
+.quick-log-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.quick-log-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1.2fr;
+  gap: var(--space-3);
+  align-items: flex-end;
+}
+@media (max-width: 640px) {
+  .quick-log-inputs { grid-template-columns: 1fr 1fr; }
+}
+
+.recent-logs-table-wrap {
+  overflow-x: auto;
+  margin-top: var(--space-4);
+}
+
+.recent-logs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  background: var(--color-bg);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.recent-logs-table th {
+  padding: var(--space-2) var(--space-3);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.recent-logs-table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  color: var(--color-text-secondary);
+}
+
 
 /* ============================================================
    REST TIMER WIDGET

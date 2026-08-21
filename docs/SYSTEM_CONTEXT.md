@@ -292,12 +292,15 @@ Giao diện web SPA phong cách **"Iron Plate / Powerlifting Meet"** — mạnh 
 
 | File | Trang | Chức năng |
 |---|---|---|
-| `frontend/index.html` | Exercise Library | Hero banner + search bar + filter sidebar + exercise grid (phân trang) + mini ❤️ fav button |
-| `frontend/exercise.html` | Exercise Detail | GIF player + metadata strip + instructions + secondary muscles + ❤️ fav button + alternative exercises + related exercises |
+| `frontend/index.html` | Exercise Library | Hero banner + search bar + filter sidebar + exercise grid (phân trang) + mini ❤️ fav button + Exercise of the Day card |
+| `frontend/exercise.html` | Exercise Detail | GIF player + metadata strip + instructions + secondary muscles + ❤️ fav button + alternative exercises + related exercises + personal notes + Workout Log & PR widget |
 | `frontend/recommend.html` | Smart Recommender | Wizard 3 bước: Goal → Equipment → Details → Generate Plan |
 | `frontend/schedule.html` | My Schedule | Hiển thị lịch tập tuần, empty state, delete/regenerate |
+| `frontend/log.html` | Workout Logger | Nhật ký tập luyện: Active workout tracker với live timer, autocomplete thêm bài tập, bảng sets/reps/weight/RPE, lịch sử buổi tập, PR tracking, tổng hợp stats, CSV/JSON export/import |
+| `frontend/calculator.html` | Body Stats Calculator | Tính BMI, BMR, TDEE, đánh giá nguy cơ vòng eo WHO 2011, phân bổ Macro (Donut chart SVG), lưu lịch sử 10 lần tính |
+| `frontend/compare.html` | Compare Exercises | So sánh 2 bài tập song song (GIF, cơ mục tiêu, thiết bị, instructions), phân tích cơ chung/riêng, bảng Diff Table, Share link |
 | `frontend/analytics.html` | Analytics Dashboard | 4 stat cards + equipment bar chart (đỏ) + muscle bar chart (vàng) + body part doughnut + co-occurrence table + ETL history table |
-| `frontend/favorites.html` | My Favourites | Grid view bài tập đã lưu, animated remove, empty state, clear all |
+| `frontend/favorites.html` | My Favourites | Grid view bài tập đã lưu, animated remove, empty state, clear all, toolbar sort/filter, CSV/JSON export |
 
 ### Nội dung chi tiết — JavaScript Modules
 
@@ -305,7 +308,9 @@ Giao diện web SPA phong cách **"Iron Plate / Powerlifting Meet"** — mạnh 
 |---|---|
 | `frontend/js/app.js` | Core utilities: `$()`, `$$()`, `el()`, `api` (fetch wrapper), `buildExerciseCard()` (với mini ❤️), pagination builder, mobile hamburger menu toggle, scroll-to-top button, Rest Timer floating widget (30s/45s/60s/90s + Web Audio API beep) |
 | `frontend/js/exercises.js` | Trang index: load filters, bind search/filter events, render exercise grid, Exercise of the Day (seeded rotation) |
-| `frontend/js/exercise-detail.js` | Trang detail: load exercise by ID, render GIF + instructions + fav button + alternatives + personal notes (localStorage) + compare link |
+| `frontend/js/exercise-detail.js` | Trang detail: load exercise by ID, render GIF + instructions + fav button + alternatives + personal notes (localStorage) + compare link + Quick Log & PR widget |
+| `frontend/js/workout-logger.js` | Workout Logger engine: localStorage state management, session CRUD, PR calculation (Epley 1RM formula), quickLogSet, stats calculation, CSV & JSON import/export |
+| `frontend/js/log.js` | Workout Logger page controller: live workout timer, draft auto-save, dynamic sets table, history feed with accordion breakdown, re-do workout |
 | `frontend/js/recommend.js` | Wizard logic: step navigation, quick workout templates (PPL, Upper/Lower, Full Body, HIIT), equipment checkboxes, form submit → render results with target guidance banner & warmup tips, copy summary |
 | `frontend/js/schedule.js` | Schedule controller: GET /api/schedules list dropdown selector, switch active plans, PUT rename schedule, delete schedule, today's workout highlight (🔥 Today), exercise completion checkboxes & session progress bar |
 | `frontend/js/analytics.js` | Analytics controller: Chart.js interactive graphs (click-to-filter navigation to library, Top 10/15/20 pills), muscle co-occurrence search filter & links, CSV/JSON export, ETL history table rendering |
