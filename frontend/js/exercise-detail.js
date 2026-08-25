@@ -301,27 +301,93 @@ function getAllNotes() {
 }
 
 function initNotes(exerciseId) {
-  const textarea = $('#exercise-notes');
-  const saveBtn = $('#save-notes-btn');
-  const status = $('#notes-status');
+  const textarea  = $('#exercise-notes');
+  const saveBtn   = $('#save-notes-btn');
+  const deleteBtn = $('#delete-notes-btn');
+  const statusEl  = $('#notes-status');
+  const charCount = $('#notes-char-count');
+  const savedIndicator = $('#notes-saved-indicator');
+
   if (!textarea || !saveBtn) return;
 
   const id = String(exerciseId);
-  const notes = getAllNotes();
-  if (notes[id]) textarea.value = notes[id];
+  const MAX = textarea.maxLength || 1000;
 
-  saveBtn.addEventListener('click', () => {
-    const all = getAllNotes();
+  // ── Helpers ──────────────────────────────────────────────
+  function updateCharCount() {
+    const len = textarea.value.length;
+    if (charCount) {
+      charCount.textContent = `${len} / ${MAX}`;
+      charCount.className = 'notes-char-count'
+        + (len >= MAX        ? ' at-limit'   : '')
+        + (len >= MAX * 0.85 ? ' near-limit' : '');
+    }
+    textarea.classList.toggle('has-content', len > 0);
+  }
+
+  function showStatus(msg, type = '') {
+    if (!statusEl) return;
+    statusEl.textContent = msg;
+    statusEl.className = `notes-status ${type}`;
+    setTimeout(() => {
+      statusEl.textContent = '';
+      statusEl.className = 'notes-status';
+    }, 2500);
+  }
+
+  function saveNote() {
+    const all  = getAllNotes();
     const text = textarea.value.trim();
     if (text) {
       all[id] = text;
+      if (savedIndicator) savedIndicator.classList.add('visible');
     } else {
       delete all[id];
+      if (savedIndicator) savedIndicator.classList.remove('visible');
     }
     localStorage.setItem(NOTES_KEY, JSON.stringify(all));
-    status.textContent = '✓ Saved!';
-    setTimeout(() => { status.textContent = ''; }, 2000);
+    showStatus('✓ Saved', 'saved');
+  }
+
+  function deleteNote() {
+    if (!textarea.value.trim()) return;
+    if (!confirm('Delete this note? This cannot be undone.')) return;
+    const all = getAllNotes();
+    delete all[id];
+    localStorage.setItem(NOTES_KEY, JSON.stringify(all));
+    textarea.value = '';
+    updateCharCount();
+    if (savedIndicator) savedIndicator.classList.remove('visible');
+    showStatus('Note deleted', 'unsaved');
+  }
+
+  // ── Load existing note ────────────────────────────────────
+  const notes = getAllNotes();
+  if (notes[id]) {
+    textarea.value = notes[id];
+    if (savedIndicator) savedIndicator.classList.add('visible');
+  }
+  updateCharCount();
+
+  // ── Auto-save on input (debounced 800 ms) ─────────────────
+  let autoSaveTimer = null;
+  textarea.addEventListener('input', () => {
+    updateCharCount();
+    showStatus('Unsaved…', 'unsaved');
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(saveNote, 800);
   });
+
+  // ── Manual Save button ────────────────────────────────────
+  saveBtn.addEventListener('click', () => {
+    clearTimeout(autoSaveTimer);
+    saveNote();
+  });
+
+  // ── Delete Note button ────────────────────────────────────
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', deleteNote);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init);

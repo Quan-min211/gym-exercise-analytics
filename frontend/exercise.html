@@ -389,15 +389,36 @@
 
           <!-- Personal notes (localStorage) -->
           <section class="mt-10" aria-labelledby="notes-heading">
-            <h2 id="notes-heading" data-i18n="detail.notes_title">My Notes</h2>
-            <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--space-2)" data-i18n="detail.notes_hint">Personal notes are saved locally in your browser.</p>
-            <textarea id="exercise-notes" class="exercise-notes-textarea mt-4"
-              placeholder="Write your notes about this exercise…"
-              aria-label="Personal notes for this exercise"
-              rows="4"></textarea>
-            <div class="flex gap-3 mt-3">
-              <button type="button" id="save-notes-btn" class="btn btn-primary btn-sm" data-i18n="detail.notes_save">Save Notes</button>
-              <span id="notes-status" class="text-muted" style="font-size:var(--text-xs);align-self:center" aria-live="polite"></span>
+            <header class="exercise-notes-header">
+              <div>
+                <h2 id="notes-heading" data-i18n="detail.notes_title">My Notes</h2>
+                <p class="notes-hint" data-i18n="detail.notes_hint">Personal notes are saved locally in your browser.</p>
+              </div>
+              <output id="notes-saved-indicator" class="notes-saved-indicator" aria-live="polite" aria-label="Notes save status">
+                <span class="notes-saved-dot" aria-hidden="true"></span>
+                Saved
+              </output>
+            </header>
+
+            <div class="exercise-notes-wrap">
+              <textarea id="exercise-notes"
+                class="exercise-notes-textarea"
+                placeholder="E.g. Keep shoulders back on the descent. Try 3 sets of 12 at 40 kg next session…"
+                aria-label="Personal notes for this exercise"
+                aria-describedby="notes-char-count"
+                rows="5"
+                maxlength="1000"></textarea>
+              <output id="notes-char-count" class="notes-char-count" aria-live="off">0 / 1000</output>
+            </div>
+
+            <div class="notes-toolbar">
+              <button type="button" id="save-notes-btn" class="btn btn-primary btn-sm" data-i18n="detail.notes_save">
+                Save Notes
+              </button>
+              <button type="button" id="delete-notes-btn" class="btn btn-ghost btn-sm" style="color:var(--color-accent)" data-i18n="detail.notes_delete">
+                Delete Note
+              </button>
+              <span id="notes-status" class="notes-status" role="status" aria-live="polite"></span>
             </div>
           </section>
 

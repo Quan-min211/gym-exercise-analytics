@@ -6,26 +6,69 @@ async function init() {
 }
 
 function setupTemplates() {
-  $$('.template-card').forEach(btn => {
+  // ── "Use This Template" buttons (on card + inside modal footer) ──
+  $$('.tpl-use-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const goal = btn.dataset.goal;
       const days = btn.dataset.days;
       const duration = btn.dataset.duration;
+      const level = btn.dataset.level;
 
-      // Select goal radio
-      const radio = $(`#goal-${goal === 'build_muscle' ? 'muscle' : goal === 'lose_weight' ? 'weight' : goal === 'general_fitness' ? 'general' : goal}`);
+      // Map goal value → radio id suffix
+      const goalMap = {
+        build_muscle: 'muscle',
+        lose_weight: 'weight',
+        improve_endurance: 'endurance',
+        flexibility: 'flex',
+        general_fitness: 'general',
+      };
+      const radio = $(`#goal-${goalMap[goal] ?? goal}`);
       if (radio) radio.checked = true;
 
-      // Select days and duration
       const daysSelect = $('#days_per_week');
       if (daysSelect) daysSelect.value = days;
 
       const durSelect = $('#session_duration');
       if (durSelect) durSelect.value = duration;
 
-      // Move to Step 2: Equipment
+      const levelSelect = $('#fitness_level');
+      if (levelSelect && level) levelSelect.value = level;
+
+      // Close any open modal first
+      document.querySelectorAll('.tpl-modal[open]').forEach(m => m.close());
+
+      // Scroll to & open wizard Step 2: Equipment
+      const wizard = $('#wizard-container');
+      if (wizard) wizard.scrollIntoView({ behavior: 'smooth', block: 'start' });
       nextStep(2);
     });
+  });
+
+  // ── "Details" buttons — open <dialog> modal ──
+  $$('.tpl-detail-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const modalId = btn.dataset.modal;
+      const modal = document.getElementById(modalId);
+      if (modal && typeof modal.showModal === 'function') {
+        modal.showModal();
+      }
+    });
+  });
+
+  // ── Close buttons inside modals ──
+  $$('.tpl-modal-close').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const modal = btn.closest('.tpl-modal');
+      if (modal) modal.close();
+    });
+  });
+
+  // ── Close on backdrop click ──
+  $$('.tpl-modal').forEach(modal => {
+    modal.addEventListener('click', e => {
+      if (e.target === modal) modal.close();
+    });
+    // Close on Escape is native <dialog> behaviour
   });
 }
 
@@ -107,7 +150,8 @@ function setupForm() {
 
   $('#restart-btn').addEventListener('click', () => {
     $('#wizard-container').style.display = '';
-    $('.template-bar').style.display = '';
+    const tplSection = $('.templates-section');
+    if (tplSection) tplSection.style.display = '';
     $('#results-container').style.display = 'none';
     nextStep(1);
   });
@@ -181,8 +225,8 @@ function getGoalGuidance(goal) {
 
 function renderResults(plan) {
   $('#wizard-container').style.display = 'none';
-  const templateBar = $('.template-bar');
-  if (templateBar) templateBar.style.display = 'none';
+  const tplSection = $('.templates-section');
+  if (tplSection) tplSection.style.display = 'none';
 
   const resultsContainer = $('#results-container');
   resultsContainer.style.display = 'block';

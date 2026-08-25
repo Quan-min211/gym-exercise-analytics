@@ -114,6 +114,7 @@ const translations = {
     'detail.notes_title': 'Ghi chú của tôi',
     'detail.notes_hint': 'Ghi chú cá nhân được lưu trên trình duyệt của bạn.',
     'detail.notes_save': 'Lưu ghi chú',
+    'detail.notes_delete': 'Xóa ghi chú',
     'detail.compare_title': 'So sánh bài tập',
     'detail.compare_hint': 'So sánh bài tập này với một bài tập khác.',
     'detail.compare_btn': '🔀 So sánh với bài tập khác',

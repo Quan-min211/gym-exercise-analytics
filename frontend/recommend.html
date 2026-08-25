@@ -296,35 +296,440 @@
       </div>
     </section>
 
-    <section class="page-content" aria-labelledby="page-title">
-
-      <!-- Quick Templates Bar -->
-      <section class="template-bar" aria-label="Popular workout templates">
-        <header class="template-bar-header">
-          <h2 data-i18n="recommend.templates_title">⚡ Quick Workout Templates</h2>
-          <span style="font-size:var(--text-xs);color:var(--color-text-muted)" data-i18n="recommend.templates_hint">Click to auto-set preferences</span>
+      <!-- ── Workout Templates Section ───────────────────────────────── -->
+      <section class="templates-section" aria-labelledby="templates-heading">
+        <header class="templates-section-header">
+          <div>
+            <h2 id="templates-heading" data-i18n="recommend.templates_title">⚡ Workout Templates</h2>
+            <p class="templates-subtitle" data-i18n="recommend.templates_hint">Pick a proven program — we'll auto-fill the form. Click a card for full details.</p>
+          </div>
         </header>
-        <div class="template-grid">
-          <button type="button" class="template-card" data-goal="build_muscle" data-days="3" data-duration="60">
-            <div class="template-card-title">💪 Push / Pull / Legs</div>
-            <div class="template-card-sub">3 Days • 60 min • Hypertrophy</div>
-          </button>
-          <button type="button" class="template-card" data-goal="build_muscle" data-days="4" data-duration="60">
-            <div class="template-card-title">🏋️ Upper / Lower Split</div>
-            <div class="template-card-sub">4 Days • 60 min • Strength</div>
-          </button>
-          <button type="button" class="template-card" data-goal="general_fitness" data-days="3" data-duration="45">
-            <div class="template-card-title">🏆 3-Day Full Body</div>
-            <div class="template-card-sub">3 Days • 45 min • Balanced</div>
-          </button>
-          <button type="button" class="template-card" data-goal="lose_weight" data-days="4" data-duration="30">
-            <div class="template-card-title">🔥 HIIT Fat Burn</div>
-            <div class="template-card-sub">4 Days • 30 min • High Intensity</div>
-          </button>
-        </div>
+
+        <div class="templates-grid" role="list">
+
+          <!-- 1. Push / Pull / Legs -->
+          <article class="tpl-card" role="listitem" data-template="ppl">
+            <header class="tpl-card-header">
+              <span class="tpl-icon" aria-hidden="true">💪</span>
+              <div>
+                <h3 class="tpl-name">Push / Pull / Legs</h3>
+                <p class="tpl-tagline">The gold standard for hypertrophy</p>
+              </div>
+              <span class="tpl-badge tpl-badge-red">Hypertrophy</span>
+            </header>
+            <dl class="tpl-meta">
+              <div><dt>Days</dt><dd>3 / week</dd></div>
+              <div><dt>Duration</dt><dd>60 min</dd></div>
+              <div><dt>Level</dt><dd>Intermediate</dd></div>
+              <div><dt>Goal</dt><dd>Build Muscle</dd></div>
+            </dl>
+            <ol class="tpl-schedule" aria-label="Weekly schedule">
+              <li class="tpl-day train"><span class="tpl-day-label">Day 1</span><span>Push — Chest, Shoulders, Triceps</span></li>
+              <li class="tpl-day train"><span class="tpl-day-label">Day 2</span><span>Pull — Back, Biceps</span></li>
+              <li class="tpl-day train"><span class="tpl-day-label">Day 3</span><span>Legs — Quads, Hamstrings, Calves</span></li>
+              <li class="tpl-day rest"><span class="tpl-day-label">Day 4–7</span><span>Rest &amp; Recovery</span></li>
+            </ol>
+            <footer class="tpl-card-footer">
+              <button type="button" class="btn btn-primary tpl-use-btn"
+                data-goal="build_muscle" data-days="3" data-duration="60" data-level="intermediate">
+                Use This Template →
+              </button>
+              <button type="button" class="btn btn-ghost tpl-detail-btn" aria-haspopup="dialog" data-modal="modal-ppl">
+                Details
+              </button>
+            </footer>
+          </article>
+
+          <!-- 2. Upper / Lower Split -->
+          <article class="tpl-card" role="listitem" data-template="upper-lower">
+            <header class="tpl-card-header">
+              <span class="tpl-icon" aria-hidden="true">🏋️</span>
+              <div>
+                <h3 class="tpl-name">Upper / Lower Split</h3>
+                <p class="tpl-tagline">Strength &amp; size in 4 sessions</p>
+              </div>
+              <span class="tpl-badge tpl-badge-gold">Strength</span>
+            </header>
+            <dl class="tpl-meta">
+              <div><dt>Days</dt><dd>4 / week</dd></div>
+              <div><dt>Duration</dt><dd>60 min</dd></div>
+              <div><dt>Level</dt><dd>Intermediate</dd></div>
+              <div><dt>Goal</dt><dd>Build Muscle</dd></div>
+            </dl>
+            <ol class="tpl-schedule" aria-label="Weekly schedule">
+              <li class="tpl-day train"><span class="tpl-day-label">Mon</span><span>Upper Body — Chest, Back, Shoulders, Arms</span></li>
+              <li class="tpl-day train"><span class="tpl-day-label">Tue</span><span>Lower Body — Quads, Hamstrings, Glutes</span></li>
+              <li class="tpl-day rest"><span class="tpl-day-label">Wed</span><span>Rest</span></li>
+              <li class="tpl-day train"><span class="tpl-day-label">Thu</span><span>Upper Body (strength focus)</span></li>
+              <li class="tpl-day train"><span class="tpl-day-label">Fri</span><span>Lower Body (volume focus)</span></li>
+            </ol>
+            <footer class="tpl-card-footer">
+              <button type="button" class="btn btn-primary tpl-use-btn"
+                data-goal="build_muscle" data-days="4" data-duration="60" data-level="intermediate">
+                Use This Template →
+              </button>
+              <button type="button" class="btn btn-ghost tpl-detail-btn" aria-haspopup="dialog" data-modal="modal-ul">
+                Details
+              </button>
+            </footer>
+          </article>
+
+          <!-- 3. Full Body 3-Day -->
+          <article class="tpl-card" role="listitem" data-template="fullbody">
+            <header class="tpl-card-header">
+              <span class="tpl-icon" aria-hidden="true">🏆</span>
+              <div>
+                <h3 class="tpl-name">3-Day Full Body</h3>
+                <p class="tpl-tagline">Perfect for beginners &amp; busy schedules</p>
+              </div>
+              <span class="tpl-badge tpl-badge-green">Balanced</span>
+            </header>
+            <dl class="tpl-meta">
+              <div><dt>Days</dt><dd>3 / week</dd></div>
+              <div><dt>Duration</dt><dd>45 min</dd></div>
+              <div><dt>Level</dt><dd>Beginner</dd></div>
+              <div><dt>Goal</dt><dd>General Fitness</dd></div>
+            </dl>
+            <ol class="tpl-schedule" aria-label="Weekly schedule">
+              <li class="tpl-day train"><span class="tpl-day-label">Mon</span><span>Full Body A — Squat, Bench, Row</span></li>
+              <li class="tpl-day rest"><span class="tpl-day-label">Tue</span><span>Rest</span></li>
+              <li class="tpl-day train"><span class="tpl-day-label">Wed</span><span>Full Body B — Deadlift, OHP, Pulldown</span></li>
+              <li class="tpl-day rest"><span class="tpl-day-label">Thu</span><span>Rest</span></li>
+              <li class="tpl-day train"><span class="tpl-day-label">Fri</span><span>Full Body A (repeat)</span></li>
+            </ol>
+            <footer class="tpl-card-footer">
+              <button type="button" class="btn btn-primary tpl-use-btn"
+                data-goal="general_fitness" data-days="3" data-duration="45" data-level="beginner">
+                Use This Template →
+              </button>
+              <button type="button" class="btn btn-ghost tpl-detail-btn" aria-haspopup="dialog" data-modal="modal-fb">
+                Details
+              </button>
+            </footer>
+          </article>
+
+          <!-- 4. HIIT Fat Burn -->
+          <article class="tpl-card" role="listitem" data-template="hiit">
+            <header class="tpl-card-header">
+              <span class="tpl-icon" aria-hidden="true">🔥</span>
+              <div>
+                <h3 class="tpl-name">HIIT Fat Burn</h3>
+                <p class="tpl-tagline">Max calorie burn, minimal time</p>
+              </div>
+              <span class="tpl-badge tpl-badge-orange">Fat Loss</span>
+            </header>
+            <dl class="tpl-meta">
+              <div><dt>Days</dt><dd>4 / week</dd></div>
+              <div><dt>Duration</dt><dd>30 min</dd></div>
+              <div><dt>Level</dt><dd>Intermediate</dd></div>
+              <div><dt>Goal</dt><dd>Lose Weight</dd></div>
+            </dl>
+            <ol class="tpl-schedule" aria-label="Weekly schedule">
+              <li class="tpl-day train"><span class="tpl-day-label">Mon</span><span>HIIT Circuit — Full body</span></li>
+              <li class="tpl-day train"><span class="tpl-day-label">Tue</span><span>Strength + Cardio — Upper</span></li>
+              <li class="tpl-day rest"><span class="tpl-day-label">Wed</span><span>Active Rest / Yoga</span></li>
+              <li class="tpl-day train"><span class="tpl-day-label">Thu</span><span>HIIT Circuit — Core focus</span></li>
+              <li class="tpl-day train"><span class="tpl-day-label">Fri</span><span>Strength + Cardio — Lower</span></li>
+            </ol>
+            <footer class="tpl-card-footer">
+              <button type="button" class="btn btn-primary tpl-use-btn"
+                data-goal="lose_weight" data-days="4" data-duration="30" data-level="intermediate">
+                Use This Template →
+              </button>
+              <button type="button" class="btn btn-ghost tpl-detail-btn" aria-haspopup="dialog" data-modal="modal-hiit">
+                Details
+              </button>
+            </footer>
+          </article>
+
+          <!-- 5. Bro Split -->
+          <article class="tpl-card" role="listitem" data-template="bro">
+            <header class="tpl-card-header">
+              <span class="tpl-icon" aria-hidden="true">🦾</span>
+              <div>
+                <h3 class="tpl-name">Bro Split</h3>
+                <p class="tpl-tagline">One muscle group per day, high volume</p>
+              </div>
+              <span class="tpl-badge tpl-badge-red">Volume</span>
+            </header>
+            <dl class="tpl-meta">
+              <div><dt>Days</dt><dd>5 / week</dd></div>
+              <div><dt>Duration</dt><dd>60 min</dd></div>
+              <div><dt>Level</dt><dd>Intermediate</dd></div>
+              <div><dt>Goal</dt><dd>Build Muscle</dd></div>
+            </dl>
+            <ol class="tpl-schedule" aria-label="Weekly schedule">
+              <li class="tpl-day train"><span class="tpl-day-label">Mon</span><span>Chest — Bench, Flyes, Dips</span></li>
+              <li class="tpl-day train"><span class="tpl-day-label">Tue</span><span>Back — Rows, Pulldowns, Deadlift</span></li>
+              <li class="tpl-day train"><span class="tpl-day-label">Wed</span><span>Shoulders — OHP, Lateral Raises</span></li>
+              <li class="tpl-day train"><span class="tpl-day-label">Thu</span><span>Arms — Biceps &amp; Triceps</span></li>
+              <li class="tpl-day train"><span class="tpl-day-label">Fri</span><span>Legs — Squat, Leg Press, Curls</span></li>
+            </ol>
+            <footer class="tpl-card-footer">
+              <button type="button" class="btn btn-primary tpl-use-btn"
+                data-goal="build_muscle" data-days="5" data-duration="60" data-level="intermediate">
+                Use This Template →
+              </button>
+              <button type="button" class="btn btn-ghost tpl-detail-btn" aria-haspopup="dialog" data-modal="modal-bro">
+                Details
+              </button>
+            </footer>
+          </article>
+
+          <!-- 6. Strength 5×5 -->
+          <article class="tpl-card" role="listitem" data-template="5x5">
+            <header class="tpl-card-header">
+              <span class="tpl-icon" aria-hidden="true">⚡</span>
+              <div>
+                <h3 class="tpl-name">Strength 5×5</h3>
+                <p class="tpl-tagline">Big lifts, progressive overload, power</p>
+              </div>
+              <span class="tpl-badge tpl-badge-gold">Power</span>
+            </header>
+            <dl class="tpl-meta">
+              <div><dt>Days</dt><dd>3 / week</dd></div>
+              <div><dt>Duration</dt><dd>60 min</dd></div>
+              <div><dt>Level</dt><dd>Advanced</dd></div>
+              <div><dt>Goal</dt><dd>Build Muscle</dd></div>
+            </dl>
+            <ol class="tpl-schedule" aria-label="Weekly schedule">
+              <li class="tpl-day train"><span class="tpl-day-label">Mon</span><span>Workout A — Squat 5×5, Bench 5×5, Row 5×5</span></li>
+              <li class="tpl-day rest"><span class="tpl-day-label">Tue</span><span>Rest</span></li>
+              <li class="tpl-day train"><span class="tpl-day-label">Wed</span><span>Workout B — Squat 5×5, OHP 5×5, Deadlift 1×5</span></li>
+              <li class="tpl-day rest"><span class="tpl-day-label">Thu</span><span>Rest</span></li>
+              <li class="tpl-day train"><span class="tpl-day-label">Fri</span><span>Workout A (repeat, add weight)</span></li>
+            </ol>
+            <footer class="tpl-card-footer">
+              <button type="button" class="btn btn-primary tpl-use-btn"
+                data-goal="build_muscle" data-days="3" data-duration="60" data-level="advanced">
+                Use This Template →
+              </button>
+              <button type="button" class="btn btn-ghost tpl-detail-btn" aria-haspopup="dialog" data-modal="modal-5x5">
+                Details
+              </button>
+            </footer>
+          </article>
+
+        </div><!-- /.templates-grid -->
       </section>
 
-      <!-- Wizard Container -->
+      <!-- ── Template Detail Modals ──────────────────────────────────── -->
+
+      <dialog id="modal-ppl" class="tpl-modal" aria-labelledby="modal-ppl-title">
+        <article class="tpl-modal-inner">
+          <header class="tpl-modal-header">
+            <h2 id="modal-ppl-title">💪 Push / Pull / Legs</h2>
+            <button type="button" class="tpl-modal-close" aria-label="Close details">✕</button>
+          </header>
+          <section class="tpl-modal-body">
+            <p><strong>Overview:</strong> PPL is the most popular hypertrophy split. Each session targets one movement pattern, allowing maximum volume per muscle group with adequate recovery.</p>
+            <h3>Weekly Structure</h3>
+            <table class="tpl-detail-table">
+              <thead><tr><th scope="col">Day</th><th scope="col">Focus</th><th scope="col">Key Exercises</th></tr></thead>
+              <tbody>
+                <tr><td>Day 1</td><td><span class="tpl-badge tpl-badge-red">Push</span></td><td>Bench Press, OHP, Incline DB Press, Lateral Raise, Tricep Pushdown</td></tr>
+                <tr><td>Day 2</td><td><span class="tpl-badge tpl-badge-gold">Pull</span></td><td>Deadlift, Pull-ups, Cable Row, Face Pull, Bicep Curl</td></tr>
+                <tr><td>Day 3</td><td><span class="tpl-badge tpl-badge-green">Legs</span></td><td>Squat, Leg Press, Romanian DL, Leg Curl, Calf Raise</td></tr>
+                <tr><td>Day 4–7</td><td><span class="tpl-badge">Rest</span></td><td>Active recovery, stretching, walks</td></tr>
+              </tbody>
+            </table>
+            <h3>Target Parameters</h3>
+            <ul class="tpl-param-list">
+              <li><strong>Sets:</strong> 4–5 per exercise</li>
+              <li><strong>Reps:</strong> 8–12 (hypertrophy range)</li>
+              <li><strong>Rest:</strong> 60–90 seconds</li>
+              <li><strong>Progressive overload:</strong> Add 2.5 kg when you hit top of rep range 2 sessions in a row</li>
+            </ul>
+          </section>
+          <footer class="tpl-modal-footer">
+            <button type="button" class="btn btn-primary tpl-use-btn"
+              data-goal="build_muscle" data-days="3" data-duration="60" data-level="intermediate">
+              Use This Template →
+            </button>
+            <button type="button" class="btn btn-ghost tpl-modal-close">Close</button>
+          </footer>
+        </article>
+      </dialog>
+
+      <dialog id="modal-ul" class="tpl-modal" aria-labelledby="modal-ul-title">
+        <article class="tpl-modal-inner">
+          <header class="tpl-modal-header">
+            <h2 id="modal-ul-title">🏋️ Upper / Lower Split</h2>
+            <button type="button" class="tpl-modal-close" aria-label="Close details">✕</button>
+          </header>
+          <section class="tpl-modal-body">
+            <p><strong>Overview:</strong> Trains each muscle group twice per week. Ideal for building both strength and hypertrophy with good frequency.</p>
+            <h3>Weekly Structure</h3>
+            <table class="tpl-detail-table">
+              <thead><tr><th scope="col">Day</th><th scope="col">Focus</th><th scope="col">Key Exercises</th></tr></thead>
+              <tbody>
+                <tr><td>Mon</td><td><span class="tpl-badge tpl-badge-red">Upper A</span></td><td>Bench, Row, OHP, Pulldown, Curls, Triceps</td></tr>
+                <tr><td>Tue</td><td><span class="tpl-badge tpl-badge-gold">Lower A</span></td><td>Squat, Romanian DL, Leg Press, Leg Curl, Calf</td></tr>
+                <tr><td>Wed</td><td><span class="tpl-badge">Rest</span></td><td>—</td></tr>
+                <tr><td>Thu</td><td><span class="tpl-badge tpl-badge-red">Upper B</span></td><td>Incline Bench, Cable Row, DB OHP, Pullup, Face Pull</td></tr>
+                <tr><td>Fri</td><td><span class="tpl-badge tpl-badge-gold">Lower B</span></td><td>Deadlift, Hack Squat, Split Squat, Leg Ext, Calf</td></tr>
+              </tbody>
+            </table>
+            <h3>Target Parameters</h3>
+            <ul class="tpl-param-list">
+              <li><strong>Sets:</strong> 3–4 per exercise</li>
+              <li><strong>Reps:</strong> 6–10 (strength) / 10–15 (volume)</li>
+              <li><strong>Rest:</strong> 90–120 seconds</li>
+            </ul>
+          </section>
+          <footer class="tpl-modal-footer">
+            <button type="button" class="btn btn-primary tpl-use-btn"
+              data-goal="build_muscle" data-days="4" data-duration="60" data-level="intermediate">
+              Use This Template →
+            </button>
+            <button type="button" class="btn btn-ghost tpl-modal-close">Close</button>
+          </footer>
+        </article>
+      </dialog>
+
+      <dialog id="modal-fb" class="tpl-modal" aria-labelledby="modal-fb-title">
+        <article class="tpl-modal-inner">
+          <header class="tpl-modal-header">
+            <h2 id="modal-fb-title">🏆 3-Day Full Body</h2>
+            <button type="button" class="tpl-modal-close" aria-label="Close details">✕</button>
+          </header>
+          <section class="tpl-modal-body">
+            <p><strong>Overview:</strong> The best beginner program. Hit every muscle 3× per week with compound movements. Simple, effective, proven.</p>
+            <h3>Weekly Structure</h3>
+            <table class="tpl-detail-table">
+              <thead><tr><th scope="col">Day</th><th scope="col">Focus</th><th scope="col">Key Exercises</th></tr></thead>
+              <tbody>
+                <tr><td>Mon</td><td><span class="tpl-badge tpl-badge-green">Full Body A</span></td><td>Squat, Bench Press, Bent-over Row</td></tr>
+                <tr><td>Wed</td><td><span class="tpl-badge tpl-badge-green">Full Body B</span></td><td>Deadlift, OHP, Pull-up / Lat Pulldown</td></tr>
+                <tr><td>Fri</td><td><span class="tpl-badge tpl-badge-green">Full Body A</span></td><td>Repeat A (add weight)</td></tr>
+              </tbody>
+            </table>
+            <h3>Target Parameters</h3>
+            <ul class="tpl-param-list">
+              <li><strong>Sets:</strong> 3 per exercise</li>
+              <li><strong>Reps:</strong> 5–8 (strength) or 8–12 (hypertrophy)</li>
+              <li><strong>Rest:</strong> 2–3 minutes between sets</li>
+              <li><strong>Tip:</strong> Alternate A/B each session for variety</li>
+            </ul>
+          </section>
+          <footer class="tpl-modal-footer">
+            <button type="button" class="btn btn-primary tpl-use-btn"
+              data-goal="general_fitness" data-days="3" data-duration="45" data-level="beginner">
+              Use This Template →
+            </button>
+            <button type="button" class="btn btn-ghost tpl-modal-close">Close</button>
+          </footer>
+        </article>
+      </dialog>
+
+      <dialog id="modal-hiit" class="tpl-modal" aria-labelledby="modal-hiit-title">
+        <article class="tpl-modal-inner">
+          <header class="tpl-modal-header">
+            <h2 id="modal-hiit-title">🔥 HIIT Fat Burn</h2>
+            <button type="button" class="tpl-modal-close" aria-label="Close details">✕</button>
+          </header>
+          <section class="tpl-modal-body">
+            <p><strong>Overview:</strong> High-intensity intervals mixed with compound strength work. Burns maximum calories in minimal time with EPOC (afterburn) effect.</p>
+            <h3>Weekly Structure</h3>
+            <table class="tpl-detail-table">
+              <thead><tr><th scope="col">Day</th><th scope="col">Focus</th><th scope="col">Key Exercises</th></tr></thead>
+              <tbody>
+                <tr><td>Mon</td><td><span class="tpl-badge tpl-badge-orange">HIIT</span></td><td>Burpees, Jump Squat, Mountain Climber (40s on / 20s off × 6 rounds)</td></tr>
+                <tr><td>Tue</td><td><span class="tpl-badge tpl-badge-red">Strength</span></td><td>DB Press, Rows, Pushups, Core work</td></tr>
+                <tr><td>Wed</td><td><span class="tpl-badge">Active Rest</span></td><td>Yoga / Walking / Stretching</td></tr>
+                <tr><td>Thu</td><td><span class="tpl-badge tpl-badge-orange">HIIT</span></td><td>Plank, Bicycle Crunch, KB Swings (core focus)</td></tr>
+                <tr><td>Fri</td><td><span class="tpl-badge tpl-badge-red">Strength</span></td><td>Goblet Squat, Lunge, Hip Thrust, Leg Curl</td></tr>
+              </tbody>
+            </table>
+            <h3>Target Parameters</h3>
+            <ul class="tpl-param-list">
+              <li><strong>Work interval:</strong> 40 seconds on, 20 seconds off</li>
+              <li><strong>Rounds:</strong> 5–8 per circuit</li>
+              <li><strong>Rest:</strong> 1 min between circuits</li>
+              <li><strong>Tip:</strong> Combine with 200–300 kcal daily deficit for best fat loss</li>
+            </ul>
+          </section>
+          <footer class="tpl-modal-footer">
+            <button type="button" class="btn btn-primary tpl-use-btn"
+              data-goal="lose_weight" data-days="4" data-duration="30" data-level="intermediate">
+              Use This Template →
+            </button>
+            <button type="button" class="btn btn-ghost tpl-modal-close">Close</button>
+          </footer>
+        </article>
+      </dialog>
+
+      <dialog id="modal-bro" class="tpl-modal" aria-labelledby="modal-bro-title">
+        <article class="tpl-modal-inner">
+          <header class="tpl-modal-header">
+            <h2 id="modal-bro-title">🦾 Bro Split</h2>
+            <button type="button" class="tpl-modal-close" aria-label="Close details">✕</button>
+          </header>
+          <section class="tpl-modal-body">
+            <p><strong>Overview:</strong> Classic bodybuilding split — one muscle group per day, with extremely high volume. Best for those who have 1+ years of training experience.</p>
+            <h3>Weekly Structure</h3>
+            <table class="tpl-detail-table">
+              <thead><tr><th scope="col">Day</th><th scope="col">Focus</th><th scope="col">Key Exercises</th></tr></thead>
+              <tbody>
+                <tr><td>Mon</td><td><span class="tpl-badge tpl-badge-red">Chest</span></td><td>Flat Bench, Incline DB, Cable Fly, Dips, Pushup Burnout</td></tr>
+                <tr><td>Tue</td><td><span class="tpl-badge tpl-badge-gold">Back</span></td><td>Deadlift, Pull-up, Cable Row, Single-arm Row, Face Pull</td></tr>
+                <tr><td>Wed</td><td><span class="tpl-badge tpl-badge-orange">Shoulders</span></td><td>BB OHP, DB Lateral Raise, Rear Delt Fly, Shrugs</td></tr>
+                <tr><td>Thu</td><td><span class="tpl-badge tpl-badge-green">Arms</span></td><td>Barbell Curl, Hammer Curl, Skullcrusher, Pushdown</td></tr>
+                <tr><td>Fri</td><td><span class="tpl-badge tpl-badge-red">Legs</span></td><td>Squat, Leg Press, RDL, Leg Curl, Leg Ext, Calf Raise</td></tr>
+              </tbody>
+            </table>
+            <h3>Target Parameters</h3>
+            <ul class="tpl-param-list">
+              <li><strong>Sets:</strong> 4–5 per exercise, 5–6 exercises per session</li>
+              <li><strong>Reps:</strong> 8–12 (hypertrophy range)</li>
+              <li><strong>Rest:</strong> 60–90 seconds</li>
+            </ul>
+          </section>
+          <footer class="tpl-modal-footer">
+            <button type="button" class="btn btn-primary tpl-use-btn"
+              data-goal="build_muscle" data-days="5" data-duration="60" data-level="intermediate">
+              Use This Template →
+            </button>
+            <button type="button" class="btn btn-ghost tpl-modal-close">Close</button>
+          </footer>
+        </article>
+      </dialog>
+
+      <dialog id="modal-5x5" class="tpl-modal" aria-labelledby="modal-5x5-title">
+        <article class="tpl-modal-inner">
+          <header class="tpl-modal-header">
+            <h2 id="modal-5x5-title">⚡ Strength 5×5</h2>
+            <button type="button" class="tpl-modal-close" aria-label="Close details">✕</button>
+          </header>
+          <section class="tpl-modal-body">
+            <p><strong>Overview:</strong> Based on StrongLifts 5×5 — the simplest and most effective program to build raw strength. Focus on compound barbell movements and linear progression.</p>
+            <h3>Weekly Structure</h3>
+            <table class="tpl-detail-table">
+              <thead><tr><th scope="col">Day</th><th scope="col">Focus</th><th scope="col">Key Exercises</th></tr></thead>
+              <tbody>
+                <tr><td>Mon</td><td><span class="tpl-badge tpl-badge-gold">Workout A</span></td><td>Squat 5×5, Bench Press 5×5, Barbell Row 5×5</td></tr>
+                <tr><td>Wed</td><td><span class="tpl-badge tpl-badge-gold">Workout B</span></td><td>Squat 5×5, OHP 5×5, Deadlift 1×5</td></tr>
+                <tr><td>Fri</td><td><span class="tpl-badge tpl-badge-gold">Workout A</span></td><td>Repeat A (add +2.5 kg to each lift)</td></tr>
+              </tbody>
+            </table>
+            <h3>Target Parameters</h3>
+            <ul class="tpl-param-list">
+              <li><strong>Sets:</strong> 5 × 5 reps (1 × 5 for Deadlift)</li>
+              <li><strong>Rest:</strong> 3–5 minutes between sets</li>
+              <li><strong>Progression:</strong> Add 2.5 kg every session — the key to this program</li>
+              <li><strong>When to deload:</strong> If you fail to complete 5 reps 3 sessions in a row, drop weight by 10%</li>
+            </ul>
+          </section>
+          <footer class="tpl-modal-footer">
+            <button type="button" class="btn btn-primary tpl-use-btn"
+              data-goal="build_muscle" data-days="3" data-duration="60" data-level="advanced">
+              Use This Template →
+            </button>
+            <button type="button" class="btn btn-ghost tpl-modal-close">Close</button>
+          </footer>
+        </article>
+      </dialog>
+
       <div id="wizard-container" style="max-width: 860px; margin: 0 auto;">
 
         <!-- Step Indicator -->
