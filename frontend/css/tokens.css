@@ -120,3 +120,43 @@
   --sidebar-width: 260px;
   --header-height: 60px;
 }
+
+/* ============================================================
+   LIGHT THEME OVERRIDES
+   Applied when <html data-theme="light"> is set.
+   Brand red accent is kept — only surface / text colors swap.
+   ============================================================ */
+
+[data-theme="light"] {
+  /* Surfaces */
+  --color-bg:              #F4F5F7;
+  --color-bg-deep:         #ECEEF1;
+  --color-surface:         #FFFFFF;
+  --color-surface-raised:  #F9FAFB;
+  --color-surface-hover:   #F0F2F5;
+
+  /* Borders */
+  --color-border:          #D8DCE6;
+  --color-border-iron:     #C5CAD6;
+  --color-border-strong:   rgba(211,47,47,0.25);
+
+  /* Text */
+  --color-text-primary:    #111318;
+  --color-text-secondary:  #3A4055;
+  --color-text-muted:      #6B7590;
+  --color-text-disabled:   #A0A8B8;
+  --color-text-red:        #C62828;
+
+  /* Shadows — lighter for light bg */
+  --shadow-sm:   0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md:   0 4px 16px rgba(0,0,0,0.10);
+  --shadow-lg:   0 8px 32px rgba(0,0,0,0.12);
+  --shadow-xl:   0 16px 56px rgba(0,0,0,0.14);
+  --shadow-red:  0 4px 24px rgba(211,47,47,0.15);
+  --shadow-glow: 0 0 32px rgba(211,47,47,0.12);
+
+  /* Accent dim adjustments */
+  --color-accent-dim:  rgba(211,47,47,0.12);
+  --color-accent-glow: rgba(211,47,47,0.10);
+  --color-gold-dim:    rgba(255,193,7,0.12);
+}

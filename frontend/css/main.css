@@ -2411,3 +2411,156 @@ p { line-height: var(--leading-relaxed); }
 
 .notes-status.saved   { color: #66BB6A; }
 .notes-status.unsaved { color: var(--color-gold); }
+
+
+/* ============================================================
+   DARK / LIGHT THEME TOGGLE BUTTON
+   ============================================================ */
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    background var(--transition-fast),
+    transform var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-toggle:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: rgba(211, 47, 47, 0.08);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.theme-toggle:active {
+  transform: scale(0.93);
+}
+
+/* Icon layers: moon (dark mode) and sun (light mode) */
+.theme-toggle .icon-moon,
+.theme-toggle .icon-sun {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+/* In dark mode (default): show moon, hide sun */
+.theme-toggle .icon-moon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+.theme-toggle .icon-sun {
+  opacity: 0;
+  transform: rotate(-45deg) scale(0.6);
+}
+
+/* In light mode: show sun, hide moon */
+[data-theme="light"] .theme-toggle .icon-moon {
+  opacity: 0;
+  transform: rotate(45deg) scale(0.6);
+}
+
+[data-theme="light"] .theme-toggle .icon-sun {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+/* Mobile: also show in drawer footer */
+.mobile-theme-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 36px;
+  height: 36px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: border-color 0.18s, color 0.18s, background 0.18s;
+  flex-shrink: 0;
+}
+
+.mobile-theme-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: rgba(211, 47, 47, 0.1);
+}
+
+/* ── Light mode element-specific overrides ── */
+
+/* Header: swap dark glass background */
+[data-theme="light"] .site-header {
+  background: rgba(244, 245, 247, 0.95);
+  border-bottom-color: var(--color-accent);
+}
+
+/* Mobile drawer */
+[data-theme="light"] .mobile-nav-drawer {
+  background: rgba(244, 245, 247, 0.98);
+  box-shadow: -8px 0 32px rgba(0,0,0,0.15);
+}
+
+/* Lang dropdown */
+[data-theme="light"] .lang-dropdown {
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.12), 0 0 0 1px rgba(211,47,47,0.10);
+}
+
+[data-theme="light"] .lang-dropdown li:hover,
+[data-theme="light"] .lang-dropdown li:focus-visible {
+  background: rgba(0,0,0,0.04);
+}
+
+/* Exercise card image overlay */
+[data-theme="light"] .exercise-card figure figcaption {
+  background: rgba(244, 245, 247, 0.75);
+}
+
+/* Tpl modal backdrop */
+[data-theme="light"] .tpl-modal::backdrop {
+  background: rgba(30, 32, 40, 0.6);
+}
+
+/* Rest timer panel */
+[data-theme="light"] .rest-timer-toggle {
+  background: rgba(244, 245, 247, 0.95);
+}
+
+[data-theme="light"] .rest-timer-panel {
+  background: rgba(255, 255, 255, 0.98);
+}
+
+/* Scroll-to-top progress ring */
+[data-theme="light"] .scroll-top-btn svg.progress-ring circle {
+  stroke: rgba(0,0,0,0.15);
+}
+
+/* Hide desktop theme toggle on mobile (replaced by mobile drawer btn) */
+@media (max-width: 768px) {
+  .theme-toggle { display: none; }
+}
