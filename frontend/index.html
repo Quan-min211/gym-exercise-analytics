@@ -106,6 +106,25 @@
         <!-- Filter sidebar -->
         <aside class="filter-sidebar" aria-label="Exercise filters">
 
+          <!-- ── Muscle Group Visual Map ── -->
+          <section class="muscle-map-section" aria-labelledby="mm-section-heading" id="mm-section">
+            <header class="muscle-map-header">
+              <h3 id="mm-section-heading" class="muscle-map-title" data-i18n="index.muscle_map">
+                Body Map
+              </h3>
+              <button type="button" class="btn btn-ghost btn-sm" id="mm-clear-btn"
+                aria-label="Clear body map selection"
+                style="font-size:0.6rem;padding:var(--space-1) var(--space-2);display:none">
+                ✕ Clear
+              </button>
+            </header>
+            <figure id="muscle-map-container" aria-label="Interactive muscle group map">
+              <!-- SVG injected by muscle-map.js -->
+            </figure>
+          </section>
+
+          <p class="mm-divider" aria-hidden="true">or filter by</p>
+
           <section class="filter-group" aria-labelledby="filter-bodypart">
             <h3 id="filter-bodypart" data-i18n="index.filter_body_part">Body Part</h3>
             <fieldset id="filter-body-part-list" aria-labelledby="filter-bodypart">
@@ -160,5 +179,6 @@
   <script src="/js/app.js" type="module"></script>
   <script src="/js/i18n.js" type="module"></script>
   <script src="/js/exercises.js" type="module"></script>
+  <script src="/js/muscle-map.js" type="module"></script>
 </body>
 </html>

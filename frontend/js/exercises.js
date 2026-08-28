@@ -1,4 +1,6 @@
 import { $, $$, api, buildExerciseCard, buildPagination, debounce, el } from './app.js';
+import { initMuscleMap, resetMuscleMap } from './muscle-map.js';
+
 
 let currentState = {
   q: '',
@@ -12,8 +14,13 @@ async function init() {
   await loadFilters();
   setupEventListeners();
   loadExerciseOfDay();
+
+  // Initialise the muscle group SVG body map
+  initMuscleMap('muscle-map-container');
+
   await fetchAndRender();
 }
+
 
 async function loadExerciseOfDay() {
   const card = $('#exercise-of-day');
@@ -136,8 +143,56 @@ function setupEventListeners() {
     currentState = { q: '', body_part: '', equipment: '', target: '', page: 1 };
     $('#search-input').value = '';
     $$('.filter-sidebar input[type="radio"]').forEach(r => r.checked = false);
+    // Also reset muscle map selection
+    resetMuscleMap();
+    const mmSection = $('#mm-section');
+    if (mmSection) mmSection.classList.remove('map-active');
+    const mmClearBtn = $('#mm-clear-btn');
+    if (mmClearBtn) mmClearBtn.style.display = 'none';
     fetchAndRender();
   });
+
+  // Muscle map selection → update filters
+  window.addEventListener('muscle-selected', (e) => {
+    const { filterType, filterValue } = e.detail;
+    // Reset both filter dimensions first
+    currentState.body_part = '';
+    currentState.target    = '';
+    currentState.page      = 1;
+    // Deselect all radio buttons (muscle map now drives)
+    $$('.filter-sidebar input[type="radio"]').forEach(r => r.checked = false);
+
+    const mmSection  = $('#mm-section');
+    const mmClearBtn = $('#mm-clear-btn');
+
+    if (filterValue) {
+      // Apply the muscle map selection
+      currentState[filterType] = filterValue;
+      if (mmSection)  mmSection.classList.add('map-active');
+      if (mmClearBtn) mmClearBtn.style.display = '';
+    } else {
+      // Cleared
+      if (mmSection)  mmSection.classList.remove('map-active');
+      if (mmClearBtn) mmClearBtn.style.display = 'none';
+    }
+
+    fetchAndRender();
+  });
+
+  // "✕ Clear" button inside the map section
+  const mmClearBtn = $('#mm-clear-btn');
+  if (mmClearBtn) {
+    mmClearBtn.addEventListener('click', () => {
+      resetMuscleMap();
+      currentState.body_part = '';
+      currentState.target    = '';
+      currentState.page      = 1;
+      const mmSection = $('#mm-section');
+      if (mmSection) mmSection.classList.remove('map-active');
+      mmClearBtn.style.display = 'none';
+      fetchAndRender();
+    });
+  }
 }
 
 async function fetchAndRender() {

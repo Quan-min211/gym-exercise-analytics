@@ -2564,3 +2564,225 @@ p { line-height: var(--leading-relaxed); }
 @media (max-width: 768px) {
   .theme-toggle { display: none; }
 }
+
+
+/* ============================================================
+   MUSCLE GROUP VISUAL MAP
+   ============================================================ */
+
+/* ── Design tokens (dark mode defaults) ── */
+:root {
+  --mm-surface:       #1e2028;
+  --mm-border:        #3a4050;
+  --mm-outline:       #707888;
+  --mm-muscle-fill:   #2c3244;
+  --mm-hover:         rgba(211, 47, 47, 0.45);
+  --mm-active:        #D32F2F;
+  --mm-dimmed:        #1a1d24;
+  --mm-glow:          rgba(211, 47, 47, 0.5);
+  --mm-label-bg:      rgba(211, 47, 47, 0.12);
+  --mm-label-border:  rgba(211, 47, 47, 0.3);
+  --mm-label-color:   var(--color-accent);
+}
+
+[data-theme="light"] {
+  --mm-surface:       #e8eaf0;
+  --mm-border:        #c5cad6;
+  --mm-outline:       #9aa0b0;
+  --mm-muscle-fill:   #dde1ec;
+  --mm-hover:         rgba(211, 47, 47, 0.30);
+  --mm-active:        #D32F2F;
+  --mm-dimmed:        #f0f2f5;
+  --mm-glow:          rgba(211, 47, 47, 0.35);
+  --mm-label-bg:      rgba(211, 47, 47, 0.08);
+  --mm-label-border:  rgba(211, 47, 47, 0.2);
+  --mm-label-color:   #C62828;
+}
+
+/* ── Outer section ── */
+.muscle-map-section {
+  margin-bottom: var(--space-8);
+}
+
+.muscle-map-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.muscle-map-title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-black);
+  font-size: var(--text-sm);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.muscle-map-title::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 14px;
+  background: var(--color-accent);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── Map container ── */
+#muscle-map-container {
+  background: var(--color-bg-deep);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-3);
+  position: relative;
+}
+
+/* ── Dual SVG view ── */
+.mm-views {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.mm-figure {
+  flex: 1;
+  max-width: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.mm-view-label {
+  font-family: var(--font-display);
+  font-weight: var(--weight-black);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.muscle-map-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+/* ── Interactive muscle regions ── */
+.mm-region {
+  fill: var(--mm-muscle-fill);
+  stroke: var(--mm-border);
+  stroke-width: 0.7;
+  cursor: pointer;
+  transition:
+    fill 0.18s ease,
+    stroke 0.18s ease,
+    filter 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.mm-region:hover {
+  fill: var(--mm-hover);
+  stroke: var(--color-accent);
+  filter: drop-shadow(0 0 4px var(--mm-glow));
+}
+
+.mm-region:focus-visible {
+  outline: none;
+  stroke: var(--color-accent);
+  stroke-width: 1.5;
+}
+
+.mm-region.is-active {
+  fill: var(--mm-active);
+  stroke: var(--color-accent-light);
+  stroke-width: 1;
+  filter: drop-shadow(0 0 6px var(--mm-glow));
+}
+
+.mm-region.is-dimmed {
+  fill: var(--mm-dimmed);
+  opacity: 0.35;
+  stroke: var(--mm-border);
+}
+
+/* Static non-interactive outlines */
+.mm-outline,
+.mm-static {
+  pointer-events: none;
+}
+
+/* ── Active muscle label ── */
+.mm-label {
+  display: block;
+  text-align: center;
+  margin-top: var(--space-3);
+  padding: var(--space-1) var(--space-4);
+  background: transparent;
+  border-radius: 99px;
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  border: 1px solid transparent;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.mm-label.has-selection {
+  background: var(--mm-label-bg);
+  border-color: var(--mm-label-border);
+  color: var(--mm-label-color);
+}
+
+/* ── Divider between map and traditional filters ── */
+.mm-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-5) 0 var(--space-4);
+  color: var(--color-text-muted);
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.mm-divider::before,
+.mm-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+/* ── Highlight when map is driving filter ── */
+.muscle-map-section.map-active .muscle-map-title {
+  color: var(--color-accent);
+}
+
+/* ── Mobile: stack front/back vertically on very small screens ── */
+@media (max-width: 400px) {
+  .mm-views {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .mm-figure {
+    max-width: 110px;
+  }
+}

@@ -96,6 +96,7 @@ const translations = {
     'index.clear_filters': 'Xóa bộ lọc',
     'index.eod_badge': '⭐ Bài tập trong ngày',
     'index.eod_compare': 'So sánh ⚡',
+    'index.muscle_map': 'Bản đồ cơ bắp',
 
     // ── Exercise detail ──
     'detail.back': '← Quay lại thư viện',

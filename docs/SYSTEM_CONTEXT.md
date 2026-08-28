@@ -443,6 +443,9 @@ Push/PR → GitHub Actions
 | 2026-07-31 | Fix: JSONB → JSON cho SQLite compatibility |
 | 2026-08-01 | Fix: route registration order trong main.py (health check trước mount) |
 | 2026-08-02 | Fix: ci.yml python-version typo, Docker integration test không cần ETL data |
+| 2026-08-25 | Thêm Exercise Notes: auto-save, char counter, delete button, saved indicator badge — `exercise.html` + `exercise-detail.js` |
+| 2026-08-26 | Thêm Dark/Light Theme Toggle: CSS variable swap `[data-theme]`, moon/sun icons, mobile drawer sync — `tokens.css`, `main.css`, `i18n.js`, `app.js` |
+| 2026-08-28 | Thêm Muscle Group Visual Map: SVG dual-view (front + back) body diagram click-to-filter trên `index.html` — `muscle-map.js` (NEW), `exercises.js` updated, `main.css` updated |
 
 ---
 
