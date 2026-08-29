@@ -28,6 +28,7 @@ const translations = {
     'nav.favourites': 'Yêu thích',
     'nav.compare': 'So sánh',
     'nav.logger': 'Nhật ký tập',
+    'nav.progress': 'Tiến độ',
 
     // ── Workout Logger ──
     'logger.title': 'Nhật ký<br><strong>Tập luyện</strong>',

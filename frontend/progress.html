@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FitData Hub — Progress Charts: visualise your training volume over time, personal record timelines, and workout frequency heatmap.">
+  <title>Progress Charts — FitData Hub</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    /* ============================================================
+       PROGRESS CHARTS PAGE — inline styles
+       ============================================================ */
+
+    /* ── Tab navigation ── */
+    .progress-tabs {
+      display: flex;
+      gap: var(--space-1);
+      border-bottom: 2px solid var(--color-border);
+      margin-bottom: var(--space-8);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .progress-tabs::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-5);
+      font-family: var(--font-display);
+      font-weight: var(--weight-bold);
+      font-size: var(--text-sm);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      cursor: pointer;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      transition: color var(--transition-fast), border-color var(--transition-fast);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .tab-btn:hover { color: var(--color-text-primary); }
+    .tab-btn.is-active {
+      color: var(--color-accent);
+      border-bottom-color: var(--color-accent);
+    }
+
+    /* ── Tab panels ── */
+    .tab-panel { display: none; }
+    .tab-panel.is-active { display: block; }
+
+    /* ── Chart card ── */
+    .chart-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+
+    .chart-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--space-4);
+      margin-bottom: var(--space-5);
+      flex-wrap: wrap;
+    }
+
+    .chart-title {
+      font-family: var(--font-display);
+      font-weight: var(--weight-black);
+      font-size: var(--text-xl);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--color-text-primary);
+    }
+
+    .chart-subtitle {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      margin-top: var(--space-1);
+      text-transform: none;
+      letter-spacing: 0;
+      font-family: var(--font-body);
+      font-weight: var(--weight-regular);
+    }
+
+    .chart-canvas-wrap {
+      position: relative;
+      height: 280px;
+    }
+
+    .chart-canvas-wrap canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* ── Period selector pills ── */
+    .period-pills {
+      display: flex;
+      gap: var(--space-1);
+      flex-wrap: wrap;
+    }
+
+    .period-pill {
+      padding: 4px 12px;
+      font-family: var(--font-display);
+      font-weight: var(--weight-bold);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 99px;
+      border: 1px solid var(--color-border);
+      background: transparent;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .period-pill:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+    .period-pill.is-active {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: #fff;
+    }
+
+    /* ── Exercise select (PR tab) ── */
+    .ex-select-wrap {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-5);
+      flex-wrap: wrap;
+    }
+    .ex-select-wrap label {
+      font-family: var(--font-display);
+      font-weight: var(--weight-bold);
+      font-size: var(--text-xs);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+    .ex-select {
+      flex: 1;
+      min-width: 200px;
+      padding: var(--space-2) var(--space-4);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      color: var(--color-text-primary);
+      font-size: var(--text-sm);
+      font-family: var(--font-body);
+    }
+    .ex-select:focus {
+      outline: none;
+      border-color: var(--color-accent);
+    }
+
+    /* ── PR summary cards ── */
+    .pr-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+    @media (max-width: 640px) {
+      .pr-summary-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .pr-summary-card {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      text-align: center;
+    }
+    .pr-summary-label {
+      font-size: 0.6rem;
+      font-family: var(--font-display);
+      font-weight: var(--weight-black);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-1);
+    }
+    .pr-summary-value {
+      font-family: var(--font-display);
+      font-weight: var(--weight-black);
+      font-size: var(--text-2xl);
+      color: var(--color-accent);
+      line-height: 1;
+    }
+    .pr-summary-meta {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      margin-top: var(--space-1);
+    }
+
+    /* ── GitHub-style heatmap ── */
+    .heatmap-wrap {
+      overflow-x: auto;
+      padding-bottom: var(--space-2);
+    }
+    .heatmap-grid {
+      display: inline-flex;
+      gap: 3px;
+      flex-direction: row;
+    }
+    .heatmap-week {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .heatmap-cell {
+      width: 13px;
+      height: 13px;
+      border-radius: 2px;
+      background: var(--color-surface);
+      transition: transform 0.12s;
+      cursor: default;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .heatmap-cell:hover { transform: scale(1.4); z-index: 2; }
+
+    /* Intensity levels */
+    .hm-0 { background: var(--color-surface); border: 1px solid var(--color-border); }
+    .hm-1 { background: rgba(211, 47, 47, 0.25); }
+    .hm-2 { background: rgba(211, 47, 47, 0.45); }
+    .hm-3 { background: rgba(211, 47, 47, 0.70); }
+    .hm-4 { background: #D32F2F; }
+
+    .heatmap-legend {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-top: var(--space-4);
+      font-size: 0.6rem;
+      color: var(--color-text-muted);
+      font-family: var(--font-display);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .heatmap-legend-cells {
+      display: flex;
+      gap: 3px;
+    }
+
+    .heatmap-months {
+      display: inline-flex;
+      gap: 3px;
+      margin-bottom: 4px;
+      padding-left: 0;
+    }
+    .hm-month-label {
+      font-size: 0.6rem;
+      color: var(--color-text-muted);
+      font-family: var(--font-display);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .heatmap-day-labels {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-right: 6px;
+      padding-top: 0;
+    }
+    .hm-day-label {
+      font-size: 0.55rem;
+      color: var(--color-text-muted);
+      font-family: var(--font-display);
+      height: 13px;
+      line-height: 13px;
+    }
+
+    .heatmap-outer {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+    }
+
+    /* ── Streak banner ── */
+    .streak-banner {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+      background: linear-gradient(135deg, rgba(211,47,47,0.08) 0%, rgba(255,193,7,0.06) 100%);
+      border: 1px solid rgba(211,47,47,0.2);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5) var(--space-6);
+      margin-bottom: var(--space-6);
+      flex-wrap: wrap;
+    }
+    .streak-fire {
+      font-size: 2.5rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .streak-info { flex: 1; }
+    .streak-count {
+      font-family: var(--font-display);
+      font-weight: var(--weight-black);
+      font-size: var(--text-4xl);
+      color: var(--color-accent);
+      line-height: 1;
+    }
+    .streak-label {
+      font-family: var(--font-display);
+      font-weight: var(--weight-bold);
+      font-size: var(--text-xs);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-top: var(--space-1);
+    }
+    .streak-stats-row {
+      display: flex;
+      gap: var(--space-6);
+      flex-wrap: wrap;
+    }
+    .streak-stat {
+      text-align: center;
+    }
+    .streak-stat-val {
+      font-family: var(--font-display);
+      font-weight: var(--weight-black);
+      font-size: var(--text-xl);
+      color: var(--color-text-primary);
+    }
+    .streak-stat-lbl {
+      font-size: 0.6rem;
+      font-family: var(--font-display);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+
+    /* ── Empty state ── */
+    .no-data-placeholder {
+      text-align: center;
+      padding: var(--space-16) var(--space-8);
+      color: var(--color-text-muted);
+    }
+    .no-data-placeholder .nd-icon { font-size: 3rem; margin-bottom: var(--space-4); }
+    .no-data-placeholder p { font-size: var(--text-sm); }
+    .no-data-placeholder a { color: var(--color-accent); }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="site-logo" aria-label="FitData Hub home">
+        Fit<strong>Data</strong>Hub
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <ul>
+          <li><a href="/" data-i18n="nav.exercises">Exercises</a></li>
+          <li><a href="/recommend.html" data-i18n="nav.recommender">Recommender</a></li>
+          <li><a href="/schedule.html" data-i18n="nav.schedule">My Schedule</a></li>
+          <li><a href="/log.html" data-i18n="nav.logger">Workout Log</a></li>
+          <li><a href="/analytics.html" data-i18n="nav.analytics">Analytics</a></li>
+          <li><a href="/calculator.html" data-i18n="nav.calculator">Calculator</a></li>
+          <li><a href="/favorites.html" data-i18n="nav.favourites">Favourites</a></li>
+          <li><a href="/compare.html" data-i18n="nav.compare">Compare</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- Page Hero -->
+    <section class="page-hero" aria-labelledby="page-title">
+      <div class="hero-inner">
+        <h1 id="page-title">Progress<br><strong>Charts</strong></h1>
+        <p>Track your training momentum — volume trends, personal records, and workout consistency — all from your local workout history.</p>
+        <div class="flex gap-4 mt-6" style="flex-wrap: wrap;">
+          <a href="/log.html" class="btn btn-outline-red btn-sm">← Back to Log</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-content" aria-label="Progress charts and analytics">
+
+      <!-- Tab bar -->
+      <nav class="progress-tabs" role="tablist" aria-label="Progress chart tabs">
+        <button class="tab-btn is-active" role="tab" aria-selected="true"  aria-controls="tab-volume"   id="tb-volume">
+          📈 Volume
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-pr"     id="tb-pr">
+          🏆 PR Timeline
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-heatmap" id="tb-heatmap">
+          📅 Consistency
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-muscles" id="tb-muscles">
+          💪 Muscles
+        </button>
+      </nav>
+
+      <!-- ════════════════════════════════════════════
+           TAB 1 — Volume Chart
+           ════════════════════════════════════════════ -->
+      <section id="tab-volume" class="tab-panel is-active" role="tabpanel" aria-labelledby="tb-volume">
+
+        <div class="chart-card">
+          <header class="chart-card-header">
+            <div>
+              <h2 class="chart-title">Training Volume</h2>
+              <p class="chart-subtitle">Total weight lifted (kg × reps) per workout session</p>
+            </div>
+            <div class="period-pills" role="group" aria-label="Volume period">
+              <button class="period-pill" data-period="7"  data-chart="volume">7D</button>
+              <button class="period-pill is-active" data-period="30" data-chart="volume">30D</button>
+              <button class="period-pill" data-period="90" data-chart="volume">90D</button>
+              <button class="period-pill" data-period="365" data-chart="volume">1Y</button>
+              <button class="period-pill" data-period="all" data-chart="volume">All</button>
+            </div>
+          </header>
+          <div class="chart-canvas-wrap">
+            <canvas id="volume-chart" aria-label="Training volume over time line chart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <header class="chart-card-header">
+            <div>
+              <h2 class="chart-title">Sets Per Session</h2>
+              <p class="chart-subtitle">Total sets logged in each workout</p>
+            </div>
+            <div class="period-pills" role="group" aria-label="Sets period">
+              <button class="period-pill" data-period="7"  data-chart="sets">7D</button>
+              <button class="period-pill is-active" data-period="30" data-chart="sets">30D</button>
+              <button class="period-pill" data-period="90" data-chart="sets">90D</button>
+              <button class="period-pill" data-period="365" data-chart="sets">1Y</button>
+              <button class="period-pill" data-period="all" data-chart="sets">All</button>
+            </div>
+          </header>
+          <div class="chart-canvas-wrap">
+            <canvas id="sets-chart" aria-label="Sets per session bar chart"></canvas>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ════════════════════════════════════════════
+           TAB 2 — PR Timeline
+           ════════════════════════════════════════════ -->
+      <section id="tab-pr" class="tab-panel" role="tabpanel" aria-labelledby="tb-pr">
+
+        <div class="chart-card">
+          <header class="chart-card-header">
+            <div>
+              <h2 class="chart-title">Personal Record Timeline</h2>
+              <p class="chart-subtitle">Estimated 1RM progress over time for a selected exercise</p>
+            </div>
+          </header>
+
+          <!-- Exercise selector -->
+          <div class="ex-select-wrap">
+            <label for="pr-exercise-select">Exercise</label>
+            <select id="pr-exercise-select" class="ex-select" aria-label="Select exercise for PR timeline">
+              <option value="">— Choose an exercise you've logged —</option>
+            </select>
+          </div>
+
+          <!-- PR Summary Cards -->
+          <div class="pr-summary-grid" id="pr-summary-grid" style="display: none;">
+            <article class="pr-summary-card">
+              <p class="pr-summary-label">Best 1RM (Est.)</p>
+              <p class="pr-summary-value" id="pr-best-1rm">—</p>
+              <p class="pr-summary-meta" id="pr-best-1rm-date">—</p>
+            </article>
+            <article class="pr-summary-card">
+              <p class="pr-summary-label">Max Weight</p>
+              <p class="pr-summary-value" id="pr-max-weight">—</p>
+              <p class="pr-summary-meta" id="pr-max-weight-date">—</p>
+            </article>
+            <article class="pr-summary-card">
+              <p class="pr-summary-label">Sessions Logged</p>
+              <p class="pr-summary-value" id="pr-sessions-count">—</p>
+              <p class="pr-summary-meta">total sessions</p>
+            </article>
+          </div>
+
+          <div class="chart-canvas-wrap">
+            <canvas id="pr-chart" aria-label="Personal record timeline line chart"></canvas>
+          </div>
+
+          <!-- PR empty state -->
+          <div id="pr-empty" class="no-data-placeholder">
+            <p class="nd-icon">🏆</p>
+            <p>Choose an exercise above to see your personal record timeline.<br>
+               You'll need at least 2 logged sessions to see a trend.</p>
+            <p style="margin-top: var(--space-3);">No logs yet? <a href="/log.html">Start logging your workouts →</a></p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ════════════════════════════════════════════
+           TAB 3 — Consistency Heatmap
+           ════════════════════════════════════════════ -->
+      <section id="tab-heatmap" class="tab-panel" role="tabpanel" aria-labelledby="tb-heatmap">
+
+        <!-- Streak Banner -->
+        <div class="streak-banner" id="streak-banner" aria-label="Workout streak information">
+          <div class="streak-fire" aria-hidden="true">🔥</div>
+          <div class="streak-info">
+            <p class="streak-count" id="streak-count">0</p>
+            <p class="streak-label">Day Streak</p>
+          </div>
+          <div class="streak-stats-row">
+            <div class="streak-stat">
+              <p class="streak-stat-val" id="streak-longest">0</p>
+              <p class="streak-stat-lbl">Longest Streak</p>
+            </div>
+            <div class="streak-stat">
+              <p class="streak-stat-val" id="streak-this-month">0</p>
+              <p class="streak-stat-lbl">This Month</p>
+            </div>
+            <div class="streak-stat">
+              <p class="streak-stat-val" id="streak-total-days">0</p>
+              <p class="streak-stat-lbl">Total Days</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <header class="chart-card-header">
+            <div>
+              <h2 class="chart-title">Workout Consistency</h2>
+              <p class="chart-subtitle">Last 52 weeks — darker = more volume lifted</p>
+            </div>
+          </header>
+
+          <!-- Heatmap container -->
+          <div class="heatmap-wrap" role="img" aria-label="Workout frequency calendar heatmap">
+            <div id="heatmap-container"></div>
+          </div>
+
+          <!-- Legend -->
+          <div class="heatmap-legend" aria-hidden="true">
+            <span>Less</span>
+            <div class="heatmap-legend-cells">
+              <div class="heatmap-cell hm-0"></div>
+              <div class="heatmap-cell hm-1"></div>
+              <div class="heatmap-cell hm-2"></div>
+              <div class="heatmap-cell hm-3"></div>
+              <div class="heatmap-cell hm-4"></div>
+            </div>
+            <span>More</span>
+          </div>
+
+          <!-- No logs placeholder -->
+          <div id="heatmap-empty" class="no-data-placeholder" style="display: none;">
+            <p class="nd-icon">📅</p>
+            <p>No workout data yet. <a href="/log.html">Log your first session →</a></p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ════════════════════════════════════════════
+           TAB 4 — Muscle Distribution
+           ════════════════════════════════════════════ -->
+      <section id="tab-muscles" class="tab-panel" role="tabpanel" aria-labelledby="tb-muscles">
+
+        <div class="chart-card">
+          <header class="chart-card-header">
+            <div>
+              <h2 class="chart-title">Volume by Muscle Group</h2>
+              <p class="chart-subtitle">Which muscles have you trained the most?</p>
+            </div>
+            <div class="period-pills" role="group" aria-label="Muscle period">
+              <button class="period-pill" data-period="7"   data-chart="muscles">7D</button>
+              <button class="period-pill is-active" data-period="30"  data-chart="muscles">30D</button>
+              <button class="period-pill" data-period="90"  data-chart="muscles">90D</button>
+              <button class="period-pill" data-period="all" data-chart="muscles">All</button>
+            </div>
+          </header>
+          <div class="chart-canvas-wrap" style="height: 320px;">
+            <canvas id="muscles-chart" aria-label="Volume by muscle group bar chart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <header class="chart-card-header">
+            <div>
+              <h2 class="chart-title">Workout Split</h2>
+              <p class="chart-subtitle">Sessions breakdown by body part</p>
+            </div>
+          </header>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6);">
+            <div class="chart-canvas-wrap" style="height: 260px;">
+              <canvas id="split-chart" aria-label="Workout split donut chart"></canvas>
+            </div>
+            <div id="split-legend" style="display: flex; flex-direction: column; gap: var(--space-2); justify-content: center;"></div>
+          </div>
+        </div>
+
+      </section>
+
+    </section><!-- /page-content -->
+
+  </main>
+
+  <footer class="site-footer">
+    <address>
+      <span data-i18n="footer.source">Data sourced from</span> <a href="https://gymvisual.com/" rel="noopener noreferrer">Gym Visual</a>.
+    </address>
+    <p data-i18n="footer.tagline">FitData Hub &mdash; Data Engineering &amp; Analytics learning project.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="/js/app.js" type="module"></script>
+  <script src="/js/i18n.js" type="module"></script>
+  <script src="/js/progress.js" type="module"></script>
+
+</body>
+</html>
