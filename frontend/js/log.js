@@ -448,7 +448,154 @@ function renderStatsOverview() {
   if (totalVolumeEl) totalVolumeEl.textContent = `${stats.totalVolume.toLocaleString()} kg`;
   if (totalSetsEl) totalSetsEl.textContent = stats.totalSets;
   if (weekWorkoutsEl) weekWorkoutsEl.textContent = stats.workoutsThisWeek;
+
+  renderStreakWidget();
 }
+
+// ---------------------------------------------------------------------------
+// Streak & Consistency Widget
+// ---------------------------------------------------------------------------
+
+function renderStreakWidget() {
+  const logs = getWorkoutLogs();
+
+  // Build a map: dateStr (YYYY-MM-DD) → total volume that day
+  const volByDay = new Map();
+  logs.forEach(session => {
+    const d = (session.date || '').slice(0, 10);
+    if (!d) return;
+    volByDay.set(d, (volByDay.get(d) || 0) + (session.totalVolume || 0));
+  });
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const toStr = (d) => d.toISOString().slice(0, 10);
+  const hasWorkout = (d) => (volByDay.get(toStr(d)) || 0) > 0;
+
+  // ── Current streak ──
+  let streak = 0;
+  const checkDay = new Date(today);
+  while (hasWorkout(checkDay)) {
+    streak++;
+    checkDay.setDate(checkDay.getDate() - 1);
+  }
+
+  // ── Longest streak ──
+  const allDays = [...volByDay.keys()].filter(k => volByDay.get(k) > 0).sort();
+  let longestStreak = 0, cur = 0;
+  allDays.forEach((d, i) => {
+    if (i === 0) { cur = 1; return; }
+    const prev = new Date(allDays[i - 1]);
+    prev.setDate(prev.getDate() + 1);
+    cur = (toStr(prev) === d) ? cur + 1 : 1;
+    if (cur > longestStreak) longestStreak = cur;
+  });
+  if (allDays.length === 1) longestStreak = 1;
+  if (cur > longestStreak) longestStreak = cur;
+
+  // ── This month ──
+  const thisMonthStr = toStr(today).slice(0, 7); // YYYY-MM
+  const thisMonth = allDays.filter(d => d.startsWith(thisMonthStr)).length;
+
+  // ── Total unique workout days ──
+  const totalDays = allDays.length;
+
+  // ── Update DOM ──
+  const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+  setEl('streak-count',     streak);
+  setEl('streak-longest',   longestStreak);
+  setEl('streak-this-month', thisMonth);
+  setEl('streak-total-days', totalDays);
+
+  // Fire emoji logic
+  const emojiEl = document.getElementById('streak-emoji');
+  if (emojiEl) {
+    if (streak >= 14) emojiEl.textContent = '🔥🔥🔥';
+    else if (streak >= 7) emojiEl.textContent = '🔥🔥';
+    else if (streak >= 3) emojiEl.textContent = '🔥';
+    else if (streak === 1) emojiEl.textContent = '⚡';
+    else emojiEl.textContent = '💤';
+  }
+
+  // Headline + subline
+  const headline = document.getElementById('streak-headline');
+  const subline   = document.getElementById('streak-subline');
+  if (headline && subline) {
+    if (streak === 0) {
+      headline.textContent = 'Start your streak!';
+      subline.textContent  = totalDays > 0
+        ? 'Your last streak ended. Get back at it today!'
+        : 'Log a workout today to begin.';
+    } else if (streak === 1) {
+      headline.textContent = 'Day 1 — Keep going!';
+      subline.textContent  = 'Come back tomorrow to build your streak.';
+    } else if (streak < 7) {
+      headline.textContent = `${streak}-Day Streak 🎯`;
+      subline.textContent  = `${7 - streak} more days to hit a week!`;
+    } else if (streak < 30) {
+      headline.textContent = `${streak}-Day Streak — On Fire!`;
+      subline.textContent  = `${30 - streak} more days to hit a month!`;
+    } else {
+      headline.textContent = `${streak}-Day Streak — Legendary!`;
+      subline.textContent  = `You're in the top 1% of consistency.`;
+    }
+  }
+
+  // ── 7-Day mini calendar ──
+  const daysRow = document.getElementById('streak-days-row');
+  if (!daysRow) return;
+
+  daysRow.innerHTML = '';
+
+  const maxVol = Math.max(...[...volByDay.values()], 1);
+  const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  for (let i = 6; i >= 0; i--) {
+    const day = new Date(today);
+    day.setDate(today.getDate() - i);
+    const dateStr = toStr(day);
+    const vol     = volByDay.get(dateStr) || 0;
+    const isToday = (i === 0);
+
+    // Intensity class
+    let dotClass = 'streak-day-dot is-rest';
+    let dotLabel = '—';
+    if (vol > 0) {
+      const ratio = vol / maxVol;
+      if (ratio >= 0.66)      { dotClass = 'streak-day-dot is-active'; dotLabel = '🔥'; }
+      else if (ratio >= 0.33) { dotClass = 'streak-day-dot is-medium'; dotLabel = '💪'; }
+      else                    { dotClass = 'streak-day-dot is-light';  dotLabel = '✓'; }
+    }
+    if (isToday) dotClass += ' is-today';
+
+    const cell = document.createElement('div');
+    cell.className = 'streak-day-cell';
+    cell.setAttribute('role', 'listitem');
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'streak-day-name';
+    nameEl.textContent = DAY_NAMES[day.getDay()];
+    nameEl.setAttribute('aria-hidden', 'true');
+
+    const dot = document.createElement('div');
+    dot.className = dotClass;
+    dot.textContent = dotLabel;
+    dot.setAttribute(
+      'title',
+      vol > 0
+        ? `${day.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' })}: ${vol.toLocaleString()} kg`
+        : `${day.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' })}: Rest day`
+    );
+    dot.setAttribute('aria-label', dot.getAttribute('title'));
+
+    cell.appendChild(nameEl);
+    cell.appendChild(dot);
+    daysRow.appendChild(cell);
+  }
+}
+
 
 function renderHistoryList() {
   const container = $('#workout-history-list');

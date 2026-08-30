@@ -447,6 +447,177 @@
       text-align: center;
       color: var(--color-text-muted);
     }
+
+    /* ============================================================
+       STREAK & CONSISTENCY WIDGET
+       ============================================================ */
+    .streak-widget {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: var(--space-5);
+      align-items: center;
+      background: linear-gradient(
+        135deg,
+        rgba(211, 47, 47, 0.07) 0%,
+        rgba(255, 193, 7, 0.04) 100%
+      );
+      border: 1px solid rgba(211, 47, 47, 0.18);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5) var(--space-6);
+      margin-bottom: var(--space-5);
+      flex-wrap: wrap;
+    }
+    @media (max-width: 768px) {
+      .streak-widget { grid-template-columns: auto 1fr; }
+      .streak-week-col { grid-column: 1 / -1; }
+    }
+    @media (max-width: 480px) {
+      .streak-widget { grid-template-columns: 1fr; }
+    }
+
+    /* Fire + streak number */
+    .streak-flame-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      min-width: 56px;
+    }
+    .streak-fire-emoji {
+      font-size: 2.2rem;
+      line-height: 1;
+      animation: streak-pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes streak-pulse {
+      0%, 100% { transform: scale(1); }
+      50%       { transform: scale(1.12); }
+    }
+    .streak-number {
+      font-family: var(--font-display);
+      font-weight: var(--weight-black);
+      font-size: var(--text-3xl);
+      color: var(--color-accent);
+      line-height: 1;
+    }
+    .streak-days-label {
+      font-family: var(--font-display);
+      font-size: 0.55rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+
+    /* Stats mid column */
+    .streak-meta-col {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .streak-meta-title {
+      font-family: var(--font-display);
+      font-weight: var(--weight-black);
+      font-size: var(--text-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-primary);
+    }
+    .streak-meta-subtitle {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+    }
+    .streak-pill-row {
+      display: flex;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      margin-top: var(--space-1);
+    }
+    .streak-stat-pill {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--color-border);
+      border-radius: 99px;
+      padding: 2px 10px;
+      font-family: var(--font-display);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+    }
+    .streak-stat-pill strong {
+      color: var(--color-text-primary);
+      font-weight: var(--weight-black);
+    }
+
+    /* 7-day mini calendar */
+    .streak-week-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: var(--space-2);
+    }
+    .streak-week-label {
+      font-family: var(--font-display);
+      font-size: 0.55rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      text-align: right;
+    }
+    .streak-days-row {
+      display: flex;
+      gap: 5px;
+      align-items: flex-end;
+    }
+    .streak-day-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+    .streak-day-name {
+      font-family: var(--font-display);
+      font-size: 0.5rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+    .streak-day-dot {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      transition: background var(--transition-fast), border-color var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      color: var(--color-text-muted);
+    }
+    .streak-day-dot.is-rest {
+      background: var(--color-surface);
+      border-color: var(--color-border);
+      color: var(--color-text-muted);
+    }
+    .streak-day-dot.is-light {
+      background: rgba(211, 47, 47, 0.22);
+      border-color: rgba(211, 47, 47, 0.3);
+      color: #D32F2F;
+    }
+    .streak-day-dot.is-medium {
+      background: rgba(211, 47, 47, 0.50);
+      border-color: rgba(211, 47, 47, 0.6);
+      color: #fff;
+    }
+    .streak-day-dot.is-active {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: #fff;
+      box-shadow: 0 0 8px rgba(211,47,47,0.45);
+    }
+    .streak-day-dot.is-today {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
   </style>
 </head>
 <body>
@@ -502,6 +673,37 @@
           <p class="logger-stat-label" data-i18n="logger.this_week">This Week</p>
           <p id="stat-week-workouts" class="logger-stat-value">0</p>
         </article>
+      </section>
+
+      <!-- ── Streak & Consistency Widget ── -->
+      <section class="streak-widget" id="streak-widget" aria-label="Workout streak and consistency">
+
+        <!-- Flame + Streak Count -->
+        <div class="streak-flame-col">
+          <span class="streak-fire-emoji" id="streak-emoji" aria-hidden="true">💤</span>
+          <output class="streak-number" id="streak-count" aria-label="Current streak">0</output>
+          <span class="streak-days-label">day streak</span>
+        </div>
+
+        <!-- Meta info -->
+        <div class="streak-meta-col">
+          <p class="streak-meta-title" id="streak-headline">Start your streak!</p>
+          <p class="streak-meta-subtitle" id="streak-subline">Log a workout today to begin.</p>
+          <div class="streak-pill-row" aria-label="Streak statistics">
+            <span class="streak-stat-pill">🏅 Longest: <strong id="streak-longest">0</strong> days</span>
+            <span class="streak-stat-pill">📅 This month: <strong id="streak-this-month">0</strong></span>
+            <span class="streak-stat-pill">💪 Total days: <strong id="streak-total-days">0</strong></span>
+          </div>
+        </div>
+
+        <!-- Last 7-day mini calendar -->
+        <div class="streak-week-col" aria-label="Last 7 days activity">
+          <span class="streak-week-label">Last 7 days</span>
+          <div class="streak-days-row" id="streak-days-row" role="list" aria-label="Daily workout activity">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
       </section>
 
       <!-- Progress Charts shortcut -->
