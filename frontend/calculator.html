@@ -300,6 +300,308 @@
       to   { opacity: 1; transform: translateY(0); }
     }
     .animated-num { animation: fade-num 0.4s ease both; }
+
+    /* ============================================================
+       1RM CALCULATOR SECTION
+       ============================================================ */
+    .orm-section {
+      margin-top: var(--space-16);
+      scroll-margin-top: calc(var(--header-height) + var(--space-6));
+    }
+    .orm-section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+      flex-wrap: wrap;
+      border-bottom: 2px solid var(--color-border);
+      padding-bottom: var(--space-5);
+    }
+    .orm-section-title {
+      font-family: var(--font-display);
+      font-weight: var(--weight-black);
+      font-size: clamp(var(--text-2xl), 4vw, var(--text-4xl));
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--color-text-primary);
+    }
+    .orm-section-title strong { color: var(--color-accent); }
+    .orm-section-subtitle {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      margin-top: var(--space-1);
+    }
+
+    .orm-layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: var(--space-8);
+      align-items: flex-start;
+    }
+    @media (max-width: 900px) { .orm-layout { grid-template-columns: 1fr; } }
+
+    /* Input card */
+    .orm-form-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-4));
+    }
+    @media (max-width: 900px) { .orm-form-card { position: static; } }
+
+    .orm-form-title {
+      font-family: var(--font-display);
+      font-weight: var(--weight-black);
+      font-size: var(--text-base);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-5);
+      color: var(--color-text-primary);
+    }
+
+    /* Results area */
+    .orm-results { display: flex; flex-direction: column; gap: var(--space-5); }
+
+    /* Formula cards row */
+    .orm-formula-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+    }
+    @media (max-width: 640px) { .orm-formula-row { grid-template-columns: 1fr 1fr; } }
+
+    .orm-formula-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      text-align: center;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .orm-formula-card:hover {
+      border-color: rgba(211,47,47,0.4);
+      transform: translateY(-2px);
+    }
+    .orm-formula-card.is-best {
+      border-color: var(--color-accent);
+      background: rgba(211,47,47,0.06);
+    }
+    .orm-formula-label {
+      font-family: var(--font-display);
+      font-size: 0.55rem;
+      font-weight: var(--weight-black);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-1);
+    }
+    .orm-formula-value {
+      font-family: var(--font-display);
+      font-weight: var(--weight-black);
+      font-size: var(--text-2xl);
+      color: var(--color-text-primary);
+      line-height: 1;
+    }
+    .orm-formula-card.is-best .orm-formula-value { color: var(--color-accent); }
+    .orm-formula-unit {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+    .orm-best-badge {
+      display: inline-block;
+      margin-top: var(--space-1);
+      font-size: 0.5rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--color-accent);
+      color: #fff;
+      padding: 1px 6px;
+      border-radius: 99px;
+    }
+
+    /* Level result badge */
+    .orm-level-result {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5) var(--space-6);
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+      flex-wrap: wrap;
+    }
+    .orm-level-icon { font-size: 2.4rem; flex-shrink: 0; }
+    .orm-level-text { flex: 1; }
+    .orm-level-exercise {
+      font-family: var(--font-display);
+      font-size: var(--text-xs);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-1);
+    }
+    .orm-level-headline {
+      font-family: var(--font-display);
+      font-weight: var(--weight-black);
+      font-size: var(--text-xl);
+      color: var(--color-text-primary);
+      margin-bottom: 2px;
+    }
+    .orm-level-sub {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+    }
+    .orm-level-badge {
+      font-family: var(--font-display);
+      font-weight: var(--weight-black);
+      font-size: var(--text-sm);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: var(--space-2) var(--space-5);
+      border-radius: 99px;
+      flex-shrink: 0;
+    }
+    .lvl-beginner   { background: rgba(100,100,100,0.2);  color: #aaa; }
+    .lvl-novice     { background: rgba(76,175,80,0.2);    color: #81C784; }
+    .lvl-intermediate { background: rgba(33,150,243,0.2); color: #64B5F6; }
+    .lvl-advanced   { background: rgba(255,193,7,0.25);  color: #FFD54F; }
+    .lvl-elite      { background: rgba(211,47,47,0.25);  color: #EF9A9A; }
+    .lvl-none       { background: rgba(100,100,100,0.1); color: var(--color-text-muted); }
+
+    /* Standards table */
+    .orm-standards-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5);
+      overflow: hidden;
+    }
+    .orm-standards-heading {
+      font-family: var(--font-display);
+      font-weight: var(--weight-black);
+      font-size: var(--text-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-4);
+      color: var(--color-text-primary);
+    }
+    .orm-table-wrap { overflow-x: auto; }
+    .orm-standards-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-xs);
+    }
+    .orm-standards-table thead th {
+      padding: var(--space-2) var(--space-3);
+      text-align: right;
+      font-size: 0.55rem;
+      font-weight: var(--weight-black);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--color-text-muted);
+      border-bottom: 1px solid var(--color-border);
+      white-space: nowrap;
+    }
+    .orm-standards-table thead th:first-child { text-align: left; }
+    .orm-standards-table tbody tr { transition: background 0.15s; }
+    .orm-standards-table tbody tr:hover td { background: rgba(255,255,255,0.03); }
+    .orm-standards-table tbody tr.is-user-level td { background: rgba(211,47,47,0.08); }
+    .orm-standards-table td {
+      padding: var(--space-3);
+      text-align: right;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--color-text-secondary);
+      font-family: var(--font-display);
+      white-space: nowrap;
+    }
+    .orm-standards-table td:first-child {
+      text-align: left;
+      font-weight: var(--weight-bold);
+      letter-spacing: 0.05em;
+    }
+    .orm-level-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 5px;
+      flex-shrink: 0;
+    }
+    .dot-beginner   { background: #888; }
+    .dot-novice     { background: #81C784; }
+    .dot-intermediate { background: #64B5F6; }
+    .dot-advanced   { background: #FFD54F; }
+    .dot-elite      { background: #EF9A9A; }
+
+    /* Progress bar inside table */
+    .orm-progress-cell {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      justify-content: flex-end;
+    }
+    .orm-progress-track {
+      flex: 1;
+      max-width: 80px;
+      height: 4px;
+      background: var(--color-bg);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .orm-progress-fill {
+      height: 100%;
+      background: var(--color-accent);
+      border-radius: 99px;
+      transition: width 0.6s cubic-bezier(0.22,1,0.36,1);
+    }
+
+    /* Reps table */
+    .orm-reps-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5);
+      overflow: hidden;
+    }
+    .orm-reps-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-xs);
+    }
+    .orm-reps-table th {
+      padding: var(--space-2) var(--space-3);
+      text-align: right;
+      font-size: 0.55rem;
+      font-weight: var(--weight-black);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-text-muted);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .orm-reps-table th:first-child { text-align: left; }
+    .orm-reps-table td {
+      padding: var(--space-2) var(--space-3);
+      text-align: right;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--color-text-secondary);
+      font-family: var(--font-display);
+    }
+    .orm-reps-table td:first-child { text-align: left; color: var(--color-text-muted); }
+    .orm-reps-table tbody tr:hover td { background: rgba(255,255,255,0.03); }
+    .orm-reps-table .is-target-rep td { background: rgba(211,47,47,0.08); color: var(--color-text-primary); }
+
+    /* No-data placeholder */
+    .orm-placeholder {
+      text-align: center;
+      padding: var(--space-10);
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+    }
+    .orm-placeholder .nd-icon { font-size: 2.5rem; margin-bottom: var(--space-3); }
   </style>
 </head>
 <body>
@@ -593,6 +895,179 @@
           </table>
         </div>
       </section>
+
+    </section><!-- /page-content -->
+
+    <!-- ════════════════════════════════════════
+         1RM CALCULATOR & STRENGTH STANDARDS
+         ════════════════════════════════════════ -->
+    <section class="page-content orm-section" id="orm-section" aria-labelledby="orm-heading">
+
+      <!-- Section header -->
+      <header class="orm-section-header">
+        <div>
+          <h2 id="orm-heading" class="orm-section-title">1RM <strong>Strength</strong> Calculator</h2>
+          <p class="orm-section-subtitle">Estimate your one-rep max and compare to strength standards by bodyweight</p>
+        </div>
+        <a href="#orm-section" class="btn btn-ghost btn-sm">💪 Jump to 1RM</a>
+      </header>
+
+      <div class="orm-layout">
+
+        <!-- ── Input Form ── -->
+        <aside class="orm-form-card" aria-label="1RM calculator inputs">
+          <h3 class="orm-form-title">Your Lift</h3>
+
+          <form id="orm-form" novalidate>
+
+            <div class="form-field">
+              <label for="orm-exercise">Exercise</label>
+              <select id="orm-exercise" name="exercise" required aria-label="Select exercise for strength standard comparison">
+                <optgroup label="Upper Body — Push">
+                  <option value="bench_press">Bench Press</option>
+                  <option value="overhead_press">Overhead Press</option>
+                  <option value="incline_bench">Incline Bench Press</option>
+                  <option value="dips_weighted">Weighted Dips</option>
+                </optgroup>
+                <optgroup label="Upper Body — Pull">
+                  <option value="barbell_row">Barbell Row</option>
+                  <option value="weighted_pullup">Weighted Pull-up</option>
+                  <option value="lat_pulldown">Lat Pulldown</option>
+                </optgroup>
+                <optgroup label="Lower Body">
+                  <option value="squat">Back Squat</option>
+                  <option value="deadlift">Deadlift</option>
+                  <option value="front_squat">Front Squat</option>
+                  <option value="leg_press">Leg Press</option>
+                  <option value="romanian_deadlift">Romanian Deadlift</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label for="orm-weight">Weight Lifted (kg)</label>
+                <input type="number" id="orm-weight" name="weight" min="1" max="500" step="0.5" placeholder="100" required aria-required="true">
+              </div>
+              <div class="form-field">
+                <label for="orm-reps">Reps Performed</label>
+                <input type="number" id="orm-reps" name="reps" min="1" max="20" step="1" placeholder="5" required aria-required="true">
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="orm-bodyweight">Your Bodyweight (kg)
+                <span class="opt-badge">For standards</span>
+              </label>
+              <input type="number" id="orm-bodyweight" name="bodyweight" min="30" max="300" step="0.5" placeholder="75" aria-describedby="bw-hint">
+              <p id="bw-hint" style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:4px;">Enter bodyweight to compare with strength level standards.</p>
+            </div>
+
+            <div class="form-field">
+              <label for="orm-gender-select">Gender <span class="opt-badge">For standards</span></label>
+              <select id="orm-gender-select" name="gender" aria-label="Gender for strength standards">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full" id="orm-submit">
+              💪 Calculate 1RM
+            </button>
+          </form>
+        </aside>
+
+        <!-- ── Results Panel ── -->
+        <div class="orm-results" id="orm-results" aria-live="polite" aria-label="1RM calculation results">
+
+          <!-- Placeholder (before first calculation) -->
+          <div class="orm-placeholder" id="orm-placeholder">
+            <p class="nd-icon">🏋️</p>
+            <p>Enter your lift details to see your estimated 1RM and strength level.</p>
+          </div>
+
+          <!-- Hidden until calculated -->
+          <div id="orm-output" hidden>
+
+            <!-- Formula comparison cards -->
+            <div class="orm-formula-row" role="list" aria-label="1RM estimates by formula">
+              <article class="orm-formula-card" role="listitem" id="orm-card-epley">
+                <p class="orm-formula-label">Epley</p>
+                <output class="orm-formula-value" id="orm-epley">—</output>
+                <p class="orm-formula-unit">kg</p>
+              </article>
+              <article class="orm-formula-card" role="listitem" id="orm-card-brzycki">
+                <p class="orm-formula-label">Brzycki</p>
+                <output class="orm-formula-value" id="orm-brzycki">—</output>
+                <p class="orm-formula-unit">kg</p>
+              </article>
+              <article class="orm-formula-card" role="listitem" id="orm-card-lander">
+                <p class="orm-formula-label">Lander</p>
+                <output class="orm-formula-value" id="orm-lander">—</output>
+                <p class="orm-formula-unit">kg</p>
+              </article>
+            </div>
+
+            <!-- Strength level badge -->
+            <div class="orm-level-result" id="orm-level-result" aria-label="Strength level classification">
+              <span class="orm-level-icon" id="orm-level-icon" aria-hidden="true">🏅</span>
+              <div class="orm-level-text">
+                <p class="orm-level-exercise" id="orm-level-exercise">—</p>
+                <p class="orm-level-headline" id="orm-level-headline">—</p>
+                <p class="orm-level-sub" id="orm-level-sub">—</p>
+              </div>
+              <span class="orm-level-badge lvl-none" id="orm-level-badge">—</span>
+            </div>
+
+            <!-- Strength Standards Table -->
+            <div class="orm-standards-card" id="orm-standards-card">
+              <h3 class="orm-standards-heading">📊 Strength Standards — <span id="orm-std-exercise-name"></span></h3>
+              <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:var(--space-4);">Bodyweight ratio (1RM ÷ Bodyweight). Highlighted row = your current level.</p>
+              <div class="orm-table-wrap">
+                <table class="orm-standards-table" aria-label="Strength standards table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Level</th>
+                      <th scope="col">Ratio (×BW)</th>
+                      <th scope="col">For 70 kg</th>
+                      <th scope="col">For 80 kg</th>
+                      <th scope="col">For 90 kg</th>
+                      <th scope="col" style="min-width:120px;">Your lift</th>
+                    </tr>
+                  </thead>
+                  <tbody id="orm-standards-tbody">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Percentage / Reps table -->
+            <div class="orm-reps-card">
+              <h3 class="orm-standards-heading">📐 Training Load Calculator</h3>
+              <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:var(--space-4);">Estimated weight for different rep ranges based on your 1RM. Highlighted row = your input reps.</p>
+              <div class="orm-table-wrap">
+                <table class="orm-reps-table" aria-label="Training percentages table">
+                  <thead>
+                    <tr>
+                      <th scope="col">% 1RM</th>
+                      <th scope="col">Weight (kg)</th>
+                      <th scope="col">Est. Reps</th>
+                      <th scope="col">Zone</th>
+                    </tr>
+                  </thead>
+                  <tbody id="orm-reps-tbody">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div><!-- /orm-output -->
+        </div><!-- /orm-results -->
+
+      </div><!-- /orm-layout -->
+    </section><!-- /orm-section -->
 
     </section><!-- /page-content -->
   </main>

@@ -387,3 +387,310 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
+
+// ==========================================================================
+// 1RM CALCULATOR & STRENGTH STANDARDS
+// ==========================================================================
+
+// ---------------------------------------------------------------------------
+// 1RM Formulas  (weight in kg, reps performed)
+// ---------------------------------------------------------------------------
+
+const orm = {
+  epley:   (w, r) => r === 1 ? w : Math.round(w * (1 + r / 30) * 10) / 10,
+  brzycki: (w, r) => r === 1 ? w : Math.round((w / (1.0278 - 0.0278 * r)) * 10) / 10,
+  lander:  (w, r) => r === 1 ? w : Math.round((100 * w / (101.3 - 2.67123 * r)) * 10) / 10,
+};
+
+// ---------------------------------------------------------------------------
+// Strength Standards  (bodyweight multipliers × BW → 1RM)
+// Sources: Symmetric Strength, StrengthLevel.com, Stronger By Science
+// Format: { beginner, novice, intermediate, advanced, elite }
+// ---------------------------------------------------------------------------
+
+const STANDARDS = {
+  male: {
+    bench_press:       { beginner: 0.5, novice: 0.75, intermediate: 1.0, advanced: 1.25, elite: 1.5  },
+    overhead_press:    { beginner: 0.3, novice: 0.5,  intermediate: 0.65,advanced: 0.8,  elite: 1.0  },
+    incline_bench:     { beginner: 0.4, novice: 0.65, intermediate: 0.9, advanced: 1.1,  elite: 1.35 },
+    dips_weighted:     { beginner: 0.3, novice: 0.5,  intermediate: 0.7, advanced: 0.9,  elite: 1.1  },
+    barbell_row:       { beginner: 0.5, novice: 0.7,  intermediate: 0.9, advanced: 1.1,  elite: 1.35 },
+    weighted_pullup:   { beginner: 0.15,novice: 0.35, intermediate: 0.55,advanced: 0.75, elite: 1.0  },
+    lat_pulldown:      { beginner: 0.4, novice: 0.6,  intermediate: 0.8, advanced: 1.0,  elite: 1.2  },
+    squat:             { beginner: 0.75,novice: 1.0,  intermediate: 1.25,advanced: 1.5,  elite: 1.75 },
+    deadlift:          { beginner: 1.0, novice: 1.25, intermediate: 1.5, advanced: 1.75, elite: 2.0  },
+    front_squat:       { beginner: 0.6, novice: 0.8,  intermediate: 1.0, advanced: 1.2,  elite: 1.45 },
+    leg_press:         { beginner: 1.0, novice: 1.5,  intermediate: 2.0, advanced: 2.5,  elite: 3.0  },
+    romanian_deadlift: { beginner: 0.7, novice: 0.9,  intermediate: 1.1, advanced: 1.35, elite: 1.6  },
+  },
+  female: {
+    bench_press:       { beginner: 0.25,novice: 0.4,  intermediate: 0.55,advanced: 0.7,  elite: 0.9  },
+    overhead_press:    { beginner: 0.15,novice: 0.25, intermediate: 0.35,advanced: 0.45, elite: 0.6  },
+    incline_bench:     { beginner: 0.2, novice: 0.35, intermediate: 0.5, advanced: 0.65, elite: 0.8  },
+    dips_weighted:     { beginner: 0.1, novice: 0.25, intermediate: 0.4, advanced: 0.55, elite: 0.7  },
+    barbell_row:       { beginner: 0.3, novice: 0.45, intermediate: 0.6, advanced: 0.75, elite: 0.95 },
+    weighted_pullup:   { beginner: 0.05,novice: 0.15, intermediate: 0.3, advanced: 0.5,  elite: 0.7  },
+    lat_pulldown:      { beginner: 0.2, novice: 0.35, intermediate: 0.5, advanced: 0.65, elite: 0.8  },
+    squat:             { beginner: 0.5, novice: 0.65, intermediate: 0.85,advanced: 1.05, elite: 1.3  },
+    deadlift:          { beginner: 0.6, novice: 0.8,  intermediate: 1.0, advanced: 1.2,  elite: 1.5  },
+    front_squat:       { beginner: 0.4, novice: 0.55, intermediate: 0.7, advanced: 0.9,  elite: 1.1  },
+    leg_press:         { beginner: 0.6, novice: 1.0,  intermediate: 1.4, advanced: 1.8,  elite: 2.2  },
+    romanian_deadlift: { beginner: 0.45,novice: 0.6,  intermediate: 0.75,advanced: 0.9,  elite: 1.1  },
+  },
+};
+
+const EXERCISE_NAMES = {
+  bench_press: 'Bench Press', overhead_press: 'Overhead Press',
+  incline_bench: 'Incline Bench Press', dips_weighted: 'Weighted Dips',
+  barbell_row: 'Barbell Row', weighted_pullup: 'Weighted Pull-up',
+  lat_pulldown: 'Lat Pulldown', squat: 'Back Squat', deadlift: 'Deadlift',
+  front_squat: 'Front Squat', leg_press: 'Leg Press',
+  romanian_deadlift: 'Romanian Deadlift',
+};
+
+const LEVELS = ['beginner', 'novice', 'intermediate', 'advanced', 'elite'];
+
+const LEVEL_META = {
+  beginner:     { icon: '🔰', label: 'Beginner',     cls: 'lvl-beginner',     dotCls: 'dot-beginner',     headline: 'Just Getting Started',    color: '#888' },
+  novice:       { icon: '💪', label: 'Novice',        cls: 'lvl-novice',       dotCls: 'dot-novice',       headline: 'Building a Foundation',   color: '#81C784' },
+  intermediate: { icon: '⚡', label: 'Intermediate',  cls: 'lvl-intermediate', dotCls: 'dot-intermediate', headline: 'Solid Lifter',             color: '#64B5F6' },
+  advanced:     { icon: '🔥', label: 'Advanced',      cls: 'lvl-advanced',     dotCls: 'dot-advanced',     headline: 'Seriously Strong',         color: '#FFD54F' },
+  elite:        { icon: '🏆', label: 'Elite',          cls: 'lvl-elite',        dotCls: 'dot-elite',        headline: 'Elite Athlete Level',      color: '#EF9A9A' },
+  none:         { icon: '📋', label: 'Below Beginner',cls: 'lvl-none',         dotCls: '',                 headline: 'Keep Training!',           color: '#666' },
+};
+
+// Training percentages table data
+const REP_PERCENTAGES = [
+  { pct: 100, reps: 1,  zone: 'Max Effort' },
+  { pct: 95,  reps: 2,  zone: 'Max Effort' },
+  { pct: 90,  reps: 3,  zone: 'Strength' },
+  { pct: 85,  reps: 4,  zone: 'Strength' },
+  { pct: 80,  reps: 5,  zone: 'Strength' },
+  { pct: 75,  reps: 6,  zone: 'Strength-Hypertrophy' },
+  { pct: 70,  reps: 8,  zone: 'Hypertrophy' },
+  { pct: 65,  reps: 10, zone: 'Hypertrophy' },
+  { pct: 60,  reps: 12, zone: 'Hypertrophy' },
+  { pct: 55,  reps: 15, zone: 'Endurance' },
+  { pct: 50,  reps: 20, zone: 'Endurance' },
+];
+
+// ---------------------------------------------------------------------------
+// Classify level given 1RM ratio (1RM / BW)
+// ---------------------------------------------------------------------------
+
+function classifyLevel(ratio, exKey, gender) {
+  const std = STANDARDS[gender]?.[exKey];
+  if (!std) return 'none';
+
+  if (ratio >= std.elite)        return 'elite';
+  if (ratio >= std.advanced)     return 'advanced';
+  if (ratio >= std.intermediate) return 'intermediate';
+  if (ratio >= std.novice)       return 'novice';
+  if (ratio >= std.beginner)     return 'beginner';
+  return 'none';
+}
+
+// ---------------------------------------------------------------------------
+// Render helpers
+// ---------------------------------------------------------------------------
+
+function setEl(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function renderORMFormulas(w, r) {
+  const epley   = orm.epley(w, r);
+  const brzycki = orm.brzycki(w, r);
+  const lander  = orm.lander(w, r);
+
+  setEl('orm-epley',   epley);
+  setEl('orm-brzycki', brzycki);
+  setEl('orm-lander',  lander);
+
+  // Highlight the average (Epley is industry standard — mark it as "best")
+  ['orm-card-epley', 'orm-card-brzycki', 'orm-card-lander'].forEach(id => {
+    document.getElementById(id)?.classList.remove('is-best');
+  });
+  document.getElementById('orm-card-epley')?.classList.add('is-best');
+
+  // Add "Recommended" badge to Epley
+  const epleyCard = document.getElementById('orm-card-epley');
+  if (epleyCard && !epleyCard.querySelector('.orm-best-badge')) {
+    const badge = document.createElement('span');
+    badge.className = 'orm-best-badge';
+    badge.textContent = '★ Standard';
+    epleyCard.appendChild(badge);
+  }
+
+  return epley; // return primary 1RM
+}
+
+function renderLevelBadge(orm1RM, bw, exKey, gender) {
+  const exName = EXERCISE_NAMES[exKey] || exKey;
+  setEl('orm-std-exercise-name', exName);
+
+  const levelEl    = document.getElementById('orm-level-badge');
+  const iconEl     = document.getElementById('orm-level-icon');
+  const headlineEl = document.getElementById('orm-level-headline');
+  const subEl      = document.getElementById('orm-level-sub');
+  const exNameEl   = document.getElementById('orm-level-exercise');
+
+  if (!bw || bw <= 0) {
+    if (levelEl)    { levelEl.textContent = '—'; levelEl.className = 'orm-level-badge lvl-none'; }
+    if (iconEl)     iconEl.textContent = '📋';
+    if (headlineEl) headlineEl.textContent = 'Enter bodyweight for level';
+    if (subEl)      subEl.textContent = 'Add your bodyweight in the form above.';
+    if (exNameEl)   exNameEl.textContent = exName;
+    return;
+  }
+
+  const ratio = orm1RM / bw;
+  const level = classifyLevel(ratio, exKey, gender);
+  const meta  = LEVEL_META[level];
+
+  if (iconEl)     iconEl.textContent = meta.icon;
+  if (exNameEl)   exNameEl.textContent = exName;
+  if (headlineEl) headlineEl.textContent = `${meta.headline} — ${(ratio).toFixed(2)}× bodyweight`;
+  if (subEl)      subEl.textContent = `Your 1RM (${orm1RM} kg) is ${((orm1RM / bw) * 100).toFixed(0)}% of your bodyweight`;
+
+  if (levelEl) {
+    LEVELS.concat(['none']).forEach(l => levelEl.classList.remove(`lvl-${l}`));
+    levelEl.className = `orm-level-badge ${meta.cls}`;
+    levelEl.textContent = meta.label;
+  }
+}
+
+function renderStandardsTable(orm1RM, bw, exKey, gender) {
+  const tbody = document.getElementById('orm-standards-tbody');
+  if (!tbody) return;
+
+  const std    = STANDARDS[gender]?.[exKey];
+  if (!std) { tbody.innerHTML = '<tr><td colspan="6">No standards data for this exercise.</td></tr>'; return; }
+
+  const ratio  = bw > 0 ? orm1RM / bw : null;
+  const level  = ratio ? classifyLevel(ratio, exKey, gender) : null;
+
+  tbody.innerHTML = '';
+
+  LEVELS.forEach(lvl => {
+    const multiplier = std[lvl];
+    const meta       = LEVEL_META[lvl];
+    const isUserLevel = lvl === level;
+    const userLiftPct = ratio ? Math.min(100, (ratio / multiplier) * 100) : 0;
+
+    const tr = document.createElement('tr');
+    if (isUserLevel) tr.className = 'is-user-level';
+
+    // Level name cell
+    const tdName = document.createElement('td');
+    tdName.innerHTML = `<span class="orm-level-dot ${meta.dotCls}" aria-hidden="true"></span>${meta.label}`;
+    if (isUserLevel) tdName.innerHTML += ` <span style="font-size:0.55rem;background:var(--color-accent);color:#fff;padding:1px 5px;border-radius:99px;margin-left:4px;letter-spacing:0.1em;">YOU</span>`;
+    tr.appendChild(tdName);
+
+    // Ratio cell
+    const tdRatio = document.createElement('td');
+    tdRatio.textContent = `${multiplier.toFixed(2)}×`;
+    tr.appendChild(tdRatio);
+
+    // Fixed BW columns: 70, 80, 90 kg
+    [70, 80, 90].forEach(fixedBW => {
+      const td = document.createElement('td');
+      td.textContent = `${Math.round(multiplier * fixedBW)} kg`;
+      tr.appendChild(td);
+    });
+
+    // User's lift column with progress bar
+    const tdUser = document.createElement('td');
+    if (bw > 0) {
+      const targetKg = Math.round(multiplier * bw);
+      tdUser.innerHTML = `
+        <div class="orm-progress-cell">
+          <span>${targetKg} kg</span>
+          <div class="orm-progress-track" aria-hidden="true">
+            <div class="orm-progress-fill" style="width:${isUserLevel ? userLiftPct.toFixed(0) : (orm1RM >= targetKg ? 100 : (orm1RM/targetKg*100).toFixed(0))}%"></div>
+          </div>
+        </div>`;
+    } else {
+      tdUser.textContent = '—';
+    }
+    tr.appendChild(tdUser);
+
+    tbody.appendChild(tr);
+  });
+}
+
+function renderRepsTable(orm1RM, inputReps) {
+  const tbody = document.getElementById('orm-reps-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  REP_PERCENTAGES.forEach(row => {
+    const tr = document.createElement('tr');
+    // Check if this row is close to the user's input reps
+    const isTarget = row.reps === inputReps || (row.reps === 1 && inputReps === 1);
+    if (isTarget) tr.className = 'is-target-rep';
+
+    const weightAtPct = Math.round(orm1RM * row.pct / 100 * 10) / 10;
+    tr.innerHTML = `
+      <td>${row.pct}%</td>
+      <td>${weightAtPct} kg</td>
+      <td>${row.reps} rep${row.reps > 1 ? 's' : ''}</td>
+      <td>${row.zone}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Main calculate function
+// ---------------------------------------------------------------------------
+
+function calculateORM(e) {
+  e.preventDefault();
+
+  const exKey = document.getElementById('orm-exercise')?.value;
+  const w     = parseFloat(document.getElementById('orm-weight')?.value);
+  const r     = parseInt(document.getElementById('orm-reps')?.value, 10);
+  const bw    = parseFloat(document.getElementById('orm-bodyweight')?.value) || 0;
+  const gender = document.getElementById('orm-gender-select')?.value || 'male';
+
+  if (!exKey || !w || w <= 0 || !r || r < 1 || r > 20) {
+    alert('Please enter a valid exercise, weight (> 0 kg) and reps (1–20).');
+    return;
+  }
+
+  // Show output, hide placeholder
+  document.getElementById('orm-placeholder').hidden = true;
+  document.getElementById('orm-output').hidden      = false;
+
+  // Render 3 formula cards
+  const primary1RM = renderORMFormulas(w, r);
+
+  // Render level badge
+  renderLevelBadge(primary1RM, bw, exKey, gender);
+
+  // Render standards table
+  renderStandardsTable(primary1RM, bw, exKey, gender);
+
+  // Render reps table
+  renderRepsTable(primary1RM, r);
+
+  // Smooth scroll to results
+  document.getElementById('orm-output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ---------------------------------------------------------------------------
+// Init 1RM form
+// ---------------------------------------------------------------------------
+
+function initORM() {
+  const form = document.getElementById('orm-form');
+  if (!form) return;
+  form.addEventListener('submit', calculateORM);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initORM);
+} else {
+  initORM();
+}
