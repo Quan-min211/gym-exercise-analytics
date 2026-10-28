@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="FitData Hub — Progress Charts: visualise your training volume over time, personal record timelines, and workout frequency heatmap.">
   <title>Progress Charts — FitData Hub</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#D32F2F">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="stylesheet" href="/css/main.css">
   <style>
     /* ============================================================
@@ -509,6 +513,47 @@
           </div>
         </div>
 
+        <!-- Personal Records Hall of Fame -->
+        <article class="chart-card mt-6" aria-labelledby="pr-hall-title">
+          <header class="chart-card-header">
+            <div>
+              <h2 id="pr-hall-title" class="chart-title">🏆 Personal Records Hall</h2>
+              <p class="chart-subtitle">All-time best lifts, estimated 1RMs, and records achieved across all exercises</p>
+            </div>
+            <div class="pr-hall-controls">
+              <input type="search" id="pr-hall-search" class="input input-sm" placeholder="Search PRs by name/muscle…" aria-label="Filter personal records">
+              <div class="period-pills" role="group" aria-label="PR sort order">
+                <button type="button" class="period-pill is-active" data-pr-sort="1rm">⚡ 1RM (Highest)</button>
+                <button type="button" class="period-pill" data-pr-sort="date">📅 Most Recent</button>
+                <button type="button" class="period-pill" data-pr-sort="name">🔤 Name A-Z</button>
+              </div>
+            </div>
+          </header>
+
+          <div id="pr-hall-table-wrap" class="pr-hall-wrap">
+            <table class="pr-hall-table" aria-label="Personal Records Leaderboard">
+              <thead>
+                <tr>
+                  <th scope="col">Rank</th>
+                  <th scope="col">Exercise</th>
+                  <th scope="col">Target Muscle</th>
+                  <th scope="col">Best Weight</th>
+                  <th scope="col">Best Est. 1RM</th>
+                  <th scope="col">Date Achieved</th>
+                  <th scope="col">Sessions</th>
+                </tr>
+              </thead>
+              <tbody id="pr-hall-tbody">
+                <!-- Dynamically populated from getAllPRs() -->
+              </tbody>
+            </table>
+          </div>
+          <div id="pr-hall-empty" class="no-data-placeholder" style="display: none;">
+            <p class="nd-icon">🏆</p>
+            <p>No personal records recorded yet. Complete workout sessions with weights and reps to conquer PRs!</p>
+          </div>
+        </article>
+
       </section>
 
       <!-- ════════════════════════════════════════════
@@ -575,9 +620,63 @@
       </section>
 
       <!-- ════════════════════════════════════════════
-           TAB 4 — Muscle Distribution
+           TAB 4 — Muscle Distribution & Volume Heatmap
            ════════════════════════════════════════════ -->
       <section id="tab-muscles" class="tab-panel" role="tabpanel" aria-labelledby="tb-muscles">
+
+        <!-- Muscle Volume Visual Heatmap (Anatomical SVG Body Map) -->
+        <article class="chart-card mb-6" aria-labelledby="muscle-heatmap-title">
+          <header class="chart-card-header">
+            <div>
+              <h2 id="muscle-heatmap-title" class="chart-title">🌡️ Muscle Volume Heatmap</h2>
+              <p class="chart-subtitle">Anatomical body map colored by your logged training volume (kg lifted)</p>
+            </div>
+            <div class="period-pills" role="group" aria-label="Heatmap period">
+              <button type="button" class="period-pill" data-period="7" data-chart="heatmap-muscles">7D</button>
+              <button type="button" class="period-pill is-active" data-period="30" data-chart="heatmap-muscles">30D</button>
+              <button type="button" class="period-pill" data-period="90" data-chart="heatmap-muscles">90D</button>
+              <button type="button" class="period-pill" data-period="all" data-chart="heatmap-muscles">All</button>
+            </div>
+          </header>
+
+          <!-- Imbalance & Recovery Alert Box -->
+          <aside id="muscle-imbalance-alert" class="imbalance-alert" aria-label="Muscle training balance analysis" style="display: none;">
+            <span class="imbalance-icon" aria-hidden="true">⚖️</span>
+            <div class="imbalance-body">
+              <strong class="imbalance-title">Balance &amp; Recovery Insight</strong>
+              <p id="imbalance-message" class="imbalance-text"></p>
+            </div>
+          </aside>
+
+          <!-- Dual-view SVG Body Map Container & Legend -->
+          <div class="heatmap-body-wrap">
+            <figure id="muscle-volume-heatmap-svg" class="heatmap-svg-container" aria-label="Dual-view anatomical volume heatmap"></figure>
+
+            <aside class="heatmap-info-panel" aria-label="Selected muscle details">
+              <div id="muscle-info-card" class="muscle-detail-card">
+                <span class="detail-label">Hover or Click a Muscle</span>
+                <strong id="hovered-muscle-name" class="detail-title">—</strong>
+                <div class="detail-stats-grid">
+                  <div>
+                    <span class="sub-label">Volume</span>
+                    <p id="hovered-muscle-vol" class="sub-val">0 kg</p>
+                  </div>
+                  <div>
+                    <span class="sub-label">Total Sets</span>
+                    <p id="hovered-muscle-sets" class="sub-val">0 sets</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Color intensity scale -->
+              <div class="volume-scale-bar" aria-label="Volume intensity scale">
+                <span class="scale-lbl">Untrained (0 kg)</span>
+                <div class="scale-gradient"></div>
+                <span class="scale-lbl">Heavy Peak</span>
+              </div>
+            </aside>
+          </div>
+        </article>
 
         <div class="chart-card">
           <header class="chart-card-header">

@@ -20,6 +20,10 @@ import {
   exportLogsCSV,
   exportLogsJSON,
   getActiveSession,
+  getCustomRoutines,
+  deleteCustomRoutine,
+  saveCustomRoutine,
+  loadRoutineIntoSession,
   getExercisePR,
   getWorkoutLogs,
   getWorkoutStats,
@@ -889,6 +893,380 @@ function setupPageEvents() {
 }
 
 // ---------------------------------------------------------------------------
+// Custom Routines (Feature 5)
+// ---------------------------------------------------------------------------
+
+let builderExercises = [];
+
+function renderCustomRoutines() {
+  const container = document.getElementById('custom-routines-list');
+  if (!container) return;
+
+  const routines = getCustomRoutines();
+  if (routines.length === 0) {
+    container.innerHTML = `
+      <p class="text-muted" style="font-size: var(--text-xs); padding: var(--space-2) var(--space-3);">
+        No saved routines yet. Click "+ New Routine" to save your favorite workout templates.
+      </p>
+    `;
+    return;
+  }
+
+  container.innerHTML = '';
+  routines.forEach(rtn => {
+    const card = document.createElement('article');
+    card.className = 'routine-chip-card';
+    card.innerHTML = `
+      <strong class="routine-chip-title" title="${rtn.title}">${rtn.title}</strong>
+      <span class="routine-chip-meta">${(rtn.exercises || []).length} exercises</span>
+      <div class="flex gap-2 mt-1">
+        <button type="button" class="btn btn-outline-red btn-sm load-routine-btn" style="padding: 2px 8px; font-size: 11px;">
+          ▶ Start
+        </button>
+        <button type="button" class="btn btn-ghost btn-sm delete-routine-btn" style="padding: 2px 6px; font-size: 11px;" title="Delete routine">
+          ✕
+        </button>
+      </div>
+    `;
+
+    card.querySelector('.load-routine-btn')?.addEventListener('click', () => {
+      const session = loadRoutineIntoSession(rtn.id);
+      if (session) {
+        activeWorkout = session;
+        initActiveSession();
+        window.scrollTo({ top: document.querySelector('.active-workout-card')?.offsetTop || 200, behavior: 'smooth' });
+      }
+    });
+
+    card.querySelector('.delete-routine-btn')?.addEventListener('click', () => {
+      if (confirm(`Delete custom routine "${rtn.title}"?`)) {
+        deleteCustomRoutine(rtn.id);
+        renderCustomRoutines();
+      }
+    });
+
+    container.appendChild(card);
+  });
+}
+
+function setupRoutineBuilder() {
+  const modal = document.getElementById('routine-builder-modal');
+  const openBtn = document.getElementById('open-routine-builder-btn');
+  const closeBtn = document.getElementById('close-routine-builder-btn');
+  const cancelBtn = document.getElementById('cancel-routine-btn');
+  const saveBtn = document.getElementById('save-routine-btn');
+  const searchInput = document.getElementById('builder-exercise-search');
+  const autocomplete = document.getElementById('builder-autocomplete-list');
+  const selectedContainer = document.getElementById('builder-selected-exercises');
+  const emptyHint = document.getElementById('builder-empty-hint');
+
+  if (!modal) return;
+
+  function renderBuilderExercises() {
+    if (!selectedContainer) return;
+    if (builderExercises.length === 0) {
+      if (emptyHint) emptyHint.style.display = 'block';
+      return;
+    }
+    if (emptyHint) emptyHint.style.display = 'none';
+
+    selectedContainer.innerHTML = '';
+    builderExercises.forEach((ex, idx) => {
+      const item = document.createElement('article');
+      item.className = 'active-ex-card';
+      item.innerHTML = `
+        <header class="active-ex-header">
+          <strong class="active-ex-name">${ex.exerciseName}</strong>
+          <button type="button" class="btn btn-ghost btn-sm remove-builder-ex-btn" data-idx="${idx}">✕ Remove</button>
+        </header>
+        <div class="flex gap-4 mt-2">
+          <div class="form-field" style="width: 100px;">
+            <label style="font-size: 10px;">Target Sets</label>
+            <input type="number" class="builder-sets-input" min="1" max="10" value="${ex.targetSets || 3}">
+          </div>
+          <div class="form-field" style="width: 100px;">
+            <label style="font-size: 10px;">Target Reps</label>
+            <input type="number" class="builder-reps-input" min="1" max="50" value="${ex.targetReps || 10}">
+          </div>
+        </div>
+      `;
+
+      item.querySelector('.remove-builder-ex-btn')?.addEventListener('click', () => {
+        builderExercises.splice(idx, 1);
+        renderBuilderExercises();
+      });
+
+      item.querySelector('.builder-sets-input')?.addEventListener('input', (e) => {
+        ex.targetSets = parseInt(e.target.value, 10) || 3;
+      });
+
+      item.querySelector('.builder-reps-input')?.addEventListener('input', (e) => {
+        ex.targetReps = parseInt(e.target.value, 10) || 10;
+      });
+
+      selectedContainer.appendChild(item);
+    });
+  }
+
+  openBtn?.addEventListener('click', () => {
+    builderExercises = [];
+    document.getElementById('builder-routine-name').value = '';
+    document.getElementById('builder-routine-notes').value = '';
+    renderBuilderExercises();
+    modal.showModal();
+  });
+
+  const closeModal = () => modal.close();
+  closeBtn?.addEventListener('click', closeModal);
+  cancelBtn?.addEventListener('click', closeModal);
+
+  // Exercise Search Autocomplete for Builder
+  searchInput?.addEventListener('input', debounce(async (e) => {
+    const q = e.target.value.trim();
+    if (!autocomplete) return;
+    if (q.length < 2) {
+      autocomplete.innerHTML = '';
+      autocomplete.classList.remove('is-open');
+      return;
+    }
+
+    try {
+      const res = await api.get('/exercises/search', { q, page: 1, page_size: 6 });
+      if (!res.items || res.items.length === 0) {
+        autocomplete.innerHTML = '<li class="autocomplete-no-match">No exercises found</li>';
+        autocomplete.classList.add('is-open');
+        return;
+      }
+
+      autocomplete.innerHTML = '';
+      res.items.forEach(ex => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <button type="button" class="autocomplete-btn">
+            <img src="/${ex.image || ex.gif_url}" class="autocomplete-thumb" alt="">
+            <div class="autocomplete-info">
+              <span class="autocomplete-name">${ex.name}</span>
+              <span class="autocomplete-meta">${ex.target_muscle_name || ''} • ${ex.equipment_name || ''}</span>
+            </div>
+          </button>
+        `;
+        li.querySelector('button')?.addEventListener('click', () => {
+          builderExercises.push({
+            exerciseId: ex.id,
+            exerciseName: ex.name,
+            bodyPart: ex.body_part_name || '',
+            equipment: ex.equipment_name || '',
+            target: ex.target_muscle_name || '',
+            targetSets: 3,
+            targetReps: 10,
+          });
+          searchInput.value = '';
+          autocomplete.innerHTML = '';
+          autocomplete.classList.remove('is-open');
+          renderBuilderExercises();
+        });
+        autocomplete.appendChild(li);
+      });
+      autocomplete.classList.add('is-open');
+    } catch (err) {
+      console.warn('Builder exercise search failed:', err);
+    }
+  }, 250));
+
+  // Save routine
+  saveBtn?.addEventListener('click', () => {
+    const title = document.getElementById('builder-routine-name')?.value.trim();
+    const notes = document.getElementById('builder-routine-notes')?.value.trim();
+    if (!title) {
+      alert('Please enter a routine name.');
+      return;
+    }
+    if (builderExercises.length === 0) {
+      alert('Please add at least one exercise to the routine.');
+      return;
+    }
+
+    saveCustomRoutine({
+      title,
+      notes,
+      exercises: builderExercises,
+    });
+
+    renderCustomRoutines();
+    modal.close();
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Focus Workout Mode (Feature 10)
+// ---------------------------------------------------------------------------
+
+let focusState = {
+  exerciseIndex: 0,
+  setIndex: 0,
+};
+
+function setupFocusMode() {
+  const dialog = document.getElementById('focus-mode-dialog');
+  const openBtn = document.getElementById('open-focus-mode-btn');
+  const exitBtn = document.getElementById('exit-focus-mode-btn');
+  const logSetBtn = document.getElementById('focus-log-set-btn');
+  const prevExBtn = document.getElementById('focus-prev-ex-btn');
+  const nextExBtn = document.getElementById('focus-next-ex-btn');
+
+  if (!dialog) return;
+
+  function renderFocusView() {
+    if (!activeWorkout || !activeWorkout.exercises || activeWorkout.exercises.length === 0) {
+      dialog.close();
+      return;
+    }
+
+    // Clamp indices
+    if (focusState.exerciseIndex < 0) focusState.exerciseIndex = 0;
+    if (focusState.exerciseIndex >= activeWorkout.exercises.length) {
+      focusState.exerciseIndex = activeWorkout.exercises.length - 1;
+    }
+
+    const currentEx = activeWorkout.exercises[focusState.exerciseIndex];
+    if (focusState.setIndex < 0) focusState.setIndex = 0;
+
+    // Elements
+    const titleEl = document.getElementById('focus-session-title');
+    const exNameEl = document.getElementById('focus-ex-name');
+    const exMetaEl = document.getElementById('focus-ex-meta');
+    const gifEl = document.getElementById('focus-ex-gif');
+    const setNumEl = document.getElementById('focus-set-number');
+    const prevHintEl = document.getElementById('focus-prev-set-hint');
+    const weightInput = document.getElementById('focus-weight-input');
+    const repsInput = document.getElementById('focus-reps-input');
+    const timerDisplay = document.getElementById('focus-timer-display');
+
+    if (titleEl) titleEl.textContent = activeWorkout.title || 'Workout Session';
+    if (exNameEl) exNameEl.textContent = currentEx.exerciseName;
+    if (exMetaEl) exMetaEl.textContent = `${currentEx.target || currentEx.bodyPart || 'Muscle'} • ${currentEx.equipment || 'Gear'}`;
+
+    if (gifEl) {
+      const mediaId = currentEx.exerciseId ? currentEx.exerciseId.padStart(4, '0') : '';
+      gifEl.src = mediaId ? `/videos/${mediaId}.gif` : '';
+      gifEl.alt = currentEx.exerciseName;
+    }
+
+    const totalSets = (currentEx.sets && currentEx.sets.length > 0) ? currentEx.sets.length : 3;
+    const currentSetNum = focusState.setIndex + 1;
+    if (setNumEl) setNumEl.textContent = `SET ${currentSetNum} OF ${totalSets}`;
+
+    // Fill current set inputs if exists
+    const currentSet = currentEx.sets ? currentEx.sets[focusState.setIndex] : null;
+    if (currentSet) {
+      if (weightInput) weightInput.value = currentSet.weight !== undefined && currentSet.weight !== '' ? currentSet.weight : '';
+      if (repsInput) repsInput.value = currentSet.reps !== undefined && currentSet.reps !== '' ? currentSet.reps : '10';
+    } else {
+      // Pre-fill from previous set if available
+      const prevSet = currentEx.sets ? currentEx.sets[focusState.setIndex - 1] : null;
+      if (weightInput) weightInput.value = prevSet ? prevSet.weight : '';
+      if (repsInput) repsInput.value = prevSet ? prevSet.reps : '10';
+    }
+
+    // Previous set hint
+    if (prevHintEl) {
+      const prev = currentEx.sets && currentEx.sets[focusState.setIndex - 1];
+      if (prev && prev.weight) {
+        prevHintEl.textContent = `Previous Set: ${prev.weight} kg × ${prev.reps} reps`;
+      } else {
+        prevHintEl.textContent = 'Ready for set';
+      }
+    }
+
+    if (timerDisplay) {
+      timerDisplay.textContent = formatTimer(timerSeconds);
+    }
+  }
+
+  openBtn?.addEventListener('click', () => {
+    if (!activeWorkout || !activeWorkout.exercises || activeWorkout.exercises.length === 0) {
+      alert('Add at least one exercise to your session before launching Focus Mode.');
+      return;
+    }
+    focusState.exerciseIndex = 0;
+    focusState.setIndex = 0;
+    renderFocusView();
+    dialog.showModal();
+  });
+
+  exitBtn?.addEventListener('click', () => {
+    dialog.close();
+    renderActiveExercises();
+    updateActiveSessionTotals();
+  });
+
+  prevExBtn?.addEventListener('click', () => {
+    if (focusState.exerciseIndex > 0) {
+      focusState.exerciseIndex--;
+      focusState.setIndex = 0;
+      renderFocusView();
+    }
+  });
+
+  nextExBtn?.addEventListener('click', () => {
+    if (activeWorkout && focusState.exerciseIndex < activeWorkout.exercises.length - 1) {
+      focusState.exerciseIndex++;
+      focusState.setIndex = 0;
+      renderFocusView();
+    }
+  });
+
+  logSetBtn?.addEventListener('click', () => {
+    if (!activeWorkout || !activeWorkout.exercises) return;
+    const currentEx = activeWorkout.exercises[focusState.exerciseIndex];
+    if (!currentEx) return;
+
+    if (!currentEx.sets) currentEx.sets = [];
+
+    const weight = parseFloat(document.getElementById('focus-weight-input')?.value) || 0;
+    const reps = parseInt(document.getElementById('focus-reps-input')?.value, 10) || 0;
+
+    if (!currentEx.sets[focusState.setIndex]) {
+      currentEx.sets[focusState.setIndex] = {
+        setNum: focusState.setIndex + 1,
+        weight,
+        reps,
+        rpe: null,
+        completed: true,
+      };
+    } else {
+      currentEx.sets[focusState.setIndex].weight = weight;
+      currentEx.sets[focusState.setIndex].reps = reps;
+      currentEx.sets[focusState.setIndex].completed = true;
+    }
+
+    saveActiveSession(activeWorkout);
+    updateActiveSessionTotals();
+
+    // Trigger Rest Timer floating widget automatically
+    const restTimerToggle = document.getElementById('rest-timer-toggle');
+    const startRestBtn = document.getElementById('timer-start-btn');
+    if (restTimerToggle) {
+      restTimerToggle.click();
+    }
+
+    // Advance set
+    focusState.setIndex++;
+    if (focusState.setIndex >= currentEx.sets.length) {
+      // Completed all sets for this exercise
+      if (focusState.exerciseIndex < activeWorkout.exercises.length - 1) {
+        focusState.exerciseIndex++;
+        focusState.setIndex = 0;
+      } else {
+        alert('🎉 All sets and exercises completed in Focus Mode! Great job!');
+      }
+    }
+
+    renderFocusView();
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Pre-load from URL Query Param `?add=exercise_id`
 // ---------------------------------------------------------------------------
 
@@ -917,6 +1295,9 @@ async function init() {
   initActiveSession();
   setupExerciseSearch();
   setupPageEvents();
+  renderCustomRoutines();
+  setupRoutineBuilder();
+  setupFocusMode();
   renderStatsOverview();
   renderHistoryList();
   await checkURLParams();

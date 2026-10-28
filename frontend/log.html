@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="FitData Hub — Workout Logger: Record your sets, reps, weight, and volume. Track your fitness journey and personal records.">
   <title>Workout Logger — FitData Hub</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#D32F2F">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="stylesheet" href="/css/main.css">
   <style>
     /* ============================================================
@@ -718,6 +722,21 @@
 
         <!-- Column 1: Active Workout Session (Left) -->
         <section aria-labelledby="active-session-heading">
+
+          <!-- Custom Routines Quick-Selector (Feature 5) -->
+          <article class="active-workout-card mb-4" aria-labelledby="routines-heading">
+            <header class="routine-banner-bar">
+              <div>
+                <h2 id="routines-heading" style="font-size: var(--text-base); margin-bottom: 2px;">📋 Custom Routines</h2>
+                <p style="font-size: var(--text-xs); color: var(--color-text-muted);">Quick-load your personalized routine templates</p>
+              </div>
+              <button type="button" id="open-routine-builder-btn" class="btn btn-outline-red btn-sm">+ New Routine</button>
+            </header>
+            <div id="custom-routines-list" class="routine-chips-row" role="list" aria-label="Saved custom routines">
+              <!-- Populated dynamically by JS -->
+            </div>
+          </article>
+
           <article class="active-workout-card">
             <header class="active-card-header">
               <div>
@@ -725,8 +744,9 @@
                 <p style="font-size: var(--text-xs); color: var(--color-text-muted);" data-i18n="logger.active_hint">Draft automatically saved locally.</p>
               </div>
 
-              <!-- Live Timer -->
+              <!-- Live Timer & Focus Mode -->
               <div class="flex items-center gap-2">
+                <button type="button" id="open-focus-mode-btn" class="btn btn-outline-red btn-sm" title="Fullscreen distraction-free gym mode">⚡ Focus Mode</button>
                 <span class="timer-widget-inline">
                   ⏱️ <span id="workout-timer-display">00:00</span>
                 </span>
@@ -838,6 +858,93 @@
     </address>
     <p data-i18n="footer.tagline">FitData Hub &mdash; Data Engineering &amp; Analytics learning project.</p>
   </footer>
+
+  <!-- ── Custom Routine Builder Modal Dialog ── -->
+  <dialog id="routine-builder-modal" class="iron-dialog" aria-labelledby="builder-title">
+    <form id="routine-builder-form" method="dialog" onsubmit="return false;">
+      <header class="dialog-header">
+        <h2 id="builder-title" class="dialog-title">Build Custom Routine</h2>
+        <button type="button" id="close-routine-builder-btn" class="btn btn-ghost btn-sm" aria-label="Close dialog">✕</button>
+      </header>
+
+      <div class="form-field mb-3">
+        <label for="builder-routine-name">Routine Name</label>
+        <input type="text" id="builder-routine-name" placeholder="e.g. Heavy Push Day, Legs &amp; Core" required>
+      </div>
+
+      <div class="form-field mb-3">
+        <label for="builder-routine-notes">Description / Target Focus</label>
+        <input type="text" id="builder-routine-notes" placeholder="e.g. Hypertrophy focus with 90s rest">
+      </div>
+
+      <div class="ex-search-wrap mb-4">
+        <label for="builder-exercise-search" class="visually-hidden">Search exercises to add to routine</label>
+        <input type="search" id="builder-exercise-search" class="ex-search-input" placeholder="+ Search and add exercise to routine…" autocomplete="off">
+        <ul id="builder-autocomplete-list" class="autocomplete-list" role="listbox"></ul>
+      </div>
+
+      <h3 style="font-size: var(--text-xs); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: var(--space-2);">
+        Exercises in this Routine
+      </h3>
+      <div id="builder-selected-exercises" class="active-exercises-list mb-4" aria-label="Exercises in routine">
+        <p id="builder-empty-hint" class="text-muted" style="font-size: var(--text-xs); text-align: center; padding: var(--space-4);">
+          No exercises added yet. Use the search bar above to add movements.
+        </p>
+      </div>
+
+      <footer class="flex justify-end gap-3 pt-3" style="border-top: 1px solid var(--color-border);">
+        <button type="button" id="cancel-routine-btn" class="btn btn-ghost btn-sm">Cancel</button>
+        <button type="button" id="save-routine-btn" class="btn btn-primary btn-sm">Save Routine</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- ── Focus Workout Mode Fullscreen Dialog ── -->
+  <dialog id="focus-mode-dialog" class="focus-dialog" aria-label="Focus Workout Mode">
+    <header class="focus-top-bar">
+      <div>
+        <span class="focus-set-badge" id="focus-session-title">Active Workout</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="focus-timer-text">⏱️ <output id="focus-timer-display">00:00</output></span>
+        <button type="button" id="exit-focus-mode-btn" class="btn btn-ghost btn-sm" aria-label="Exit Focus Mode">✕ Exit</button>
+      </div>
+    </header>
+
+    <main class="focus-stage">
+      <header>
+        <h2 id="focus-ex-name" class="focus-ex-title">Bench Press</h2>
+        <span id="focus-ex-meta" class="tag tag-accent mt-2">Chest • Barbell</span>
+      </header>
+
+      <figure class="focus-gif-wrap">
+        <img id="focus-ex-gif" src="" alt="Exercise movement demonstration">
+      </figure>
+
+      <output id="focus-set-number" class="focus-set-badge">SET 1 OF 3</output>
+      <p id="focus-prev-set-hint" style="font-size: var(--text-xs); color: var(--color-text-muted);">Ready to lift</p>
+
+      <div class="focus-inputs-row">
+        <div class="focus-input-box">
+          <label for="focus-weight-input">Weight (kg)</label>
+          <input type="number" id="focus-weight-input" step="0.5" placeholder="0">
+        </div>
+        <div class="focus-input-box">
+          <label for="focus-reps-input">Reps</label>
+          <input type="number" id="focus-reps-input" step="1" placeholder="10">
+        </div>
+      </div>
+
+      <button type="button" id="focus-log-set-btn" class="btn btn-primary btn-lg w-full mt-2" style="max-width: 360px; font-size: var(--text-base); padding: var(--space-4);">
+        ✓ Complete Set &amp; Start Rest
+      </button>
+
+      <footer class="flex justify-between w-full mt-4" style="max-width: 480px;">
+        <button type="button" id="focus-prev-ex-btn" class="btn btn-ghost btn-sm">← Prev Exercise</button>
+        <button type="button" id="focus-next-ex-btn" class="btn btn-ghost btn-sm">Next Exercise →</button>
+      </footer>
+    </main>
+  </dialog>
 
   <script src="/js/app.js" type="module"></script>
   <script src="/js/i18n.js" type="module"></script>

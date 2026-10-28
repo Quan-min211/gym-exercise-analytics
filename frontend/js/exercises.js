@@ -120,20 +120,111 @@ async function loadFilters() {
 }
 
 function setupEventListeners() {
-  // Search
-  $('#search-input').addEventListener('input', debounce((e) => {
-    currentState.q = e.target.value.trim();
+  const searchInput = $('#search-input');
+  const autocompleteList = $('#search-autocomplete-list');
+
+  // Search input with Autocomplete Suggestions
+  const fetchSuggestions = debounce(async (query) => {
+    if (!autocompleteList) return;
+    if (!query || query.length < 2) {
+      autocompleteList.innerHTML = '';
+      autocompleteList.classList.remove('is-open');
+      return;
+    }
+
+    try {
+      const res = await api.get('/exercises/search', { q: query, page: 1, page_size: 5 });
+      if (!res.items || res.items.length === 0) {
+        autocompleteList.innerHTML = '<li class="autocomplete-no-match">No matching exercises found</li>';
+        autocompleteList.classList.add('is-open');
+        return;
+      }
+
+      autocompleteList.innerHTML = '';
+      res.items.forEach(ex => {
+        const li = document.createElement('li');
+        li.setAttribute('role', 'option');
+
+        const a = document.createElement('a');
+        a.href = `/exercise.html?id=${ex.id}`;
+        a.className = 'autocomplete-btn';
+        a.innerHTML = `
+          <img src="/${ex.image || ex.gif_url}" alt="" class="autocomplete-thumb" loading="lazy">
+          <div class="autocomplete-info">
+            <span class="autocomplete-name">${ex.name}</span>
+            <span class="autocomplete-meta">${ex.target_muscle_name || ex.muscle_group || ''} • ${ex.equipment_name || ''}</span>
+          </div>
+        `;
+        li.appendChild(a);
+        autocompleteList.appendChild(li);
+      });
+      autocompleteList.classList.add('is-open');
+    } catch (err) {
+      console.warn('Autocomplete fetch failed:', err);
+    }
+  }, 250);
+
+  searchInput.addEventListener('input', (e) => {
+    const val = e.target.value.trim();
+    currentState.q = val;
     currentState.page = 1;
-    fetchAndRender();
-  }, 400));
+
+    fetchSuggestions(val);
+    debounce(() => fetchAndRender(), 400)();
+  });
+
+  // Close autocomplete on outside click
+  document.addEventListener('click', (e) => {
+    if (autocompleteList && !autocompleteList.contains(e.target) && e.target !== searchInput) {
+      autocompleteList.classList.remove('is-open');
+    }
+  });
+
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && autocompleteList) {
+      autocompleteList.classList.remove('is-open');
+    }
+  });
 
   $('#search-form').addEventListener('submit', e => e.preventDefault());
 
-  // Filters
+  // Quick Filter Pills
+  $$('.quick-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      $$('.quick-pill').forEach(p => p.classList.remove('is-active'));
+      pill.classList.add('is-active');
+
+      const qType = pill.dataset.quickType;
+      const qVal = pill.dataset.quickVal;
+
+      // Reset specific filter fields
+      currentState.page = 1;
+      if (qType === 'all') {
+        currentState.equipment = '';
+        currentState.body_part = '';
+        $$('.filter-sidebar input[type="radio"]').forEach(r => r.checked = false);
+      } else if (qType === 'equipment') {
+        currentState.equipment = qVal;
+        // Sync radio
+        const radio = $(`input[name="equipment"][value="${qVal}"]`);
+        if (radio) radio.checked = true;
+      } else if (qType === 'body_part') {
+        currentState.body_part = qVal;
+        const radio = $(`input[name="body_part"][value="${qVal}"]`);
+        if (radio) radio.checked = true;
+      }
+
+      fetchAndRender();
+    });
+  });
+
+  // Sidebar Filters
   $$('.filter-sidebar input[type="radio"]').forEach(radio => {
     radio.addEventListener('change', (e) => {
       currentState[e.target.name] = e.target.value;
       currentState.page = 1;
+      // Reset active quick pills to avoid conflicting visual states
+      $$('.quick-pill').forEach(p => p.classList.remove('is-active'));
       fetchAndRender();
     });
   });
@@ -142,7 +233,10 @@ function setupEventListeners() {
   $('#clear-filters-btn').addEventListener('click', () => {
     currentState = { q: '', body_part: '', equipment: '', target: '', page: 1 };
     $('#search-input').value = '';
+    if (autocompleteList) autocompleteList.classList.remove('is-open');
     $$('.filter-sidebar input[type="radio"]').forEach(r => r.checked = false);
+    $$('.quick-pill').forEach(p => p.classList.remove('is-active'));
+    $('.quick-pill[data-quick-type="all"]')?.classList.add('is-active');
     // Also reset muscle map selection
     resetMuscleMap();
     const mmSection = $('#mm-section');

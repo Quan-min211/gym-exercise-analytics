@@ -316,3 +316,78 @@ function _dispatch(filterType, filterValue, label) {
     bubbles: true,
   }));
 }
+
+/**
+ * Render visual muscle heatmap for Progress Charts
+ * Colors anatomical SVG paths according to actual training volume.
+ */
+export function renderMuscleHeatmap(containerId, volumeMap = {}, onMuscleHover = null) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="mm-views">
+      <figure class="mm-figure">
+        <figcaption class="mm-fig-label">Front</figcaption>
+        ${buildSVG('front', FRONT_PATHS)}
+      </figure>
+      <figure class="mm-figure">
+        <figcaption class="mm-fig-label">Back</figcaption>
+        ${buildSVG('back', BACK_PATHS)}
+      </figure>
+    </div>
+  `;
+
+  // Find max volume to normalize
+  const volumes = Object.values(volumeMap).map(v => typeof v === 'object' ? (v.volume || 0) : (Number(v) || 0));
+  const maxVol = Math.max(1, ...volumes);
+
+  MUSCLE_REGIONS.forEach(region => {
+    const data = volumeMap[region.id] || volumeMap[region.filterValue] || { volume: 0, sets: 0 };
+    const vol = typeof data === 'object' ? (data.volume || 0) : (Number(data) || 0);
+    const sets = typeof data === 'object' ? (data.sets || 0) : 0;
+    const ratio = Math.min(1, vol / maxVol);
+
+    const paths = container.querySelectorAll(`path[data-id="${region.id}"]`);
+    paths.forEach(p => {
+      p.style.cursor = 'pointer';
+      p.style.transition = 'all 0.2s ease';
+      p.style.transformOrigin = 'center';
+
+      if (vol === 0) {
+        p.style.fill = '#252830';
+        p.style.opacity = '0.55';
+        p.style.stroke = '#2e3240';
+        p.style.strokeWidth = '0.6px';
+      } else if (ratio > 0.8) {
+        p.style.fill = '#D32F2F';
+        p.style.opacity = '1';
+        p.style.stroke = '#FFC107';
+        p.style.strokeWidth = '1.2px';
+      } else {
+        p.style.fill = '#D32F2F';
+        p.style.opacity = `${0.35 + ratio * 0.55}`;
+        p.style.stroke = '#D32F2F';
+        p.style.strokeWidth = '0.8px';
+      }
+
+      p.addEventListener('mouseenter', () => {
+        paths.forEach(pt => {
+          pt.style.filter = 'drop-shadow(0 0 5px rgba(211, 47, 47, 0.8))';
+        });
+        if (onMuscleHover) onMuscleHover({ id: region.id, label: region.label, volume: vol, sets });
+      });
+
+      p.addEventListener('mouseleave', () => {
+        paths.forEach(pt => {
+          pt.style.filter = '';
+        });
+      });
+
+      p.addEventListener('click', () => {
+        if (onMuscleHover) onMuscleHover({ id: region.id, label: region.label, volume: vol, sets, clicked: true });
+      });
+    });
+  });
+}
+

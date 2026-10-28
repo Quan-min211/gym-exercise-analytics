@@ -169,6 +169,143 @@ export function getExercisePR(exerciseId) {
   };
 }
 
+export function getAllPRs() {
+  const logs = getWorkoutLogs();
+  const map = new Map();
+
+  logs.forEach(session => {
+    (session.exercises || []).forEach(ex => {
+      const key = ex.exerciseId || ex.exerciseName;
+      if (!key) return;
+
+      if (!map.has(key)) {
+        map.set(key, {
+          exerciseId: ex.exerciseId || '',
+          exerciseName: ex.exerciseName || key,
+          bodyPart: ex.bodyPart || '',
+          target: ex.target || '',
+          equipment: ex.equipment || '',
+          maxWeight: 0,
+          maxWeightReps: 0,
+          maxWeightDate: null,
+          bestEst1RM: 0,
+          best1RMDate: null,
+          totalSets: 0,
+          totalVolume: 0,
+          sessionDates: new Set(),
+        });
+      }
+
+      const pr = map.get(key);
+      if (!pr.target && ex.target) pr.target = ex.target;
+      if (!pr.bodyPart && ex.bodyPart) pr.bodyPart = ex.bodyPart;
+      if (!pr.equipment && ex.equipment) pr.equipment = ex.equipment;
+      if (session.date) pr.sessionDates.add(session.date.split('T')[0]);
+
+      (ex.sets || []).forEach(s => {
+        pr.totalSets++;
+        const w = parseFloat(s.weight) || 0;
+        const r = parseInt(s.reps, 10) || 0;
+        const vol = w * r;
+        pr.totalVolume += vol;
+        const e1rm = estimate1RM(w, r);
+
+        if (w > pr.maxWeight || (w === pr.maxWeight && r > pr.maxWeightReps)) {
+          pr.maxWeight = w;
+          pr.maxWeightReps = r;
+          pr.maxWeightDate = session.date;
+        }
+
+        if (e1rm > pr.bestEst1RM) {
+          pr.bestEst1RM = e1rm;
+          pr.best1RMDate = session.date;
+        }
+      });
+    });
+  });
+
+  return Array.from(map.values())
+    .map(p => ({
+      ...p,
+      totalSessions: p.sessionDates.size,
+      sessionDates: undefined,
+    }))
+    .filter(p => p.bestEst1RM > 0 || p.maxWeight > 0)
+    .sort((a, b) => b.bestEst1RM - a.bestEst1RM);
+}
+
+// ---------------------------------------------------------------------------
+// Custom Workout Routines (Builder)
+// ---------------------------------------------------------------------------
+
+const ROUTINES_KEY = 'fitdata_custom_routines';
+
+export function getCustomRoutines() {
+  try {
+    const raw = localStorage.getItem(ROUTINES_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (err) {
+    console.error('Failed to load custom routines:', err);
+    return [];
+  }
+}
+
+export function saveCustomRoutine(routine) {
+  const routines = getCustomRoutines();
+  if (!routine.id) {
+    routine.id = 'rtn_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+    routine.createdAt = new Date().toISOString();
+    routines.unshift(routine);
+  } else {
+    const idx = routines.findIndex(r => r.id === routine.id);
+    if (idx !== -1) {
+      routine.updatedAt = new Date().toISOString();
+      routines[idx] = routine;
+    } else {
+      routines.unshift(routine);
+    }
+  }
+  localStorage.setItem(ROUTINES_KEY, JSON.stringify(routines));
+  window.dispatchEvent(new CustomEvent('custom-routines-changed', { detail: { routine } }));
+  return routine;
+}
+
+export function deleteCustomRoutine(routineId) {
+  const routines = getCustomRoutines().filter(r => r.id !== routineId);
+  localStorage.setItem(ROUTINES_KEY, JSON.stringify(routines));
+  window.dispatchEvent(new CustomEvent('custom-routines-changed', { detail: { deletedId: routineId } }));
+}
+
+export function loadRoutineIntoSession(routineId) {
+  const routines = getCustomRoutines();
+  const routine = routines.find(r => r.id === routineId);
+  if (!routine) return null;
+
+  const now = new Date();
+  const session = {
+    title: routine.title || 'Custom Workout',
+    date: now.toISOString(),
+    notes: routine.notes || '',
+    exercises: (routine.exercises || []).map(ex => ({
+      exerciseId: ex.exerciseId || '',
+      exerciseName: ex.exerciseName || '',
+      bodyPart: ex.bodyPart || '',
+      equipment: ex.equipment || '',
+      target: ex.target || '',
+      sets: Array.from({ length: ex.targetSets || 3 }, (_, i) => ({
+        setNum: i + 1,
+        weight: ex.defaultWeight || '',
+        reps: ex.targetReps || 10,
+        rpe: null,
+        completed: false,
+      })),
+    })),
+  };
+
+  saveActiveSession(session);
+  return session;
+}
+
 /** Quick log a single set directly from the exercise page */
 export function quickLogSet(exerciseData, weight, reps, rpe = null) {
   const todayDate = new Date();

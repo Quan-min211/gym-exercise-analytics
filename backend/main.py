@@ -12,6 +12,7 @@ In Starlette, mount("/") is terminal — it intercepts every request that
 reaches it, so API routes defined after the mount are unreachable.
 """
 
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -21,10 +22,35 @@ from fastapi.staticfiles import StaticFiles
 from backend.routers import analytics, exercises, recommendations, schedules
 
 # ---------------------------------------------------------------------------
-# App setup
+# App setup & Lifespan
 # ---------------------------------------------------------------------------
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Ensure DB tables exist on startup and seed data if database is empty
+    try:
+        from backend.database import engine
+        from de_pipeline.models import Base, Exercise
+        from sqlalchemy.orm import Session
+        Base.metadata.create_all(bind=engine)
+
+        with Session(engine) as session:
+            has_data = session.query(Exercise.id).first() is not None
+            if not has_data:
+                from de_pipeline.config import EXERCISES_JSON
+                if EXERCISES_JSON.exists():
+                    import logging
+                    logging.getLogger("uvicorn").info("Database is empty. Running auto-seed ETL...")
+                    from de_pipeline.etl import run_etl
+                    run_etl()
+    except Exception as exc:
+        import logging
+        logging.getLogger("uvicorn").info("Startup DB check notice: %s", exc)
+    yield
+
 
 app = FastAPI(
     title="FitData Hub API",
@@ -36,6 +62,7 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # ---------------------------------------------------------------------------

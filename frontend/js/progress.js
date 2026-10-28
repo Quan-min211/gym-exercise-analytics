@@ -9,7 +9,9 @@
  *   4. Muscle volume distribution (bar + donut — Chart.js)
  */
 
-import { getWorkoutLogs, estimate1RM } from './workout-logger.js';
+import { getWorkoutLogs, estimate1RM, getAllPRs } from './workout-logger.js';
+import { renderMuscleHeatmap } from './muscle-map.js';
+
 
 // ---------------------------------------------------------------------------
 // Chart.js global defaults (Iron Plate theme)
@@ -91,7 +93,7 @@ function initTabs() {
 // Period pill wiring (shared across tabs)
 // ---------------------------------------------------------------------------
 
-const _activePeriod = { volume: 30, sets: 30, muscles: 30 };
+const _activePeriod = { volume: 30, sets: 30, muscles: 30, 'heatmap-muscles': 30 };
 
 function initPeriodPills() {
   document.querySelectorAll('.period-pill').forEach(pill => {
@@ -110,6 +112,7 @@ function initPeriodPills() {
       if (chartKey === 'volume') renderVolumeChart();
       if (chartKey === 'sets')   renderSetsChart();
       if (chartKey === 'muscles') renderMuscleCharts();
+      if (chartKey === 'heatmap-muscles') renderMuscleVolumeHeatmap();
     });
   });
 }
@@ -278,7 +281,83 @@ function initPRSelect() {
     sorted.map(([id, name]) => `<option value="${id}">${name}</option>`).join('');
 
   select.addEventListener('change', () => renderPRChart(select.value));
+
+  // Also render PR Hall Leaderboard table
+  renderPRHall();
 }
+
+let _currentPRSort = '1rm';
+let _prHallInited = false;
+
+function renderPRHall() {
+  const tbody = document.getElementById('pr-hall-tbody');
+  const empty = document.getElementById('pr-hall-empty');
+  const searchInput = document.getElementById('pr-hall-search');
+  if (!tbody) return;
+
+  const allPRs = getAllPRs();
+
+  if (!_prHallInited) {
+    _prHallInited = true;
+    if (searchInput) {
+      searchInput.addEventListener('input', () => renderPRHall());
+    }
+    document.querySelectorAll('[data-pr-sort]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-pr-sort]').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        _currentPRSort = btn.dataset.prSort;
+        renderPRHall();
+      });
+    });
+  }
+
+  const query = (searchInput?.value || '').trim().toLowerCase();
+  let filtered = allPRs;
+  if (query) {
+    filtered = allPRs.filter(p =>
+      p.exerciseName.toLowerCase().includes(query) ||
+      (p.target && p.target.toLowerCase().includes(query)) ||
+      (p.bodyPart && p.bodyPart.toLowerCase().includes(query))
+    );
+  }
+
+  // Sort
+  if (_currentPRSort === '1rm') {
+    filtered.sort((a, b) => b.bestEst1RM - a.bestEst1RM);
+  } else if (_currentPRSort === 'date') {
+    filtered.sort((a, b) => new Date(b.best1RMDate || b.maxWeightDate || 0) - new Date(a.best1RMDate || a.maxWeightDate || 0));
+  } else if (_currentPRSort === 'name') {
+    filtered.sort((a, b) => a.exerciseName.localeCompare(b.exerciseName));
+  }
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  tbody.innerHTML = filtered.map((pr, idx) => {
+    const rank = idx + 1;
+    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}`;
+    const dateStr = pr.best1RMDate ? fmtDate(pr.best1RMDate) : fmtDate(pr.maxWeightDate);
+    const link = pr.exerciseId ? `<a href="/exercise.html?id=${pr.exerciseId}" class="text-accent" style="text-decoration:none;font-weight:bold;">${pr.exerciseName}</a>` : `<strong>${pr.exerciseName}</strong>`;
+
+    return `
+      <tr>
+        <td class="pr-rank-cell">${medal}</td>
+        <td>${link}</td>
+        <td><span class="tag tag-neutral" style="font-size:10px;">${pr.target || pr.bodyPart || '—'}</span></td>
+        <td><strong>${pr.maxWeight} kg</strong> <small class="text-muted">× ${pr.maxWeightReps} reps</small></td>
+        <td class="pr-1rm-val">⚡ ${pr.bestEst1RM} kg</td>
+        <td class="text-muted" style="font-size:12px;">${dateStr}</td>
+        <td class="text-muted">${pr.totalSessions}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
 
 function renderPRChart(exerciseId) {
   destroyChart('pr');
@@ -733,7 +812,127 @@ function renderMuscleCharts() {
         </div>`).join('');
     }
   }
+
+  // Also render Anatomical Muscle Volume Heatmap
+  renderMuscleVolumeHeatmap();
 }
+
+// ---------------------------------------------------------------------------
+// 6. Anatomical Muscle Volume Heatmap (SVG Body Map)
+// ---------------------------------------------------------------------------
+
+function renderMuscleVolumeHeatmap() {
+  const container = document.getElementById('muscle-volume-heatmap-svg');
+  if (!container) return;
+
+  const period = _activePeriod['heatmap-muscles'] || 30;
+  const logs = filterByPeriod(getWorkoutLogs(), period);
+  const volumeMap = {}; // muscleKey -> { volume, sets }
+
+  function addVol(id, vol, sets = 1) {
+    if (!volumeMap[id]) volumeMap[id] = { volume: 0, sets: 0 };
+    volumeMap[id].volume += vol;
+    volumeMap[id].sets += sets;
+  }
+
+  logs.forEach(session => {
+    (session.exercises || []).forEach(ex => {
+      const target = (ex.target || '').toLowerCase();
+      const bp = (ex.bodyPart || '').toLowerCase();
+      const exVol = (ex.sets || []).reduce((sum, s) => sum + (parseFloat(s.weight) || 0) * (parseInt(s.reps, 10) || 0), 0);
+      const exSets = (ex.sets || []).length || 1;
+
+      if (target.includes('pectorals') || target.includes('chest') || bp === 'chest') {
+        addVol('chest', exVol, exSets);
+      }
+      if (target.includes('biceps')) {
+        addVol('biceps', exVol, exSets);
+      }
+      if (target.includes('triceps')) {
+        addVol('triceps', exVol, exSets);
+      }
+      if (target.includes('delts') || target.includes('shoulders') || bp === 'shoulders') {
+        addVol('delts-front', exVol * 0.6, exSets);
+        addVol('delts-back', exVol * 0.4, exSets);
+      }
+      if (target.includes('lats') || target.includes('upper back')) {
+        addVol('lats', exVol * 0.6, exSets);
+        addVol('upper-back', exVol * 0.4, exSets);
+      }
+      if (target.includes('traps') || bp === 'neck') {
+        addVol('traps', exVol, exSets);
+        addVol('neck', exVol * 0.3, exSets);
+      }
+      if (target.includes('abs') || target.includes('waist') || bp === 'waist') {
+        addVol('abs', exVol * 0.7, exSets);
+        addVol('obliques', exVol * 0.3, exSets);
+      }
+      if (target.includes('glutes')) {
+        addVol('glutes', exVol, exSets);
+      }
+      if (target.includes('quads') || (bp === 'upper legs' && !target.includes('hamstrings') && !target.includes('glutes'))) {
+        addVol('quads', exVol, exSets);
+      }
+      if (target.includes('hamstrings')) {
+        addVol('hamstrings', exVol, exSets);
+      }
+      if (target.includes('calves') || bp === 'lower legs') {
+        addVol('calves-front', exVol * 0.5, exSets);
+        addVol('calves-back', exVol * 0.5, exSets);
+      }
+      if (target.includes('spine') || target.includes('lower back') || bp === 'back') {
+        addVol('lower-back', exVol * 0.6, exSets);
+        addVol('spine', exVol * 0.4, exSets);
+      }
+      if (target.includes('forearms') || bp === 'lower arms') {
+        addVol('forearms-front', exVol * 0.5, exSets);
+        addVol('forearms-back', exVol * 0.5, exSets);
+      }
+    });
+  });
+
+  const onHover = (info) => {
+    const nameEl = document.getElementById('hovered-muscle-name');
+    const volEl = document.getElementById('hovered-muscle-vol');
+    const setsEl = document.getElementById('hovered-muscle-sets');
+    if (nameEl) nameEl.textContent = info.label;
+    if (volEl) volEl.textContent = `${Math.round(info.volume).toLocaleString()} kg`;
+    if (setsEl) setsEl.textContent = `${info.sets} sets`;
+  };
+
+  renderMuscleHeatmap('muscle-volume-heatmap-svg', volumeMap, onHover);
+
+  // Check Imbalance / Recovery Alerts
+  const alertEl = document.getElementById('muscle-imbalance-alert');
+  const msgEl = document.getElementById('imbalance-message');
+  if (alertEl && msgEl) {
+    const chestVol = (volumeMap['chest']?.volume || 0);
+    const backVol = (volumeMap['lats']?.volume || 0) + (volumeMap['upper-back']?.volume || 0);
+    const legVol = (volumeMap['quads']?.volume || 0) + (volumeMap['hamstrings']?.volume || 0) + (volumeMap['glutes']?.volume || 0);
+    const coreVol = (volumeMap['abs']?.volume || 0) + (volumeMap['obliques']?.volume || 0);
+
+    const totalV = chestVol + backVol + legVol + coreVol;
+
+    if (totalV > 0) {
+      const neglected = [];
+      if (legVol === 0) neglected.push('Lower Body (Quads / Hamstrings)');
+      if (backVol === 0) neglected.push('Back & Lats');
+      if (chestVol === 0) neglected.push('Chest / Push');
+      if (coreVol === 0) neglected.push('Core / Abs');
+
+      if (neglected.length > 0) {
+        alertEl.style.display = 'flex';
+        msgEl.innerHTML = `You haven't logged volume for <strong>${neglected.join(', ')}</strong> in this period. Training all movement planes ensures structural balance and joint health.`;
+      } else {
+        alertEl.style.display = 'flex';
+        msgEl.innerHTML = `<strong>Balanced training:</strong> Your logged volume is distributed across push, pull, core, and lower body. Great job on maintaining symmetry!`;
+      }
+    } else {
+      alertEl.style.display = 'none';
+    }
+  }
+}
+
 
 // ---------------------------------------------------------------------------
 // Helpers

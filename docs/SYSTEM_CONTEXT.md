@@ -337,86 +337,29 @@ Giao diện web SPA phong cách **"Iron Plate / Powerlifting Meet"** — mạnh 
 
 ---
 
-## 6. INFRASTRUCTURE — Docker & CI/CD
+## 6. INFRASTRUCTURE — Docker, CI/CD & Cloud Deployment
 
 ### Ý tưởng
-Containerize toàn bộ hệ thống bằng Docker Compose để chạy 1 lệnh `docker compose up`. CI/CD tự động kiểm tra FE, BE, Docker mỗi khi push lên GitHub.
+Containerize toàn bộ hệ thống bằng Docker Compose để chạy 1 lệnh `docker compose up`. CI/CD tự động kiểm tra FE, BE, Docker mỗi khi push lên GitHub. Hỗ trợ deploy 100% miễn phí lên cloud.
 
-### Công nghệ
-- **Docker** + **Docker Compose** — container orchestration
-- **GitHub Actions** — CI/CD pipeline
-- **PostgreSQL 16 Alpine** — database container
-- **Pytest** + **flake8** + **HTMLHint** — testing & linting
-
-### Docker Compose Architecture
+### Free Cloud Deployment (Neon + Render)
 
 ```
-docker compose up
+[Neon.tech] (Free PostgreSQL Serverless DB)
+     ▲
+     │ DATABASE_URL (SSL)
+     ▼
+[Render.com] (Free Web Service - FastAPI + Frontend SPA)
      │
-     ├── [db]       PostgreSQL 16 Alpine
-     │              Port: 5432
-     │              Volume: postgres_data
-     │              Healthcheck: pg_isready
-     │
-     ├── [etl]      de_pipeline container
-     │              Depends: db (healthy)
-     │              Restart: "no" (chạy 1 lần rồi exit)
-     │              Mounts: ./data (read-only)
-     │
-     ├── [backend]  FastAPI + Uvicorn
-     │              Depends: db (healthy) + etl (completed_successfully)
-     │              Port: 8000
-     │              Mounts: ./images, ./videos (read-only)
-     │
-     └── [jupyter]  JupyterLab (profile: dev only)
-                    Depends: db (healthy)
-                    Port: 8888
+     ├── /api/*        → REST API endpoints
+     ├── /images/*     → Exercise thumbnails
+     ├── /videos/*     → Exercise animation GIFs
+     └── /*            → Frontend HTML5 SPA (StaticFiles)
 ```
 
-### File quan trọng
-
-| File | Vai trò |
-|---|---|
-| `docker-compose.yml` | Orchestration: 4 services (db, etl, backend, jupyter) |
-| `docker/init.sql` | DB init script: tạo pg_trgm + unaccent extensions |
-| `.env.example` | Template biến môi trường (copy thành `.env`) |
-| `backend/Dockerfile` | Backend image: Python 3.12-slim + backend + de_pipeline + frontend |
-| `de_pipeline/Dockerfile` | ETL image: Python 3.12-slim + de_pipeline + data |
-
-### GitHub Actions CI/CD (`.github/workflows/ci.yml`)
-
-```
-Push/PR → GitHub Actions
-     │
-     ├── [Job 1: frontend-check]
-     │    ├── HTMLHint validation (all HTML files)
-     │    ├── Node --check (JS syntax)
-     │    └── CSS core files exist
-     │
-     ├── [Job 2: backend-ci]
-     │    ├── flake8 syntax check (E9,F63,F7,F82)
-     │    ├── flake8 style (warnings only)
-     │    └── pytest tests/ --cov (coverage ≥ 50%)
-     │
-     └── [Job 3: docker-ci] (needs: Job 1 + Job 2)
-          ├── docker compose config
-          ├── Build DE Pipeline image
-          ├── Build Backend image
-          └── Integration test: DB + Backend + curl /api/health
-```
-
-### Test Suite (`tests/`)
-
-| File | Nội dung |
-|---|---|
-| `tests/conftest.py` | SQLite in-memory DB + test data seed (3 exercises, 3 body parts, 2 equipment, 3 muscles, 3 instructions) + FastAPI TestClient with dependency override |
-| `tests/test_backend_api.py` | 9 tests: health, list, get by ID, 404, filters, search, recommend, analytics, schedule CRUD |
-| `tests/test_recommendation_engine.py` | 2 tests: basic plan generation, rest day assignment |
-
-> **LƯU Ý**: Tests dùng SQLite in-memory (KHÔNG phải PostgreSQL). Do đó:
-> - Column `steps` phải dùng `JSON` (không phải `JSONB`)
-> - Schedules table tạo bằng `_ensure_table(db)` lazy (không phải top-level)
-> - Fixture `conftest.py` override `get_db` dependency của FastAPI
+- **Database**: [Neon.tech](https://neon.tech) — PostgreSQL v16 serverless, 0.5 GB storage, hoàn toàn miễn phí vĩnh viễn (không bị xóa sau 30 ngày như Render DB).
+- **Web App Hosting**: [Render.com](https://render.com) — Free Web Service tier (750 instance hours/tháng, HTTPS/TLS tự động).
+- **Auto-Initialization & Auto-Seed**: Trong `backend/main.py` qua `lifespan`, khi web server khởi động lần đầu, ứng dụng tự động kiểm tra bảng DB và tự chạy `run_etl()` nạp toàn bộ 873 bài tập nếu database còn rỗng mà không cần can thiệp dòng lệnh thủ công.
 
 ---
 
@@ -446,6 +389,16 @@ Push/PR → GitHub Actions
 | 2026-08-25 | Thêm Exercise Notes: auto-save, char counter, delete button, saved indicator badge — `exercise.html` + `exercise-detail.js` |
 | 2026-08-26 | Thêm Dark/Light Theme Toggle: CSS variable swap `[data-theme]`, moon/sun icons, mobile drawer sync — `tokens.css`, `main.css`, `i18n.js`, `app.js` |
 | 2026-08-28 | Thêm Muscle Group Visual Map: SVG dual-view (front + back) body diagram click-to-filter trên `index.html` — `muscle-map.js` (NEW), `exercises.js` updated, `main.css` updated |
+| 2026-08-29 | Thêm Progress Charts (`progress.html` + `progress.js`): Biểu đồ volume, sets, PR timeline và calendar heatmap phân tích lịch sử tập luyện |
+| 2026-08-29 | Thêm Workout Streak & Consistency Tracker (`log.html` + `log.js`): Widget đếm streak liên tiếp, mini calendar 7 ngày và thống kê tháng |
+| 2026-08-29 | Thêm 1RM Calculator & Strength Standards (`calculator.html` + `calculator.js`): Tính 1RM theo Epley/Brzycki/Lander, bảng so sánh chuẩn sức mạnh 5 cấp độ theo cân nặng |
+| 2026-08-30 | Thêm PWA Support (`manifest.json` + `service-worker.js` + SVG icons): Hỗ trợ cài đặt màn hình chính (A2HS), cache offline shell tĩnh |
+| 2026-08-30 | Thêm Advanced Search & Quick Filters: Autocomplete tìm kiếm trực tiếp có ảnh thumbnail và thanh pill lọc nhanh theo dụng cụ/nhóm cơ trên `index.html` |
+| 2026-08-30 | Thêm Personal Records Hall: Bảng xếp hạng kỷ lục cá nhân toàn diện, sắp xếp theo 1RM/ngày/tên và lọc tìm kiếm trên `progress.html` |
+| 2026-08-30 | Thêm Muscle Volume Heatmap: Bản đồ giải phẫu SVG tô màu theo thể tích tạ thực tế đã nâng và cảnh báo mất cân bằng nhóm cơ (Imbalance Alert) trên `progress.html` |
+| 2026-08-30 | Thêm Custom Workout Builder: Tự thiết kế và lưu trữ các routine tùy chỉnh với bài tập và số hiệp mục tiêu, nạp nhanh vào Active Session trên `log.html` |
+| 2026-08-30 | Thêm Focus Workout Mode: Chế độ tập trung toàn màn hình tối giản cho buổi tập trực tiếp, tích hợp Rest Timer tự động trên `log.html` |
+| 2026-08-31 | Chuẩn hóa cấu hình Free Cloud Deployment: Neon (Postgres) + Render (Web Service), tự động auto-init DB & auto-seed qua lifespan FastAPI, dynamic PORT container |
 
 ---
 

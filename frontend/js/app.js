@@ -604,3 +604,64 @@ markCurrentNav();
   });
 })();
 
+// ---------------------------------------------------------------------------
+// PWA — Service Worker Registration & Install Banner
+// ---------------------------------------------------------------------------
+(function initPWA() {
+  if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js').catch((err) => {
+        console.warn('[PWA] ServiceWorker registration failed:', err);
+      });
+    });
+  }
+
+  // Handle PWA Install prompt
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    // Show install banner if not dismissed before
+    if (localStorage.getItem('fitdata_pwa_dismissed') === 'true') return;
+
+    let banner = document.getElementById('pwa-install-banner');
+    if (!banner) {
+      banner = document.createElement('aside');
+      banner.id = 'pwa-install-banner';
+      banner.className = 'pwa-banner';
+      banner.setAttribute('aria-label', 'App installation prompt');
+      banner.innerHTML = `
+        <figure class="pwa-banner-icon" aria-hidden="true">
+          <img src="/icons/icon-192.svg" alt="" width="36" height="36">
+        </figure>
+        <div class="pwa-banner-content">
+          <strong class="pwa-banner-title">FitData Hub App</strong>
+          <small class="pwa-banner-sub">Install on your phone or desktop for instant gym-floor access and offline workouts.</small>
+        </div>
+        <div class="pwa-banner-actions">
+          <button type="button" class="btn btn-primary btn-sm" id="pwa-install-btn">Install</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="pwa-dismiss-btn" aria-label="Dismiss install prompt">✕</button>
+        </div>
+      `;
+      document.body.appendChild(banner);
+
+      document.getElementById('pwa-install-btn')?.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          banner.remove();
+        }
+        deferredPrompt = null;
+      });
+
+      document.getElementById('pwa-dismiss-btn')?.addEventListener('click', () => {
+        banner.remove();
+        localStorage.setItem('fitdata_pwa_dismissed', 'true');
+      });
+    }
+  });
+})();
+
+

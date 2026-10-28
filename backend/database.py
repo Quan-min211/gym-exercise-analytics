@@ -11,15 +11,23 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "5432")
-DB_NAME = os.getenv("DB_NAME", "fitdata")
-DB_USER = os.getenv("DB_USER", "fitdata")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "fitdata")
-
-DATABASE_URL = (
-    f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-)
+_raw_url = os.getenv("DATABASE_URL")
+if _raw_url:
+    if _raw_url.startswith("postgres://"):
+        DATABASE_URL = _raw_url.replace("postgres://", "postgresql+psycopg2://", 1)
+    elif _raw_url.startswith("postgresql://") and not _raw_url.startswith("postgresql+psycopg2://"):
+        DATABASE_URL = _raw_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+    else:
+        DATABASE_URL = _raw_url
+else:
+    DB_HOST = os.getenv("DB_HOST", "localhost")
+    DB_PORT = os.getenv("DB_PORT", "5432")
+    DB_NAME = os.getenv("DB_NAME", "fitdata")
+    DB_USER = os.getenv("DB_USER", "fitdata")
+    DB_PASSWORD = os.getenv("DB_PASSWORD", "fitdata")
+    DATABASE_URL = (
+        f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    )
 
 engine = create_engine(
     DATABASE_URL,

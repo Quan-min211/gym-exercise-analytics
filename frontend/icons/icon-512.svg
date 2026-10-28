@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="plateGrad512" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#252830"/>
+      <stop offset="70%" stop-color="#181a20"/>
+      <stop offset="100%" stop-color="#111318"/>
+    </radialGradient>
+    <linearGradient id="redAccent512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EF5350"/>
+      <stop offset="100%" stop-color="#D32F2F"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Plate -->
+  <rect width="512" height="512" rx="96" fill="#111318"/>
+  <circle cx="256" cy="256" r="220" fill="url(#plateGrad512)" stroke="#2e3240" stroke-width="10"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#D32F2F" stroke-width="6" stroke-dasharray="32 10"/>
+  <circle cx="256" cy="256" r="144" fill="#181a20" stroke="#252830" stroke-width="5"/>
+
+  <!-- Barbell Dumbbell Symbol -->
+  <g transform="translate(256,256) rotate(-35) translate(-256,-256)">
+    <!-- Central Bar -->
+    <rect x="138" y="245" width="236" height="22" rx="5" fill="#E0E6ED"/>
+    <!-- Inner Collars -->
+    <rect x="176" y="228" width="16" height="56" rx="4" fill="#D32F2F"/>
+    <rect x="320" y="228" width="16" height="56" rx="4" fill="#D32F2F"/>
+    <!-- Outer Heavy Plates -->
+    <rect x="154" y="206" width="22" height="100" rx="6" fill="url(#redAccent512)"/>
+    <rect x="336" y="206" width="22" height="100" rx="6" fill="url(#redAccent512)"/>
+    <rect x="132" y="218" width="22" height="76" rx="6" fill="#B0B8C8"/>
+    <rect x="358" y="218" width="22" height="76" rx="6" fill="#B0B8C8"/>
+  </g>
+
+  <!-- Center Hub -->
+  <circle cx="256" cy="256" r="32" fill="#111318" stroke="#D32F2F" stroke-width="8"/>
+  <circle cx="256" cy="256" r="14" fill="#FFC107"/>
+</svg>

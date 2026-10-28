@@ -54,6 +54,11 @@ const translations = {
     'logger.rpe': 'RPE (1-10)',
     'logger.volume': 'Khối lượng',
     'logger.est_1rm': 'Ước tính 1RM',
+    'logger.custom_routines': 'Mẫu tập tùy chỉnh',
+    'logger.new_routine': '+ Mẫu tập mới',
+    'logger.focus_mode': '⚡ Chế độ tập trung',
+    'progress.pr_hall': '🏆 Bảng kỷ lục cá nhân',
+    'progress.muscle_heatmap': '🌡️ Bản đồ thể tích cơ',
 
     // ── Exercise detail log widget ──
     'detail.log_this_exercise': 'Ghi nhật ký bài này',
