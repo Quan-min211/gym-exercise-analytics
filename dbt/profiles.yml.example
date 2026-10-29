@@ -1,0 +1,19 @@
+# Copy this file to ~/.dbt/profiles.yml or set DBT_PROFILES_DIR=.
+fitdata_tidb:
+  target: dev
+  outputs:
+    dev:
+      type: tidb
+      server: "{{ env_var('TIDB_HOST', 'gateway01.ap-southeast-1.prod.aws.tidbcloud.com') }}"
+      port: {{ env_var('TIDB_PORT', '4000') | as_number }}
+      schema: "{{ env_var('TIDB_DATABASE', 'fitdata') }}"
+      username: "{{ env_var('TIDB_USER', 'your_user.root') }}"
+      password: "{{ env_var('TIDB_PASSWORD', 'your_password') }}"
+    prod:
+      type: tidb
+      server: "{{ env_var('TIDB_HOST') }}"
+      port: {{ env_var('TIDB_PORT', '4000') | as_number }}
+      schema: "{{ env_var('TIDB_DATABASE', 'fitdata') }}"
+      username: "{{ env_var('TIDB_USER') }}"
+      password: "{{ env_var('TIDB_PASSWORD') }}"
+

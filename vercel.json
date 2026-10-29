@@ -1,0 +1,20 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "outputDirectory": "frontend",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://fitdata-hub.onrender.com/api/:path*"
+    },
+    {
+      "source": "/images/:path*",
+      "destination": "https://fitdata-hub.onrender.com/images/:path*"
+    },
+    {
+      "source": "/videos/:path*",
+      "destination": "https://fitdata-hub.onrender.com/videos/:path*"
+    }
+  ]
+}
+

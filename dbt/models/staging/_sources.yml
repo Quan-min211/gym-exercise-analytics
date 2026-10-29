@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+  - name: fitdata_raw
+    description: "Raw ingested exercise data from exercises.json loaded into TiDB via Python ETL."
+    database: "{{ env_var('TIDB_DATABASE', 'fitdata') }}"
+    tables:
+      - name: exercises
+        description: "Core exercise library with metadata and muscle IDs."
+      - name: body_parts
+        description: "Normalized body part lookup."
+      - name: equipment_types
+        description: "Normalized equipment names."
+      - name: muscles
+        description: "Normalized muscle names."
+      - name: exercise_muscles
+        description: "Many-to-many relationship mapping exercises to targeted muscles."
+      - name: instructions
+        description: "Multi-language exercise instructions."
+

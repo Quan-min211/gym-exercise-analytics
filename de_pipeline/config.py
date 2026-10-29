@@ -25,6 +25,8 @@ if _raw_url:
         DATABASE_URL = _raw_url.replace("postgres://", "postgresql+psycopg2://", 1)
     elif _raw_url.startswith("postgresql://") and not _raw_url.startswith("postgresql+psycopg2://"):
         DATABASE_URL = _raw_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+    elif _raw_url.startswith("mysql://") and not _raw_url.startswith("mysql+pymysql://"):
+        DATABASE_URL = _raw_url.replace("mysql://", "mysql+pymysql://", 1)
     else:
         DATABASE_URL = _raw_url
 else:

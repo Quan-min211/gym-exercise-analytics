@@ -342,24 +342,34 @@ Giao diện web SPA phong cách **"Iron Plate / Powerlifting Meet"** — mạnh 
 ### Ý tưởng
 Containerize toàn bộ hệ thống bằng Docker Compose để chạy 1 lệnh `docker compose up`. CI/CD tự động kiểm tra FE, BE, Docker mỗi khi push lên GitHub. Hỗ trợ deploy 100% miễn phí lên cloud.
 
-### Free Cloud Deployment (Neon + Render)
+### Free Cloud Deployment Options
 
+#### Option A: TiDB Cloud + dbt + Render + Vercel (Modern DE Multi-Cloud Architecture)
+```
+[Vercel] (Edge CDN Frontend SPA)
+     │ (Rewrites /api/* via vercel.json — Zero CORS)
+     ▼
+[Render] (FastAPI REST Backend)
+     │ (PyMySQL with SSL/TLS)
+     ▼
+[TiDB Cloud] (Serverless Distributed MySQL-compatible Database)
+     ▲
+     │ (dbt-tidb Transformations & Analytics Marts)
+[dbt] (Data Build Tool — GitHub Actions / dbt Cloud)
+```
+- **Database**: [TiDB Cloud](https://tidbcloud.com) — Serverless HTAP Database, tương thích hoàn toàn MySQL 5.7/8.0, miễn phí vĩnh viễn (5GB storage, 50M RU/tháng).
+- **Data Transformations**: [dbt](https://www.getdbt.com/) (`dbt/` folder) — staging models (`stg_*`), intermediate (`int_*`), analytics marts (`dim_exercises`, `fct_muscle_analytics`, `fct_equipment_coverage`, `mart_muscle_cooccurrence`), tự động hóa qua `.github/workflows/dbt_ci.yml`.
+- **Backend API**: [Render.com](https://render.com) — FastAPI Web Service (Python 3.12, dynamic `$PORT`, auto DB init).
+- **Frontend SPA**: [Vercel](https://vercel.com) — Static HTML5/CSS/JS trên Edge CDN toàn cầu, không bao giờ bị sleep; sử dụng `vercel.json` để reverse proxy ngầm `/api/*`, `/images/*`, `/videos/*` sang Render.
+
+#### Option B: Neon + Render Fullstack (Monolithic Single-domain)
 ```
 [Neon.tech] (Free PostgreSQL Serverless DB)
      ▲
      │ DATABASE_URL (SSL)
      ▼
 [Render.com] (Free Web Service - FastAPI + Frontend SPA)
-     │
-     ├── /api/*        → REST API endpoints
-     ├── /images/*     → Exercise thumbnails
-     ├── /videos/*     → Exercise animation GIFs
-     └── /*            → Frontend HTML5 SPA (StaticFiles)
 ```
-
-- **Database**: [Neon.tech](https://neon.tech) — PostgreSQL v16 serverless, 0.5 GB storage, hoàn toàn miễn phí vĩnh viễn (không bị xóa sau 30 ngày như Render DB).
-- **Web App Hosting**: [Render.com](https://render.com) — Free Web Service tier (750 instance hours/tháng, HTTPS/TLS tự động).
-- **Auto-Initialization & Auto-Seed**: Trong `backend/main.py` qua `lifespan`, khi web server khởi động lần đầu, ứng dụng tự động kiểm tra bảng DB và tự chạy `run_etl()` nạp toàn bộ 873 bài tập nếu database còn rỗng mà không cần can thiệp dòng lệnh thủ công.
 
 ---
 
@@ -400,6 +410,7 @@ Containerize toàn bộ hệ thống bằng Docker Compose để chạy 1 lệnh
 | 2026-08-30 | Thêm Focus Workout Mode: Chế độ tập trung toàn màn hình tối giản cho buổi tập trực tiếp, tích hợp Rest Timer tự động trên `log.html` |
 | 2026-08-31 | Chuẩn hóa cấu hình Free Cloud Deployment: Neon (Postgres) + Render (Web Service), tự động auto-init DB & auto-seed qua lifespan FastAPI, dynamic PORT container |
 | 2026-10-29 | Fix CI frontend-check: Mở thẻ section trong `recommend.html`, loại bỏ thẻ đóng thừa trong `calculator.html`, thêm data URI placeholder cho img trong `log.html` |
+| 2026-10-29 | Hỗ trợ kiến trúc TiDB + dbt + Render + Vercel: Thêm PyMySQL driver, dbt project (`dbt-tidb`), `vercel.json` rewrites proxy, và workflow dbt CI/CD |
 
 ---
 

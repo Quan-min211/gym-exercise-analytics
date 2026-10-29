@@ -3,7 +3,16 @@
  * Imported as a module by all pages.
  */
 
-const API_BASE = '/api';
+const API_BASE = window.__FITDATA_API_BASE__ || '/api';
+
+function buildUrl(path) {
+  if (API_BASE.startsWith('http://') || API_BASE.startsWith('https://')) {
+    const base = API_BASE.endsWith('/') ? API_BASE : `${API_BASE}/`;
+    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+    return new URL(cleanPath, base);
+  }
+  return new URL(API_BASE + path, window.location.origin);
+}
 
 // ---------------------------------------------------------------------------
 // API client
@@ -11,7 +20,7 @@ const API_BASE = '/api';
 
 export const api = {
   async get(path, params = {}) {
-    const url = new URL(API_BASE + path, window.location.origin);
+    const url = buildUrl(path);
     Object.entries(params).forEach(([k, v]) => {
       if (v !== null && v !== undefined && v !== '') url.searchParams.set(k, v);
     });
@@ -21,7 +30,7 @@ export const api = {
   },
 
   async post(path, body) {
-    const res = await fetch(API_BASE + path, {
+    const res = await fetch(buildUrl(path).toString(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -31,7 +40,7 @@ export const api = {
   },
 
   async put(path, body) {
-    const res = await fetch(API_BASE + path, {
+    const res = await fetch(buildUrl(path).toString(), {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -41,7 +50,7 @@ export const api = {
   },
 
   async delete(path) {
-    const res = await fetch(API_BASE + path, { method: 'DELETE' });
+    const res = await fetch(buildUrl(path).toString(), { method: 'DELETE' });
     if (!res.ok) throw new Error(`API error ${res.status}: ${path}`);
   },
 };

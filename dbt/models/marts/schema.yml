@@ -1,0 +1,50 @@
+version: 2
+
+models:
+  - name: dim_exercises
+    description: "Enriched exercise dimension with resolved body part, equipment, and target muscle names."
+    columns:
+      - name: exercise_id
+        description: "Primary key for exercise"
+        tests:
+          - unique
+          - not_null
+      - name: exercise_name
+        description: "Standard name of exercise"
+        tests:
+          - not_null
+
+  - name: mart_muscle_cooccurrence
+    description: "Frequency of muscles trained together across all exercises."
+    columns:
+      - name: muscle_a
+        description: "First muscle alphabetically"
+        tests:
+          - not_null
+      - name: muscle_b
+        description: "Second muscle alphabetically"
+        tests:
+          - not_null
+      - name: co_occurrence_count
+        description: "Number of exercises hitting both muscles"
+        tests:
+          - not_null
+
+  - name: fct_muscle_analytics
+    description: "Aggregated exercise count and variety per target muscle."
+    columns:
+      - name: muscle_name
+        description: "Target muscle name"
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_equipment_coverage
+    description: "Analysis of muscle and body part coverage per equipment type."
+    columns:
+      - name: equipment_name
+        description: "Equipment type"
+        tests:
+          - unique
+          - not_null
+

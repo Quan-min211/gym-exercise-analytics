@@ -17,6 +17,8 @@ if _raw_url:
         DATABASE_URL = _raw_url.replace("postgres://", "postgresql+psycopg2://", 1)
     elif _raw_url.startswith("postgresql://") and not _raw_url.startswith("postgresql+psycopg2://"):
         DATABASE_URL = _raw_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+    elif _raw_url.startswith("mysql://") and not _raw_url.startswith("mysql+pymysql://"):
+        DATABASE_URL = _raw_url.replace("mysql://", "mysql+pymysql://", 1)
     else:
         DATABASE_URL = _raw_url
 else:
@@ -29,8 +31,14 @@ else:
         f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
     )
 
+connect_args = {}
+if "mysql" in DATABASE_URL and ("tidb" in DATABASE_URL.lower() or "ssl" in DATABASE_URL.lower()):
+    import ssl
+    connect_args["ssl"] = ssl.create_default_context()
+
 engine = create_engine(
     DATABASE_URL,
+    connect_args=connect_args,
     pool_pre_ping=True,   # detect stale connections
     pool_size=10,
     max_overflow=20,

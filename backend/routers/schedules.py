@@ -27,12 +27,12 @@ router = APIRouter(prefix="/api/schedules", tags=["schedules"])
 
 _SCHEDULES_TABLE_SQL = """
 CREATE TABLE IF NOT EXISTS schedules (
-    id          TEXT PRIMARY KEY,
-    name        TEXT NOT NULL,
-    schedule_type TEXT NOT NULL DEFAULT 'weekly',
-    days_json   TEXT NOT NULL,
-    created_at  TIMESTAMP NOT NULL,
-    updated_at  TIMESTAMP NOT NULL
+    id            VARCHAR(64) PRIMARY KEY,
+    name          VARCHAR(255) NOT NULL,
+    schedule_type VARCHAR(64) NOT NULL DEFAULT 'weekly',
+    days_json     TEXT NOT NULL,
+    created_at    TIMESTAMP NOT NULL,
+    updated_at    TIMESTAMP NOT NULL
 );
 """
 
