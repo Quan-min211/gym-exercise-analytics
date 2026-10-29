@@ -1148,8 +1148,8 @@ function setupFocusMode() {
 
     if (gifEl) {
       const mediaId = currentEx.exerciseId ? currentEx.exerciseId.padStart(4, '0') : '';
-      gifEl.src = mediaId ? `/videos/${mediaId}.gif` : '';
-      gifEl.alt = currentEx.exerciseName;
+      gifEl.src = mediaId ? `/videos/${mediaId}.gif` : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+      gifEl.alt = currentEx.exerciseName || 'Exercise movement demonstration';
     }
 
     const totalSets = (currentEx.sets && currentEx.sets.length > 0) ? currentEx.sets.length : 3;

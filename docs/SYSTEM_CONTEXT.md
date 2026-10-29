@@ -399,6 +399,7 @@ Containerize toàn bộ hệ thống bằng Docker Compose để chạy 1 lệnh
 | 2026-08-30 | Thêm Custom Workout Builder: Tự thiết kế và lưu trữ các routine tùy chỉnh với bài tập và số hiệp mục tiêu, nạp nhanh vào Active Session trên `log.html` |
 | 2026-08-30 | Thêm Focus Workout Mode: Chế độ tập trung toàn màn hình tối giản cho buổi tập trực tiếp, tích hợp Rest Timer tự động trên `log.html` |
 | 2026-08-31 | Chuẩn hóa cấu hình Free Cloud Deployment: Neon (Postgres) + Render (Web Service), tự động auto-init DB & auto-seed qua lifespan FastAPI, dynamic PORT container |
+| 2026-10-29 | Fix CI frontend-check: Mở thẻ section trong `recommend.html`, loại bỏ thẻ đóng thừa trong `calculator.html`, thêm data URI placeholder cho img trong `log.html` |
 
 ---
 
